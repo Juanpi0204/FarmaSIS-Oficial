@@ -198,7 +198,8 @@ public class EmailService {
                     + "<p style='color: #4a5568;'>Hola <strong>" + nombre + "</strong>,</p>"
                     + "<p style='color: #4a5568;'>Te informamos que tu rol en el sistema ha sido actualizado.</p>"
                     + "<div style='background-color: #f7fafc; border-left: 4px solid #1B4332; padding: 15px; margin: 20px 0;'>"
-                    + "<p style='margin: 0; color: #4a5568;'>Tu rol ha sido actualizado a <strong>" + rolLimpio + "</strong> en L-Farma.</p>"
+                    + "<p style='margin: 0; color: #4a5568;'>Tu rol ha sido actualizado a <strong>" + rolLimpio
+                    + "</strong> en L-Farma.</p>"
                     + "</div>"
                     + "<p style='color: #718096; font-size: 14px;'>Si tienes alguna pregunta o si esta acción no fue autorizada, por favor contacta con el Owner o Administrador del sistema.</p>"
                     + "<p style='color: #718096; font-size: 12px; margin-top: 30px; text-align: center;'>L-Farma - Gestión Inteligente</p>"

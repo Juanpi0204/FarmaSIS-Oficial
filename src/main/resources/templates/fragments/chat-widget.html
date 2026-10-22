@@ -13,7 +13,8 @@
         position: fixed;
         bottom: 90px;
         right: 30px;
-        width: 380px;
+        width: 420px;
+        max-width: calc(100vw - 30px);
         height: 650px;
         max-height: 80vh;
         background: rgba(255, 255, 255, 0.85);
@@ -188,6 +189,7 @@
 
     .chat-bubble.ai {
         align-self: flex-start;
+        max-width: 95%;
         background: white;
         color: #334155;
         border-bottom-left-radius: 4px;
@@ -350,44 +352,59 @@
     }
 
     /* Markdown Formats & Tables */
-    .chat-bubble p { margin-bottom: 0; }
-    .chat-bubble ul { padding-left: 20px; margin-bottom: 0; margin-top: 8px; }
+    .chat-bubble p { margin-bottom: 6px; }
+    .chat-bubble p:last-child { margin-bottom: 0; }
+    .chat-bubble ul, .chat-bubble ol { padding-left: 20px; margin: 6px 0; }
     .chat-bubble li { margin-bottom: 4px; }
     .chat-bubble strong { font-weight: 600; color: #0f172a; }
     .chat-bubble.user strong { color: #f8fafc; }
     
+    .farma-table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 10px 0 8px 0;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        background: white;
+    }
     .farma-table {
         width: 100%;
+        min-width: 320px;
         border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 0.85rem;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        font-size: 0.82rem;
+        text-align: left;
     }
     .farma-table th {
-        background: #10b981;
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
         color: white;
-        padding: 8px;
-        text-align: left;
+        padding: 9px 12px;
         font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
     }
     .farma-table td {
-        padding: 8px;
-        border-bottom: 1px solid #e2e8f0;
+        padding: 9px 12px;
+        border-bottom: 1px solid #f1f5f9;
         color: #334155;
+        font-size: 0.83rem;
+        white-space: nowrap;
     }
     .farma-table tr:last-child td {
         border-bottom: none;
     }
+    .farma-table tr:nth-child(even) td {
+        background: #f8fafc;
+    }
+    .farma-table tr:hover td {
+        background: #ecfdf5;
+    }
     .chat-bubble.user .farma-table td {
         color: #1e293b;
     }
-    .chat-bubble ul { padding-left: 20px; margin-bottom: 0; margin-top: 8px; }
-    .chat-bubble li { margin-bottom: 4px; }
-    .chat-bubble strong { font-weight: 600; color: #0f172a; }
-    .chat-bubble.user strong { color: #f8fafc; }
     
     /* Code highlight */
     .chat-bubble code {
@@ -507,6 +524,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script src="/js/chat.js"></script>
 </th:block>
 

@@ -1,68 +1,72 @@
-// Actualizar Usuario.java - Añadir campo activo y más roles
 package com.admin.adminlfarma_mini.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "usuarios")
+@Document(collection = "usuarios")
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Indexed(unique = true)
     private String username;
 
-    @Column(nullable = false)
     private String password;
-
-    @Column(length = 20)
-    private String rol; // ROLE_OWNER, ROLE_ADMIN, ROLE_EMPLEADO
-
-    @Column(name = "email")
+    private String rol;
     private String email;
-
-    @Column(name = "telefono", length = 20)
     private String telefono;
-
-    @Column(name = "nombre", length = 100)
     private String nombre;
-
-    @Column(name = "apellido", length = 100)
     private String apellido;
-
-    @Column(name = "email_verificado")
+    
+    @Field("email_verificado")
     private Boolean emailVerificado = false;
-
-    @Column(name = "activo")
-    private Boolean activo = true; // Para soft delete
-
-    @Column(name = "fecha_creacion")
+    
+    private Boolean activo = true;
+    
+    @Field("fecha_creacion")
     private LocalDateTime fechaCreacion;
-
-    @Column(name = "fecha_ultimo_cambio_rol")
+    
+    @Field("fecha_ultimo_cambio_rol")
     private LocalDateTime fechaUltimoCambioRol;
-
-    @Column(name = "fecha_ultimo_cambio_estado")
+    
+    @Field("fecha_ultimo_cambio_estado")
     private LocalDateTime fechaUltimoCambioEstado;
-
-    // Campos 2FA
-    @Column(name = "codigo_2fa")
+    
+    @Field("codigo_2fa")
     private String codigo2FA;
-
-    @Column(name = "codigo_expiracion")
+    
+    @Field("codigo_expiracion")
     private LocalDateTime codigoExpiracion;
-
-    @Column(name = "codigo_verificado")
+    
+    @Field("codigo_verificado")
     private Boolean codigoVerificado = false;
-
-    @Lob
-    @Column(name = "foto_perfil", columnDefinition = "LONGTEXT")
+    
+    // Nueva opción para 2FA opcional, según lo solicitado
+    @Field("requiere_2fa")
+    private Boolean requiere2FA = false;
+    
+    @Field("foto_perfil")
     private String fotoPerfil;
 
-    // Constructores
+    // Campos agregados para la unificación con Cliente
+    @Indexed(unique = true, sparse = true)
+    private String codigo;
+
+    @Indexed(unique = true, sparse = true)
+    private String identificacion;
+
+    private String direccion;
+    
+    @Field("direccion_fisica")
+    private String direccionFisica;
+    
+    @Field("es_consumidor_final")
+    private Boolean esConsumidorFinal = false;
+
     public Usuario() {
         this.fechaCreacion = LocalDateTime.now();
         this.activo = true;
@@ -75,140 +79,52 @@ public class Usuario {
         this.rol = rol;
     }
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public Boolean getEmailVerificado() {
-        return emailVerificado;
-    }
-
-    public void setEmailVerificado(Boolean emailVerificado) {
-        this.emailVerificado = emailVerificado;
-    }
-
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public LocalDateTime getFechaUltimoCambioRol() {
-        return fechaUltimoCambioRol;
-    }
-
-    public void setFechaUltimoCambioRol(LocalDateTime fechaUltimoCambioRol) {
-        this.fechaUltimoCambioRol = fechaUltimoCambioRol;
-    }
-
-    public LocalDateTime getFechaUltimoCambioEstado() {
-        return fechaUltimoCambioEstado;
-    }
-
-    public void setFechaUltimoCambioEstado(LocalDateTime fechaUltimoCambioEstado) {
-        this.fechaUltimoCambioEstado = fechaUltimoCambioEstado;
-    }
-
-    public String getCodigo2FA() {
-        return codigo2FA;
-    }
-
-    public void setCodigo2FA(String codigo2FA) {
-        this.codigo2FA = codigo2FA;
-    }
-
-    public LocalDateTime getCodigoExpiracion() {
-        return codigoExpiracion;
-    }
-
-    public void setCodigoExpiracion(LocalDateTime codigoExpiracion) {
-        this.codigoExpiracion = codigoExpiracion;
-    }
-
-    public Boolean getCodigoVerificado() {
-        return codigoVerificado;
-    }
-
-    public void setCodigoVerificado(Boolean codigoVerificado) {
-        this.codigoVerificado = codigoVerificado;
-    }
-
-    public String getFotoPerfil() {
-        return fotoPerfil;
-    }
-
-    public void setFotoPerfil(String fotoPerfil) {
-        this.fotoPerfil = fotoPerfil;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    public String getRol() { return rol; }
+    public void setRol(String rol) { this.rol = rol; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getApellido() { return apellido; }
+    public void setApellido(String apellido) { this.apellido = apellido; }
+    public Boolean getEmailVerificado() { return emailVerificado; }
+    public void setEmailVerificado(Boolean emailVerificado) { this.emailVerificado = emailVerificado; }
+    public Boolean getActivo() { return activo; }
+    public void setActivo(Boolean activo) { this.activo = activo; }
+    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    public LocalDateTime getFechaUltimoCambioRol() { return fechaUltimoCambioRol; }
+    public void setFechaUltimoCambioRol(LocalDateTime fechaUltimoCambioRol) { this.fechaUltimoCambioRol = fechaUltimoCambioRol; }
+    public LocalDateTime getFechaUltimoCambioEstado() { return fechaUltimoCambioEstado; }
+    public void setFechaUltimoCambioEstado(LocalDateTime fechaUltimoCambioEstado) { this.fechaUltimoCambioEstado = fechaUltimoCambioEstado; }
+    public String getCodigo2FA() { return codigo2FA; }
+    public void setCodigo2FA(String codigo2FA) { this.codigo2FA = codigo2FA; }
+    public LocalDateTime getCodigoExpiracion() { return codigoExpiracion; }
+    public void setCodigoExpiracion(LocalDateTime codigoExpiracion) { this.codigoExpiracion = codigoExpiracion; }
+    public Boolean getCodigoVerificado() { return codigoVerificado; }
+    public void setCodigoVerificado(Boolean codigoVerificado) { this.codigoVerificado = codigoVerificado; }
+    public Boolean getRequiere2FA() { return requiere2FA; }
+    public void setRequiere2FA(Boolean requiere2FA) { this.requiere2FA = requiere2FA; }
+    public String getFotoPerfil() { return fotoPerfil; }
+    public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }
+    
+    // Getters y Setters de los campos de Cliente
+    public String getCodigo() { return codigo; }
+    public void setCodigo(String codigo) { this.codigo = codigo; }
+    public String getIdentificacion() { return identificacion; }
+    public void setIdentificacion(String identificacion) { this.identificacion = identificacion; }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
+    public String getDireccionFisica() { return direccionFisica; }
+    public void setDireccionFisica(String direccionFisica) { this.direccionFisica = direccionFisica; }
+    public Boolean getEsConsumidorFinal() { return esConsumidorFinal; }
+    public void setEsConsumidorFinal(Boolean esConsumidorFinal) { this.esConsumidorFinal = esConsumidorFinal; }
 }

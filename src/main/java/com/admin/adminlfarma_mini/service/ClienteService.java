@@ -1,7 +1,7 @@
 package com.admin.adminlfarma_mini.service;
 
-import com.admin.adminlfarma_mini.entity.Cliente;
-import com.admin.adminlfarma_mini.repository.ClienteRepository;
+import com.admin.adminlfarma_mini.entity.Usuario;
+import com.admin.adminlfarma_mini.repository.UsuarioRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ClienteService {
 
-    private final ClienteRepository clienteRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @PostConstruct
     public void init() {
@@ -22,55 +22,58 @@ public class ClienteService {
     }
 
     private void crearConsumidorFinalSiNoExiste() {
-        if (clienteRepository.findFirstByEsConsumidorFinalTrue().isEmpty()) {
-            Cliente consumidorFinal = new Cliente();
+        if (usuarioRepository.findFirstByEsConsumidorFinalTrue().isEmpty()) {
+            Usuario consumidorFinal = new Usuario();
+            consumidorFinal.setRol("ROLE_CLIENTE");
             consumidorFinal.setCodigo("CF-0001");
             consumidorFinal.setNombre("Consumidor Final");
             consumidorFinal.setIdentificacion("9999999999");
             consumidorFinal.setEsConsumidorFinal(true);
-            clienteRepository.save(consumidorFinal);
-            System.out.println("✅ Cliente 'Consumidor Final' creado en MongoDB");
+            usuarioRepository.save(consumidorFinal);
+            System.out.println("✅ Cliente 'Consumidor Final' creado unificado con Usuario en MongoDB");
         }
     }
 
-    public Cliente getConsumidorFinal() {
-        return clienteRepository.findFirstByEsConsumidorFinalTrue()
+    public Usuario getConsumidorFinal() {
+        return usuarioRepository.findFirstByEsConsumidorFinalTrue()
                 .orElseThrow(() -> new RuntimeException("No se encontró el cliente Consumidor Final"));
     }
 
-    public List<Cliente> listarTodos() {
-        return clienteRepository.findAllByOrderByNombreAsc();
+    public List<Usuario> listarTodos() {
+        return usuarioRepository.findAllClientesOrderByNombreAsc();
     }
 
-    public Page<Cliente> listarClientes(Pageable pageable) {
-        return clienteRepository.findAll(pageable);
+    public Page<Usuario> listarClientes(Pageable pageable) {
+        return usuarioRepository.findAllClientes(pageable);
     }
 
-    public Page<Cliente> buscarClientes(String search, Pageable pageable) {
+    public Page<Usuario> buscarClientes(String search, Pageable pageable) {
         if (search == null || search.trim().isEmpty()) {
             return listarClientes(pageable);
         }
-        return clienteRepository.findByNombreContainingIgnoreCaseOrCodigoContainingIgnoreCase(
-                search, search, pageable);
+        return usuarioRepository.findClientesByNombreOrCodigo(search, search, pageable);
     }
 
-    public Optional<Cliente> obtenerPorId(String id) {
-        return clienteRepository.findById(id);
+    public Optional<Usuario> obtenerPorId(String id) {
+        return usuarioRepository.findById(id);
     }
 
-    public Optional<Cliente> obtenerPorIdentificacion(String identificacion) {
-        return clienteRepository.findByIdentificacion(identificacion);
+    public Optional<Usuario> obtenerPorIdentificacion(String identificacion) {
+        return usuarioRepository.findByIdentificacion(identificacion);
     }
 
-    public Optional<Cliente> obtenerPorCodigo(String codigo) {
-        return clienteRepository.findByCodigo(codigo);
+    public Optional<Usuario> obtenerPorCodigo(String codigo) {
+        return usuarioRepository.findByCodigo(codigo);
     }
 
-    public Cliente guardar(Cliente cliente) {
-        return clienteRepository.save(cliente);
+    public Usuario guardar(Usuario cliente) {
+        if (cliente.getRol() == null) {
+            cliente.setRol("ROLE_CLIENTE");
+        }
+        return usuarioRepository.save(cliente);
     }
 
     public void eliminar(String id) {
-        clienteRepository.deleteById(id);
+        usuarioRepository.deleteById(id);
     }
 }

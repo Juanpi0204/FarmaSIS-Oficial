@@ -8,11 +8,22 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Arrays;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.admin.adminlfarma_mini.repository.FacturaRepository;
+import com.admin.adminlfarma_mini.repository.ProductoRepository;
+import com.admin.adminlfarma_mini.entity.Factura;
+import com.admin.adminlfarma_mini.entity.Producto;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.stream.Collectors;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/owner")
@@ -25,19 +36,83 @@ public class OwnerController {
     @Autowired
     private ProveedorService proveedorService;
 
+    @Autowired
+    private FacturaRepository facturaRepository;
+    
+    @Autowired
+    private ProductoRepository productoRepository;
+
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("titulo", "Panel de Owner - Control Total");
-        model.addAttribute("totalUsuarios", usuarioService.contarActivos());
-        model.addAttribute("totalAdmins", usuarioService.contarPorRol("ROLE_ADMIN"));
-        model.addAttribute("totalEmpleados", usuarioService.contarPorRol("ROLE_EMPLEADO"));
-        model.addAttribute("totalProveedores", proveedorService.contarProveedores());
+        
+        LocalDateTime inicioHoy = LocalDate.now().atStartOfDay();
+        LocalDateTime finHoy = LocalDate.now().atTime(LocalTime.MAX);
+        LocalDateTime inicioAyer = LocalDate.now().minusDays(1).atStartOfDay();
+        LocalDateTime finAyer = LocalDate.now().minusDays(1).atTime(LocalTime.MAX);
+        LocalDateTime inicioSemana = LocalDate.now().minusDays(7).atStartOfDay();
+        LocalDateTime inicioMes = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        
+        List<Factura> facturasHoy = facturaRepository.findByFechaBetween(inicioHoy, finHoy);
+        List<Factura> facturasAyer = facturaRepository.findByFechaBetween(inicioAyer, finAyer);
+        List<Factura> facturasSemana = facturaRepository.findByFechaBetween(inicioSemana, finHoy);
+        List<Factura> facturasMes = facturaRepository.findByFechaBetween(inicioMes, finHoy);
+        
+        try {
+            Map<String, Object> datasets = new HashMap<>();
+            datasets.put("hoy", buildDatasetInfo(facturasHoy, "Hoy"));
+            datasets.put("ayer", buildDatasetInfo(facturasAyer, "Ayer"));
+            datasets.put("semana", buildDatasetInfo(facturasSemana, "Últimos 7 días"));
+            datasets.put("mes", buildDatasetInfo(facturasMes, "Este Mes"));
+            
+            ObjectMapper mapper = new ObjectMapper();
+            model.addAttribute("datasetsJson", mapper.writeValueAsString(datasets));
+        } catch (Exception e) {
+            model.addAttribute("datasetsJson", "{}");
+        }
+        
+        List<Factura> ultimasFacturas = facturasHoy.stream()
+            .filter(f -> f.getFecha() != null)
+            .sorted((f1, f2) -> f2.getFecha().compareTo(f1.getFecha()))
+            .limit(10)
+            .collect(Collectors.toList());
+            
+        model.addAttribute("ultimasFacturas", ultimasFacturas);
+        
+        long productosCriticosCount = productoRepository.countBajoStock();
+        model.addAttribute("productosCriticos", productosCriticosCount);
+        
+        org.springframework.data.domain.Page<Producto> topProdPage = productoRepository.findAll(
+            org.springframework.data.domain.PageRequest.of(0, 4, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "cantidad"))
+        );
+        model.addAttribute("topProductos", topProdPage.getContent());
+        
         return "owner/dashboard";
     }
+    
+    private Map<String, Object> buildDatasetInfo(List<Factura> facturas, String titulo) {
+        Map<String, Object> data = new HashMap<>();
+        double ventas = facturas.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
+        double ganancias = ventas * 0.35; 
+        int tickets = facturas.size();
+        double prom = tickets > 0 ? ventas / tickets : 0.0;
+        
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("es", "CO"));
+        data.put("ventas", fmt.format(ventas));
+        data.put("ganancias", fmt.format(ganancias));
+        data.put("tickets", tickets + " facturas");
+        data.put("ticketProm", fmt.format(prom));
+        data.put("title", "Curva de Facturación - " + titulo);
+        
+        data.put("labels", Arrays.asList("08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"));
+        data.put("data", Arrays.asList(ventas*0.1, ventas*0.2, ventas*0.3, ventas*0.15, ventas*0.15, ventas*0.1, 0));
+        
+        return data;
+    }
 
-    @GetMapping("/optimizacion-ia")
+    @GetMapping({"/optimizacion-ia", "/prediccion-ia", "/prediccion"})
     public String mostrarOptimizacionIA(Model model) {
-        model.addAttribute("titulo", "Motor de Optimización");
+        model.addAttribute("titulo", "Predicción de Demanda e IA");
         return "owner/optimizacion-ia";
     }
 
@@ -131,7 +206,7 @@ public class OwnerController {
 
     @PostMapping("/actualizar-usuario/{id}")
     @ResponseBody
-    public Map<String, Object> actualizarUsuario(@PathVariable Long id,
+    public Map<String, Object> actualizarUsuario(@PathVariable String id,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String email,
             @RequestParam String rol) {
@@ -176,7 +251,7 @@ public class OwnerController {
 
     @PostMapping("/cambiar-rol/{id}")
     @ResponseBody
-    public Map<String, Object> cambiarRol(@PathVariable Long id, @RequestParam String nuevoRol) {
+    public Map<String, Object> cambiarRol(@PathVariable String id, @RequestParam String nuevoRol) {
         Map<String, Object> response = new HashMap<>();
         try {
             Usuario usuarioActual = usuarioService.buscarPorId(id)
@@ -201,7 +276,7 @@ public class OwnerController {
 
     @PostMapping("/desactivar/{id}")
     @ResponseBody
-    public Map<String, Object> desactivarUsuario(@PathVariable Long id) {
+    public Map<String, Object> desactivarUsuario(@PathVariable String id) {
         Map<String, Object> response = new HashMap<>();
         try {
             Usuario usuarioActualizado = usuarioService.desactivarUsuario(id);
@@ -226,7 +301,7 @@ public class OwnerController {
 
     @PostMapping("/activar/{id}")
     @ResponseBody
-    public Map<String, Object> activarUsuario(@PathVariable Long id) {
+    public Map<String, Object> activarUsuario(@PathVariable String id) {
         Map<String, Object> response = new HashMap<>();
         try {
             Usuario usuarioActualizado = usuarioService.activarUsuario(id);
@@ -251,7 +326,7 @@ public class OwnerController {
 
     @GetMapping("/usuario/{id}")
     @ResponseBody
-    public Map<String, Object> obtenerUsuario(@PathVariable Long id) {
+    public Map<String, Object> obtenerUsuario(@PathVariable String id) {
         Map<String, Object> response = new HashMap<>();
         try {
             Usuario usuario = usuarioService.buscarPorId(id)

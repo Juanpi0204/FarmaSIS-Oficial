@@ -152,7 +152,7 @@
                                 
                                 <div class="mb-3">
                                     <label class="form-label">Contraseña Actual</label>
-                                    <input type="password" name="passwordActual" class="form-control" required placeholder="Clave actual">
+                                    <input type="password" name="passwordActual" class="form-control" placeholder="Clave actual (Solo si va a cambiar su contraseña)">
                                 </div>
                                 
                                 <hr class="my-4">
@@ -160,17 +160,25 @@
                                 <div class="mb-3">
                                     <label class="form-label">Nueva Contraseña</label>
                                     <input type="password" name="nuevaPassword" id="newPass" class="form-control" 
-                                           required pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+                                           pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
                                            placeholder="Mínimo 8 caracteres, número y símbolo">
                                     <div class="form-text">La contraseña debe tener al menos 8 caracteres, un número y un símbolo especial.</div>
                                 </div>
                                 
                                 <div class="mb-4">
                                     <label class="form-label">Confirmar Nueva Contraseña</label>
-                                    <input type="password" id="confirmPass" class="form-control" required placeholder="Repita la clave">
+                                    <input type="password" id="confirmPass" class="form-control" placeholder="Repita la clave">
                                 </div>
 
-                                <button type="submit" class="btn btn-update w-100">Cambiar Contraseña</button>
+                                <div class="section-title mt-4"><i class="bi bi-shield-check"></i> Autenticación de Dos Factores (2FA)</div>
+                                <div class="form-check form-switch mb-4">
+                                    <input class="form-check-input" type="checkbox" id="requiere2FA" name="requiere2FA" value="true" th:checked="${usuario.requiere2FA}">
+                                    <label class="form-check-label" for="requiere2FA">
+                                        Requerir código de verificación por correo al iniciar sesión
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-update w-100">Guardar Configuración de Seguridad</button>
                             </form>
                         </div>
                     </div>

@@ -26,7 +26,7 @@ public class UsuarioService {
         return usuarioRepository.findFirstByUsername(username);
     }
 
-    public Optional<Usuario> buscarPorId(Long id) {
+    public Optional<Usuario> buscarPorId(String id) {
         return usuarioRepository.findById(id);
     }
 
@@ -95,7 +95,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario actualizarRol(Long id, String nuevoRol) {
+    public Usuario actualizarRol(String id, String nuevoRol) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -150,7 +150,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario desactivarUsuario(Long id) {
+    public Usuario desactivarUsuario(String id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -175,7 +175,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario activarUsuario(Long id) {
+    public Usuario activarUsuario(String id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -222,7 +222,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario actualizarPerfil(Long id, String email, String password, String fotoPerfil) {
+    public Usuario actualizarPerfil(String id, String email, String password, String fotoPerfil, Boolean requiere2FA) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -238,6 +238,12 @@ public class UsuarioService {
 
         if (fotoPerfil != null) {
             usuario.setFotoPerfil(fotoPerfil);
+        }
+
+        if (requiere2FA != null) {
+            usuario.setRequiere2FA(requiere2FA);
+        } else {
+            usuario.setRequiere2FA(false); // If unchecked, the checkbox doesn't send a value
         }
 
         return usuarioRepository.save(usuario);

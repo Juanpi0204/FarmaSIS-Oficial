@@ -29,6 +29,15 @@ public class TwoFactorController {
 
         Usuario usuario = usuarioService.buscarPorUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                
+        // REGLA: Si el usuario NO requiere 2FA, saltar directo al dashboard
+        if (usuario.getRequiere2FA() == null || !usuario.getRequiere2FA()) {
+            if ("ROLE_OWNER".equals(usuario.getRol())) return "redirect:/owner/dashboard";
+            if ("ROLE_ADMIN".equals(usuario.getRol())) return "redirect:/admin/dashboard";
+            if ("ROLE_EMPLEADO".equals(usuario.getRol())) return "redirect:/empleado/pos";
+            return "redirect:/";
+        }
+
         if (usuario.getEmail() == null || usuario.getEmail().isEmpty()) {
             return "redirect:/configurar-email";
         }

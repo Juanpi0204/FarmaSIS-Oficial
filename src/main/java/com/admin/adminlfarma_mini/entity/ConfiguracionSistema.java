@@ -1,30 +1,25 @@
 package com.admin.adminlfarma_mini.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import lombok.Data;
 
-@Entity
-@Table(name = "configuracion_sistema")
+@Document(collection = "configuracion_sistema")
 @Data
 public class ConfiguracionSistema {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(name = "nombre_farmacia")
+    @Field("nombre_farmacia")
     private String nombreFarmacia = "FARMASIS";
 
-    @Column(name = "nit")
     private String nit = "123456789-0";
-
-    @Column(name = "direccion")
     private String direccion = "Calle Principal #123";
-
-    @Column(name = "telefono")
     private String telefono = "300 000 0000";
 
-    @Column(name = "umbral_stock_bajo")
+    @Field("umbral_stock_bajo")
     private Integer umbralStockBajo = 5;
 
     public ConfiguracionSistema() {

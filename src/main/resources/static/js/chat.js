@@ -109,6 +109,13 @@ async function sendMessage(event) {
         removeElement(typingId);
 
         if (!response.ok) {
+            try {
+                const errData = await response.json();
+                if (errData && errData.response) {
+                    appendMessage(errData.response, 'ai');
+                    return;
+                }
+            } catch (e) {}
             appendMessage(response.status === 429 ? '⏳ El servicio está ocupado. Intenta de nuevo en unos segundos.' : '⚠️ Error del servidor. Intenta de nuevo más tarde.', 'ai');
             return;
         }
@@ -131,43 +138,83 @@ function getTimeString() {
 // 📊 Procesamiento Avanzado de Markdown con Tablas
 function formatMarkdown(text) {
     if (!text) return '';
-    let html = text
-        .replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/^### (.*$)/gm, '<strong style="font-size:1rem;">$1</strong>')
-        .replace(/^## (.*$)/gm, '<strong style="font-size:1.05rem;">$1</strong>')
-        .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`(.*?)`/g, '<code style="background:#e2e8f0;padding:1px 5px;border-radius:4px;font-size:0.85em;">$1</code>')
-        .replace(/\n/g, '<br>')
-        .replace(/- (.*?)<br>/g, '<li style="margin-left:15px;list-style:disc;">$1</li>')
-        .replace(/(\d+)\. (.*?)<br>/g, '<li style="margin-left:15px;list-style:decimal;">$2</li>');
-        
-    // Parseo de tablas rudimentario para Markdown
-    if (html.includes('|')) {
-        let inTable = false;
-        let rows = html.split('<br>');
-        for(let i=0; i<rows.length; i++) {
-            let row = rows[i].trim();
-            if(row.startsWith('|') && row.endsWith('|')) {
-                if(!inTable) { rows[i] = '<table class="farma-table">' + row; inTable = true; }
-                let cells = row.split('|').filter(c => c !== '');
-                if(row.includes('---')) {
-                    rows[i] = ''; // omitir fila divisora
-                } else if(i > 0 && rows[i-1].includes('<table')) { // Header
-                    rows[i] = '<tr>' + cells.map(c => `<th>${c.trim()}</th>`).join('') + '</tr>';
-                } else {
-                    rows[i] = '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
-                }
-            } else if(inTable) {
-                rows[i-1] += '</table>';
-                inTable = false;
+
+    // 1. Si marked.js está cargado, usar el motor completo de GitHub Flavored Markdown
+    if (typeof marked !== 'undefined' && marked.parse) {
+        try {
+            marked.use({
+                gfm: true,
+                breaks: true
+            });
+            let parsed = marked.parse(text);
+            parsed = parsed.replace(/<table>/g, '<div class="farma-table-responsive"><table class="farma-table">')
+                           .replace(/<\/table>/g, '</table></div>');
+            return parsed;
+        } catch (e) {
+            console.warn('Error procesando con marked:', e);
+        }
+    }
+
+    // 2. Motor fallback nativo robusto
+    return parseMarkdownFallback(text);
+}
+
+function parseMarkdownFallback(text) {
+    if (!text) return '';
+    const lines = text.split('\n');
+    let out = [];
+    let inTable = false;
+    let tableRows = [];
+
+    function flushTable() {
+        if (!tableRows.length) return;
+        let html = '<div class="farma-table-responsive"><table class="farma-table">';
+        let isFirst = true;
+        for (let r = 0; r < tableRows.length; r++) {
+            let rowText = tableRows[r].trim();
+            if (rowText.includes('---')) continue;
+            let cells = rowText.split('|').map(c => c.trim());
+            if (cells.length > 0 && cells[0] === '') cells.shift();
+            if (cells.length > 0 && cells[cells.length - 1] === '') cells.pop();
+            
+            if (isFirst) {
+                html += '<thead><tr>' + cells.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+                isFirst = false;
+            } else {
+                html += '<tr>' + cells.map(c => '<td>' + c + '</td>').join('') + '</tr>';
             }
         }
-        if(inTable) rows[rows.length-1] += '</table>';
-        html = rows.join('<br>').replace(/<br><table/g, '<table').replace(/<\/table><br>/g, '</table>');
+        if (!isFirst) html += '</tbody>';
+        html += '</table></div>';
+        out.push(html);
+        tableRows = [];
+        inTable = false;
     }
-    return html;
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        let trimmed = line.trim();
+        if (trimmed.startsWith('|') && (trimmed.endsWith('|') || trimmed.includes('|'))) {
+            inTable = true;
+            tableRows.push(trimmed);
+        } else {
+            if (inTable) flushTable();
+            if (trimmed.startsWith('### ')) out.push('<strong style="display:block;margin:6px 0 4px;font-size:1rem;">' + trimmed.slice(4) + '</strong>');
+            else if (trimmed.startsWith('## ')) out.push('<strong style="display:block;margin:8px 0 4px;font-size:1.05rem;">' + trimmed.slice(3) + '</strong>');
+            else if (trimmed.startsWith('# ')) out.push('<strong style="display:block;margin:10px 0 4px;font-size:1.1rem;">' + trimmed.slice(2) + '</strong>');
+            else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) out.push('<li style="margin-left:16px;list-style:disc;margin-bottom:3px;">' + trimmed.slice(2) + '</li>');
+            else if (/^\d+\.\s/.test(trimmed)) out.push('<li style="margin-left:16px;list-style:decimal;margin-bottom:3px;">' + trimmed.replace(/^\d+\.\s/, '') + '</li>');
+            else if (trimmed === '') out.push('<div style="height:6px;"></div>');
+            else out.push('<p style="margin-bottom:6px;">' + trimmed + '</p>');
+        }
+    }
+    if (inTable) flushTable();
+    let res = out.join('');
+    res = res.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    res = res.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    res = res.replace(/`([^`]+)`/g, '<code style="background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:0.85em;color:#059669;">$1</code>');
+    return res;
 }
 
 function appendMessage(text, sender, typewriter = false) {
@@ -196,8 +243,8 @@ function appendMessage(text, sender, typewriter = false) {
     bubble.appendChild(timeEl);
     chatBody.appendChild(bubble);
     
-    // ✍️ Efecto de Máquina de Escribir
-    if (typewriter && sender === 'ai') {
+    // ✍️ Efecto de Máquina de Escribir (solo cuando no contiene tablas para evitar renderizado parcial)
+    if (typewriter && sender === 'ai' && !formattedHtml.includes('<table')) {
         typeWriterHTML(content, formattedHtml, () => scrollToBottom());
     } else {
         content.innerHTML = formattedHtml;

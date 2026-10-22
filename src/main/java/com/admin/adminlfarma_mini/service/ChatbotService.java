@@ -1,31 +1,22 @@
 package com.admin.adminlfarma_mini.service;
 
-import com.admin.adminlfarma_mini.entity.Producto;
-import com.admin.adminlfarma_mini.entity.Usuario;
-import com.admin.adminlfarma_mini.entity.Factura;
-import com.admin.adminlfarma_mini.entity.Asistencia;
-import com.admin.adminlfarma_mini.entity.Auditoria;
-import com.admin.adminlfarma_mini.entity.Cliente;
 import com.admin.adminlfarma_mini.entity.ConfiguracionSistema;
-import com.admin.adminlfarma_mini.entity.Novedad;
+import com.admin.adminlfarma_mini.entity.Factura;
+import com.admin.adminlfarma_mini.entity.Producto;
 import com.admin.adminlfarma_mini.entity.Proveedor;
 import com.admin.adminlfarma_mini.entity.ResultadoOptimizacion;
-import com.admin.adminlfarma_mini.repository.ProductoRepository;
-import com.admin.adminlfarma_mini.repository.UsuarioRepository;
-import com.admin.adminlfarma_mini.repository.FacturaRepository;
-import com.admin.adminlfarma_mini.repository.AsistenciaRepository;
-import com.admin.adminlfarma_mini.repository.AuditoriaRepository;
-import com.admin.adminlfarma_mini.repository.ClienteRepository;
+import com.admin.adminlfarma_mini.entity.Usuario;
 import com.admin.adminlfarma_mini.repository.ConfiguracionRepository;
-import com.admin.adminlfarma_mini.repository.NovedadRepository;
+import com.admin.adminlfarma_mini.repository.FacturaRepository;
+import com.admin.adminlfarma_mini.repository.ProductoRepository;
 import com.admin.adminlfarma_mini.repository.ProveedorRepository;
 import com.admin.adminlfarma_mini.repository.ResultadoOptimizacionRepository;
+import com.admin.adminlfarma_mini.repository.UsuarioRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -39,11 +30,7 @@ public class ChatbotService {
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
     private final FacturaRepository facturaRepository;
-    private final AsistenciaRepository asistenciaRepository;
-    private final AuditoriaRepository auditoriaRepository;
-    private final ClienteRepository clienteRepository;
     private final ConfiguracionRepository configuracionRepository;
-    private final NovedadRepository novedadRepository;
     private final ProveedorRepository proveedorRepository;
     private final ResultadoOptimizacionRepository resultadoOptimizacionRepository;
     
@@ -54,21 +41,13 @@ public class ChatbotService {
                           ProductoRepository productoRepository,
                           UsuarioRepository usuarioRepository,
                           FacturaRepository facturaRepository,
-                          AsistenciaRepository asistenciaRepository,
-                          AuditoriaRepository auditoriaRepository,
-                          ClienteRepository clienteRepository,
                           ConfiguracionRepository configuracionRepository,
-                          NovedadRepository novedadRepository,
                           ProveedorRepository proveedorRepository,
                           ResultadoOptimizacionRepository resultadoOptimizacionRepository) {
         this.productoRepository = productoRepository;
         this.usuarioRepository = usuarioRepository;
         this.facturaRepository = facturaRepository;
-        this.asistenciaRepository = asistenciaRepository;
-        this.auditoriaRepository = auditoriaRepository;
-        this.clienteRepository = clienteRepository;
         this.configuracionRepository = configuracionRepository;
-        this.novedadRepository = novedadRepository;
         this.proveedorRepository = proveedorRepository;
         this.resultadoOptimizacionRepository = resultadoOptimizacionRepository;
         this.chatClient = chatClientBuilder.build();
@@ -126,17 +105,6 @@ public class ChatbotService {
                                     cleanMsg.contains("promociones") || cleanMsg.contains("rebaja") || 
                                     cleanMsg.contains("rebajas");
 
-        boolean hasAsistenciaKeyword = cleanMsg.contains("asistencia") || cleanMsg.contains("asistencias") || 
-                                       cleanMsg.contains("tardanza") || cleanMsg.contains("tardanzas") || 
-                                       cleanMsg.contains("puntualidad") || cleanMsg.contains("horario") || 
-                                       cleanMsg.contains("horarios") || cleanMsg.contains("entrada") || 
-                                       cleanMsg.contains("salida") || cleanMsg.contains("check-in") || 
-                                       cleanMsg.contains("checkin") || cleanMsg.contains("check-out") || 
-                                       cleanMsg.contains("checkout") || cleanMsg.contains("horas trabajadas") || 
-                                       cleanMsg.contains("jornada") || cleanMsg.contains("jornadas") || 
-                                       cleanMsg.contains("ausencia") || cleanMsg.contains("ausencias") || 
-                                       cleanMsg.contains("presente") || cleanMsg.contains("presentes");
-
         boolean hasProveedorKeyword = cleanMsg.contains("proveedor") || cleanMsg.contains("proveedores") || 
                                       cleanMsg.contains("suministro") || cleanMsg.contains("suministros") || 
                                       cleanMsg.contains("distribuidor") || cleanMsg.contains("distribuidores") || 
@@ -152,26 +120,6 @@ public class ChatbotService {
                                      cleanMsg.contains("consumidor") || cleanMsg.contains("consumidores") || 
                                      cleanMsg.contains("frecuente") || cleanMsg.contains("frecuentes") || 
                                      cleanMsg.contains("fidelidad");
-
-        boolean hasNovedadKeyword = cleanMsg.contains("novedad") || cleanMsg.contains("novedades") || 
-                                    cleanMsg.contains("incidencia") || cleanMsg.contains("incidencias") || 
-                                    cleanMsg.contains("incapacidad") || cleanMsg.contains("incapacidades") || 
-                                    cleanMsg.contains("calamidad") || cleanMsg.contains("permiso") || 
-                                    cleanMsg.contains("permisos") || cleanMsg.contains("vacacion") || 
-                                    cleanMsg.contains("vacaciones") || cleanMsg.contains("reporte") || 
-                                    cleanMsg.contains("reportes") || cleanMsg.contains("pendiente") || 
-                                    cleanMsg.contains("pendientes") || cleanMsg.contains("solicitud") || 
-                                    cleanMsg.contains("solicitudes");
-
-        boolean hasAuditoriaKeyword = cleanMsg.contains("auditoria") || cleanMsg.contains("auditoría") || 
-                                       cleanMsg.contains("log") || cleanMsg.contains("logs") || 
-                                       cleanMsg.contains("registro de actividad") || cleanMsg.contains("registros de actividad") || 
-                                       cleanMsg.contains("historial de cambios") || 
-                                       cleanMsg.contains("acción realizada") || cleanMsg.contains("acciones realizadas") || 
-                                       cleanMsg.contains("quién hizo") || cleanMsg.contains("quien hizo") || 
-                                       cleanMsg.contains("quién modificó") || cleanMsg.contains("quien modifico") || 
-                                       cleanMsg.contains("quién eliminó") || cleanMsg.contains("quien elimino") || 
-                                       cleanMsg.contains("trazabilidad") || cleanMsg.contains("rastro");
 
         boolean hasOptimizacionKeyword = cleanMsg.contains("optimización") || cleanMsg.contains("optimizacion") || 
                                           cleanMsg.contains("optimizar") || cleanMsg.contains("pedido inteligente") || 
@@ -215,8 +163,8 @@ public class ChatbotService {
                                       cleanMsg.contains("tabletas") || cleanMsg.contains("cápsula") || 
                                       cleanMsg.contains("capsulas");
 
-        boolean isDomainQuery = hasOfertaKeyword || hasAsistenciaKeyword || hasProveedorKeyword || 
-                                hasClienteKeyword || hasNovedadKeyword || hasAuditoriaKeyword || 
+        boolean isDomainQuery = hasOfertaKeyword || hasProveedorKeyword || 
+                                hasClienteKeyword || 
                                 hasOptimizacionKeyword || hasConfiguracionKeyword || 
                                 hasUsuarioKeyword || hasVentaKeyword || hasProductoKeyword;
 
@@ -243,18 +191,12 @@ public class ChatbotService {
         if (isDomainQuery) {
             if (hasOfertaKeyword) {
                 intention = "Ofertas";
-            } else if (hasAsistenciaKeyword) {
-                intention = "Asistencias";
             } else if (hasOptimizacionKeyword) {
                 intention = "Optimizacion";
             } else if (hasProveedorKeyword) {
                 intention = "Proveedores";
             } else if (hasClienteKeyword) {
                 intention = "Clientes";
-            } else if (hasNovedadKeyword) {
-                intention = "Novedades";
-            } else if (hasAuditoriaKeyword) {
-                intention = "Auditoria";
             } else if (hasConfiguracionKeyword) {
                 intention = "Configuracion";
             } else if (hasUsuarioKeyword) {
@@ -291,44 +233,6 @@ public class ChatbotService {
                             p.getCantidad() != null ? p.getCantidad() : 0,
                             p.getCategoria() != null ? p.getCategoria() : "N/A"
                     ));
-                }
-                contextData = sb.toString();
-            }
-
-        // --- ASISTENCIAS ---
-        } else if (intention.equals("Asistencias")) {
-            if (!roleStr.contains("OWNER") && !roleStr.contains("ADMIN")) {
-                contextData = "[No tienes autorización para consultar el módulo de asistencias. Contacta al administrador.]\n";
-            } else {
-                boolean askingForCount = cleanMsg.contains("cuantos") || cleanMsg.contains("cuántos") || 
-                                         cleanMsg.contains("cuantas") || cleanMsg.contains("cuántas") || 
-                                         cleanMsg.contains("total");
-                StringBuilder sb = new StringBuilder();
-                if (askingForCount) {
-                    long totalAsistencias = asistenciaRepository.count();
-                    sb.append("El total de registros de asistencia en el sistema es: ").append(totalAsistencias).append("\n");
-                }
-
-                List<Asistencia> asistenciasHoy = asistenciaRepository.findByFechaOrderByHoraEntradaAsc(LocalDate.now());
-                if (asistenciasHoy.isEmpty()) {
-                    sb.append("\nASISTENCIAS DE HOY: [No hay registros de asistencia para el día de hoy]\n");
-                } else {
-                    sb.append("\nASISTENCIAS REGISTRADAS HOY (").append(LocalDate.now()).append("):\n");
-                    int limit = Math.min(asistenciasHoy.size(), 10);
-                    for (int i = 0; i < limit; i++) {
-                        Asistencia a = asistenciasHoy.get(i);
-                        String nombreEmpleado = "N/A";
-                        if (a.getUsuario() != null) {
-                            nombreEmpleado = (a.getUsuario().getNombre() != null ? a.getUsuario().getNombre() : "") + " " +
-                                             (a.getUsuario().getApellido() != null ? a.getUsuario().getApellido() : "");
-                            nombreEmpleado = nombreEmpleado.trim().isEmpty() ? a.getUsuario().getUsername() : nombreEmpleado.trim();
-                        }
-                        DateTimeFormatter hFmt = DateTimeFormatter.ofPattern("HH:mm");
-                        String entrada = a.getHoraEntrada() != null ? a.getHoraEntrada().format(hFmt) : "N/A";
-                        String salida = a.getHoraSalida() != null ? a.getHoraSalida().format(hFmt) : "En curso";
-                        sb.append(String.format("- Empleado: %s | Entrada: %s | Salida: %s | Horas: %s\n",
-                                nombreEmpleado, entrada, salida, a.getHorasTrabajadas()));
-                    }
                 }
                 contextData = sb.toString();
             }
@@ -394,11 +298,11 @@ public class ChatbotService {
                                          cleanMsg.contains("total");
                 StringBuilder sb = new StringBuilder();
                 if (askingForCount) {
-                    long totalClientes = clienteRepository.count();
+                    long totalClientes = usuarioRepository.countByRol("ROLE_CLIENTE");
                     sb.append("El total de clientes registrados es: ").append(totalClientes).append("\n");
                 }
 
-                List<Cliente> clientes = clienteRepository.findAllByOrderByNombreAsc();
+                List<Usuario> clientes = usuarioRepository.findAllClientesOrderByNombreAsc();
                 int limit = Math.min(clientes.size(), 10);
 
                 if (clientes.isEmpty()) {
@@ -406,8 +310,8 @@ public class ChatbotService {
                 } else {
                     sb.append("\nLISTA DE CLIENTES REGISTRADOS:\n");
                     for (int i = 0; i < limit; i++) {
-                        Cliente c = clientes.get(i);
-                        if (Boolean.TRUE.equals(c.getEsConsumidorFinal())) continue; // Omitir consumidor final genérico
+                        Usuario c = clientes.get(i);
+                        if (Boolean.TRUE.equals(c.getEsConsumidorFinal())) continue; // Omitir consumidor final gen�rico
                         if (roleStr.contains("OWNER")) {
                             // OWNER ve todos los campos incluyendo identificación
                             sb.append(String.format("- %s | Código: %s | Teléfono: %s | Email: %s | Identificación: %s\n",
@@ -426,85 +330,6 @@ public class ChatbotService {
                                     c.getEmail() != null ? c.getEmail() : "N/A"
                             ));
                         }
-                    }
-                }
-                contextData = sb.toString();
-            }
-
-        // --- NOVEDADES ---
-        } else if (intention.equals("Novedades")) {
-            if (!roleStr.contains("OWNER") && !roleStr.contains("ADMIN")) {
-                contextData = "[No tienes autorización para consultar el módulo de novedades. Contacta al administrador.]\n";
-            } else {
-                StringBuilder sb = new StringBuilder();
-                List<Novedad> pendientes = novedadRepository.findByEstadoOrderByFechaRegistroAsc(Novedad.Estado.PENDIENTE);
-                sb.append("Novedades PENDIENTES de revisión: ").append(pendientes.size()).append("\n");
-
-                if (!pendientes.isEmpty()) {
-                    sb.append("\nNOVEDADES PENDIENTES:\n");
-                    int limit = Math.min(pendientes.size(), 8);
-                    for (int i = 0; i < limit; i++) {
-                        Novedad n = pendientes.get(i);
-                        String solicitante = "N/A";
-                        if (n.getUsuario() != null) {
-                            solicitante = (n.getUsuario().getNombre() != null ? n.getUsuario().getNombre() : "") + " " +
-                                          (n.getUsuario().getApellido() != null ? n.getUsuario().getApellido() : "");
-                            solicitante = solicitante.trim().isEmpty() ? n.getUsuario().getUsername() : solicitante.trim();
-                        }
-                        String motivo = n.getMotivo() != null ? n.getMotivo() : "N/A";
-                        if (motivo.length() > 60) motivo = motivo.substring(0, 60) + "...";
-
-                        sb.append(String.format("- Tipo: %s | Solicitante: %s | Desde: %s Hasta: %s | Motivo: %s | Registrada: %s\n",
-                                n.getTipo() != null ? n.getTipo().name() : "N/A",
-                                solicitante,
-                                n.getFechaInicio() != null ? n.getFechaInicio().toString() : "N/A",
-                                n.getFechaFin() != null ? n.getFechaFin().toString() : "N/A",
-                                motivo,
-                                n.getFechaRegistro() != null ? n.getFechaRegistro().toLocalDate().toString() : "N/A"
-                        ));
-                    }
-                }
-                contextData = sb.toString();
-            }
-
-        // --- AUDITORÍA (Solo OWNER) ---
-        } else if (intention.equals("Auditoria")) {
-            if (!roleStr.contains("OWNER")) {
-                contextData = "[No tienes autorización para consultar el módulo de auditoría. Esta información es exclusiva del Owner.]\n";
-            } else {
-                StringBuilder sb = new StringBuilder();
-                boolean askingForCount = cleanMsg.contains("cuantos") || cleanMsg.contains("cuántos") || 
-                                         cleanMsg.contains("cuantas") || cleanMsg.contains("cuántas") || 
-                                         cleanMsg.contains("total");
-                if (askingForCount) {
-                    long totalAuditoria = auditoriaRepository.count();
-                    sb.append("El total de registros de auditoría es: ").append(totalAuditoria).append("\n");
-                }
-
-                List<Auditoria> logs = auditoriaRepository.findAllByOrderByFechaHoraDesc();
-                int limit = Math.min(logs.size(), 10);
-
-                if (logs.isEmpty()) {
-                    sb.append("\nAUDITORÍA: [No hay registros de auditoría]\n");
-                } else {
-                    sb.append("\nÚLTIMOS REGISTROS DE AUDITORÍA DEL SISTEMA:\n");
-                    DateTimeFormatter dtFmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                    for (int i = 0; i < limit; i++) {
-                        Auditoria a = logs.get(i);
-                        String usuario = "N/A";
-                        if (a.getUsuario() != null) {
-                            usuario = a.getUsuario().getUsername() != null ? a.getUsuario().getUsername() : "N/A";
-                        }
-                        String detalle = a.getDetalle() != null ? a.getDetalle() : "";
-                        if (detalle.length() > 80) detalle = detalle.substring(0, 80) + "...";
-
-                        sb.append(String.format("- [%s] Usuario: %s | Módulo: %s | Acción: %s | Detalle: %s\n",
-                                a.getFechaHora() != null ? a.getFechaHora().format(dtFmt) : "N/A",
-                                usuario,
-                                a.getModulo() != null ? a.getModulo() : "N/A",
-                                a.getAccion() != null ? a.getAccion() : "N/A",
-                                detalle
-                        ));
                     }
                 }
                 contextData = sb.toString();
@@ -639,9 +464,19 @@ public class ChatbotService {
                     .sum();
             long totalVentasCount = facturas.size();
 
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            List<Factura> facturasHoy = facturas.stream()
+                    .filter(f -> f.getFecha() != null && f.getFecha().toLocalDate().isEqual(hoy))
+                    .toList();
+            double totalHoy = facturasHoy.stream()
+                    .mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0)
+                    .sum();
+
             StringBuilder sb = new StringBuilder();
-            sb.append(String.format("El total facturado en ventas (ingresos totales acumulados) es: $%.2f\n", totalFacturado));
-            sb.append(String.format("El número total de facturas emitidas en el sistema es: %d\n", totalVentasCount));
+            sb.append(String.format("El total facturado en ventas históricas es: $%,.2f COP\n", totalFacturado));
+            sb.append(String.format("El número total de facturas emitidas históricamente es: %d\n", totalVentasCount));
+            sb.append(String.format("Ventas registradas hoy (%s): %d facturas emitidas por un valor total de $%,.2f COP\n",
+                    hoy.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), facturasHoy.size(), totalHoy));
 
             List<Factura> sortedFacturas = facturas.stream()
                     .sorted((f1, f2) -> {
@@ -653,9 +488,9 @@ public class ChatbotService {
                     .toList();
 
             if (!sortedFacturas.isEmpty()) {
-                sb.append("\nÚLTIMAS 10 TRANSACCIONES / FACTURAS EMITIDAS:\n");
+                sb.append("\nÚLTIMAS TRANSACCIONES / FACTURAS EMITIDAS:\n");
                 for (Factura f : sortedFacturas) {
-                    sb.append(String.format("- Factura #%s | Cliente: %s | Total: $%.2f | Vendedor/Email: %s | Fecha: %s | Método de Pago: %s\n",
+                    sb.append(String.format("- Factura #%s | Cliente: %s | Total: $%,.2f COP | Vendedor: %s | Fecha: %s | Método de Pago: %s\n",
                             f.getNumeroFactura() != null ? f.getNumeroFactura() : "N/A",
                             f.getClienteNombre() != null ? f.getClienteNombre() : "N/A",
                             f.getTotal() != null ? f.getTotal() : 0.0,
@@ -809,13 +644,18 @@ public class ChatbotService {
                 DATOS EN TIEMPO REAL DEL SISTEMA (Contexto dinámico inyectado):
                 %s%s
                 
-                INSTRUCCIONES CRÍTICAS:
-                - ¡CRÍTICO!: TÚ SÍ TIENES ACCESO A LA INFORMACIÓN. NUNCA te disculpes ni digas que no tienes acceso a la información en tiempo real o actualizada. El contexto inyectado arriba ES la información en tiempo real. ¡Asúmelo con autoridad!
-                - Para consultas del DOMINIO FARMACÉUTICO: Basa tu respuesta ESTRICTAMENTE en los datos reales del contexto inyectado.
-                - Para TOTALES y CONTEOS: Usa SIEMPRE el valor de "Total real" del contexto inyectado.
-                - Si el usuario pregunta "cuántos productos hay", responde con el Total Real indicado en el contexto.
-                - Usa tablas Markdown si devuelves listas de productos, ventas o asistencias para que se vean bien formateadas.
-                - Sé directo, veraz, conciso y profesional.
+                INSTRUCCIONES CRÍTICAS Y DE FORMATO:
+                - ¡CRÍTICO!: TÚ SÍ TIENES ACCESO A LA INFORMACIÓN EN TIEMPO REAL. El contexto inyectado arriba ES la información exacta de la base de datos de la farmacia. Asúmelo siempre con autoridad y nunca digas que no tienes acceso.
+                - PARA TOTALES Y CONTEOS: Usa SIEMPRE el valor exacto de "Total real" del contexto inyectado.
+                - FORMATO DE PRESENTACIÓN VISUAL (ESTRICTO):
+                  * Cuando muestres listas de productos o inventario, usa una TABLA MARKDOWN COMPACTA de máximo 4 columnas esenciales para que se lea perfectamente en el chat:
+                    | Código | Producto | Precio | Stock |
+                  * Asegura SIEMPRE un formato Markdown estándar con espacios limpios entre columnas (ej: `| 0005 | Amoxicilina 800mg | $16.624 COP | 79 unidades |`).
+                  * NUNCA juntes ni pegues el texto de diferentes columnas.
+                  * Si el usuario pide una cantidad específica (ej. "los primeros 5", "muestra 3", "dame 10"), entrega EXACTAMENTE esa cantidad solicitada.
+                  * Si un producto tiene 0 unidades, agrégale la etiqueta [Agotado]. Si tiene menos de 5 unidades, márcalo como [Bajo stock].
+                  * Muestra siempre los precios con formato de moneda legible (ej: $16.624 COP).
+                - Responde siempre en español, de forma amable, directa, concisa y profesional.
                 """, formattedDateTime, directivePrompt, contextData, historyBuilder.toString());
 
         // 5. Ejecutar llamada al LLM
@@ -862,16 +702,30 @@ public class ChatbotService {
         }
     }
 
+    private int extractRequestedLimit(String cleanMsg, int defaultVal) {
+        if (cleanMsg == null) return defaultVal;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:\\b)(\\d{1,2})(?:\\b)").matcher(cleanMsg);
+        if (m.find()) {
+            try {
+                int val = Integer.parseInt(m.group(1));
+                if (val >= 1 && val <= 30) return val;
+            } catch (Exception ignored) {}
+        }
+        return defaultVal;
+    }
+
     private List<Producto> getFilteredInventory(String userMessage) {
-        if (userMessage == null || userMessage.trim().isEmpty()) {
+        String cleanMsg = userMessage != null 
+                ? userMessage.toLowerCase().replaceAll("[.,;:!?()\"']", " ").trim() 
+                : "";
+
+        int limit = extractRequestedLimit(cleanMsg, 10);
+
+        if (cleanMsg.isEmpty()) {
             return productoRepository.findProductosActivosPaginado(
-                    PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "cantidad"))
+                    PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "codigo"))
             ).getContent();
         }
-
-        String cleanMsg = userMessage.toLowerCase()
-                .replaceAll("[.,;:!?()\"']", " ")
-                .trim();
 
         boolean askingForLowStock = cleanMsg.contains("bajo stock") 
                 || cleanMsg.contains("pocas unidades") 
@@ -886,7 +740,7 @@ public class ChatbotService {
 
         if (askingForLowStock) {
             return productoRepository.findProductosActivosPaginado(
-                    PageRequest.of(0, 12, Sort.by(Sort.Direction.ASC, "cantidad"))
+                    PageRequest.of(0, limit, Sort.by(Sort.Direction.ASC, "cantidad"))
             ).getContent();
         }
 
@@ -895,24 +749,32 @@ public class ChatbotService {
         
         // Evitar que palabras genéricas del dominio se usen para buscar el nombre de un producto específico
         Set<String> domainStopWords = new java.util.HashSet<>(stopWords);
-        domainStopWords.addAll(java.util.Arrays.asList("ver", "mostrar", "inventario", "producto", "productos", "medicamento", "medicamentos", "lista", "listar"));
+        domainStopWords.addAll(java.util.Arrays.asList(
+            "ver", "mostrar", "inventario", "producto", "productos", 
+            "medicamento", "medicamentos", "lista", "listar", "primeros", 
+            "primero", "primer", "primera", "primeras", "ultimos", "ultimo", 
+            "top", "dame", "muestra", "muestrame", "todos", "algunos"
+        ));
 
         List<Producto> matching = new ArrayList<>();
         for (String token : tokens) {
             if (token.length() >= 3 && !domainStopWords.contains(token)) {
                 List<Producto> found = productoRepository.findByNombreContainingIgnoreCaseOrCodigoContainingIgnoreCase(token, token);
                 for (Producto p : found) {
-                    if (Boolean.TRUE.equals(p.getActivo()) && matching.size() < 12 && !matching.contains(p)) {
+                    if (Boolean.TRUE.equals(p.getActivo()) && matching.size() < limit && !matching.contains(p)) {
                         matching.add(p);
                     }
                 }
             }
-            if (matching.size() >= 12) break;
+            if (matching.size() >= limit) break;
         }
 
         if (matching.isEmpty()) {
+            Sort sort = (cleanMsg.contains("menos") || cleanMsg.contains("bajo"))
+                    ? Sort.by(Sort.Direction.ASC, "cantidad")
+                    : Sort.by(Sort.Direction.ASC, "codigo");
             return productoRepository.findProductosActivosPaginado(
-                    PageRequest.of(0, 10, Sort.by(Sort.Direction.ASC, "cantidad"))
+                    PageRequest.of(0, limit, sort)
             ).getContent();
         }
 
@@ -930,3 +792,4 @@ public class ChatbotService {
         );
     }
 }
+

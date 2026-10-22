@@ -49,11 +49,11 @@
                 </a>
             </li>
 
-            <!-- Asistente IA — SOLO OWNER -->
+            <!-- Predicción e IA — SOLO OWNER -->
             <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_OWNER'')')}">
-                <a href="/owner/optimizacion-ia" class="nav-link" th:classappend="${activePage == 'optimizacion-ia' ? 'active' : ''}">
-                    <i class="bi bi-cpu"></i>
-                    <span class="nav-text">Motor de Optimización</span>
+                <a href="/owner/optimizacion-ia" class="nav-link" th:classappend="${activePage == 'optimizacion-ia' || activePage == 'prediccion-ia' || activePage == 'prediccion' ? 'active' : ''}">
+                    <i class="bi bi-graph-up-arrow"></i>
+                    <span class="nav-text">Predicción de Demanda IA</span>
                 </a>
             </li>
 
@@ -97,48 +97,6 @@
             </li>
 
             <!-- LABEL: Recursos Humanos -->
-            <li class="nav-label nav-text">RRHH</li>
-
-            <!-- Asistencia — TODOS -->
-            <li class="nav-item">
-                <a href="/asistencia/calendario" class="nav-link" th:classappend="${activePage == 'asistencia' ? 'active' : ''}">
-                    <i class="bi bi-calendar-check"></i>
-                    <span class="nav-text">Mi Asistencia</span>
-                </a>
-            </li>
-
-            <!-- Asistencia Hoy — ADMIN y OWNER -->
-            <li class="nav-item" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">
-                <a th:href="${loggedUser != null && loggedUser.rol == 'ROLE_OWNER' ? '/admin/asistencia/hoy' : '/admin/asistencia/hoy'}"
-                   class="nav-link" th:classappend="${activePage == 'asistencia-hoy' ? 'active' : ''}">
-                    <i class="bi bi-people-fill"></i>
-                    <span class="nav-text">Asistencia de Hoy</span>
-                </a>
-            </li>
-
-            <!-- Exportar Excel — SOLO OWNER -->
-            <li class="nav-item" th:if="${loggedUser != null && loggedUser.rol == 'ROLE_OWNER'}">
-                <a href="/owner/asistencia/exportar" class="nav-link">
-                    <i class="bi bi-file-earmark-excel"></i>
-                    <span class="nav-text">Exportar Excel</span>
-                </a>
-            </li>
-
-            <!-- Novedades — TODOS -->
-            <li class="nav-item">
-                <a href="/novedades/mis-novedades" class="nav-link" th:classappend="${activePage == 'novedades' ? 'active' : ''}">
-                    <i class="bi bi-journal-medical"></i>
-                    <span class="nav-text">Mis Novedades</span>
-                </a>
-            </li>
-
-            <!-- Gestionar Novedades — ADMIN y OWNER -->
-            <li class="nav-item" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">
-                <a href="/admin/novedades/pendientes" class="nav-link" th:classappend="${activePage == 'novedades-admin' ? 'active' : ''}">
-                    <i class="bi bi-clipboard-check"></i>
-                    <span class="nav-text">Gestionar Novedades</span>
-                </a>
-            </li>
 
             <!-- LABEL: Sistema -->
             <li class="nav-label nav-text" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">Sistema</li>
@@ -151,19 +109,6 @@
                 </a>
             </li>
 
-            <!-- Auditoría — OWNER ve todo, ADMIN ve empleados -->
-            <li class="nav-item" th:if="${loggedUser != null && loggedUser.rol == 'ROLE_OWNER'}">
-                <a href="/owner/auditoria" class="nav-link" th:classappend="${activePage == 'auditoria' ? 'active' : ''}">
-                    <i class="bi bi-shield-lock"></i>
-                    <span class="nav-text">Log de Auditoría</span>
-                </a>
-            </li>
-            <li class="nav-item" th:if="${loggedUser != null && loggedUser.rol == 'ROLE_ADMIN'}">
-                <a href="/admin/auditoria" class="nav-link" th:classappend="${activePage == 'auditoria' ? 'active' : ''}">
-                    <i class="bi bi-shield-lock"></i>
-                    <span class="nav-text">Auditoría</span>
-                </a>
-            </li>
 
             <!-- Cerrar Sesión — TODOS -->
             <li class="nav-item">

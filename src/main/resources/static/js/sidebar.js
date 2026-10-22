@@ -129,8 +129,14 @@
         logoutTrigger.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            var logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-            logoutModal.show();
+            var modalEl = document.getElementById('logoutModal');
+            if (typeof bootstrap !== 'undefined') {
+                var logoutModal = new bootstrap.Modal(modalEl);
+                logoutModal.show();
+            } else if (modalEl) {
+                // Tailwind fallback
+                modalEl.classList.remove('hidden');
+            }
         });
 
         var confirmBtn = document.getElementById('logoutConfirmBtn');

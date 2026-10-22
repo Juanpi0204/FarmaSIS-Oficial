@@ -37,6 +37,7 @@ public class ConfiguracionController {
             @RequestParam(required = false) String passwordActual,
             @RequestParam(required = false) String nuevaPassword,
             @RequestParam(required = false) String fotoPerfil,
+            @RequestParam(required = false) Boolean requiere2FA,
             RedirectAttributes redirectAttributes) {
 
         try {
@@ -53,7 +54,7 @@ public class ConfiguracionController {
                 }
             }
 
-            usuarioService.actualizarPerfil(usuario.getId(), email, nuevaPassword, fotoPerfil);
+            usuarioService.actualizarPerfil(usuario.getId(), email, nuevaPassword, fotoPerfil, requiere2FA);
             redirectAttributes.addFlashAttribute("success", "Perfil actualizado exitosamente.");
             
         } catch (Exception e) {

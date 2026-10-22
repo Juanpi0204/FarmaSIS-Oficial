@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2550" height="1250" viewBox="0 0 2550 1250">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="40" y="44" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="bold" fill="#102a43">Modelo Entidad-Relación – FARMASIS</text>
+<text x="40" y="70" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#52606d">Persistencia híbrida MySQL + MongoDB Atlas · Extensión analítica para el pronóstico de demanda (Minería de Datos II)</text>
+<polyline points="360,250 470,250" fill="none" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><line x1="368" y1="242" x2="368" y2="258" stroke="#37474f" stroke-width="2"/><line x1="375" y1="242" x2="375" y2="258" stroke="#37474f" stroke-width="2"/><line x1="454" y1="250" x2="470" y2="259" stroke="#37474f" stroke-width="2"/><line x1="454" y1="250" x2="470" y2="250" stroke="#37474f" stroke-width="2"/><line x1="454" y1="250" x2="470" y2="241" stroke="#37474f" stroke-width="2"/><circle cx="445" cy="250" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="368.3" y="228" width="93.39999999999999" height="16" rx="3" fill="#ffffffee"/><text x="415" y="240" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R1: suministra</text><text x="390" y="270" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(1,1)</text><text x="440" y="270" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="790,290 900,290" fill="none" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><line x1="798" y1="282" x2="798" y2="298" stroke="#37474f" stroke-width="2"/><line x1="805" y1="282" x2="805" y2="298" stroke="#37474f" stroke-width="2"/><line x1="884" y1="290" x2="900" y2="299" stroke="#37474f" stroke-width="2"/><line x1="884" y1="290" x2="900" y2="290" stroke="#37474f" stroke-width="2"/><line x1="884" y1="290" x2="900" y2="281" stroke="#37474f" stroke-width="2"/><circle cx="875" cy="290" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="795.25" y="268" width="99.5" height="16" rx="3" fill="#ffffffee"/><text x="845" y="280" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R2: se vende en</text><text x="820" y="310" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(1,1)</text><text x="870" y="310" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="1330,290 1220,290" fill="none" stroke="#00897b" stroke-width="3"/><line x1="1322" y1="298" x2="1322" y2="282" stroke="#00897b" stroke-width="2"/><line x1="1315" y1="298" x2="1315" y2="282" stroke="#00897b" stroke-width="2"/><line x1="1236" y1="290" x2="1220" y2="281" stroke="#00897b" stroke-width="2"/><line x1="1236" y1="290" x2="1220" y2="290" stroke="#00897b" stroke-width="2"/><line x1="1236" y1="290" x2="1220" y2="299" stroke="#00897b" stroke-width="2"/><line x1="1240" y1="282" x2="1240" y2="298" stroke="#00897b" stroke-width="2"/><rect x="1234.4" y="268" width="81.19999999999999" height="16" rx="3" fill="#ffffffee"/><text x="1275" y="280" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#00897b" text-anchor="middle">R3: contiene</text><text x="1300" y="310" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#00897b" text-anchor="middle">(1,1)</text><text x="1250" y="310" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#00897b" text-anchor="middle">(1,N)</text>
+<polyline points="1490,520 1490,414" fill="none" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><line x1="1482" y1="512" x2="1498" y2="512" stroke="#37474f" stroke-width="2"/><line x1="1482" y1="505" x2="1498" y2="505" stroke="#37474f" stroke-width="2"/><line x1="1490" y1="430" x2="1499" y2="414" stroke="#37474f" stroke-width="2"/><line x1="1490" y1="430" x2="1490" y2="414" stroke="#37474f" stroke-width="2"/><line x1="1490" y1="430" x2="1481" y2="414" stroke="#37474f" stroke-width="2"/><circle cx="1490" cy="439" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="1496" y="458" width="75.1" height="17" rx="3" fill="#ffffffee"/><text x="1500" y="471" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f">R4: realiza</text><text x="1482" y="490" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(1,1)</text><text x="1482" y="452" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(0,N)</text>
+<polyline points="1760,300 1650,300" fill="none" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><line x1="1752" y1="308" x2="1752" y2="292" stroke="#37474f" stroke-width="2"/><line x1="1745" y1="308" x2="1745" y2="292" stroke="#37474f" stroke-width="2"/><line x1="1666" y1="300" x2="1650" y2="291" stroke="#37474f" stroke-width="2"/><line x1="1666" y1="300" x2="1650" y2="300" stroke="#37474f" stroke-width="2"/><line x1="1666" y1="300" x2="1650" y2="309" stroke="#37474f" stroke-width="2"/><circle cx="1675" cy="300" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="1673.55" y="278" width="62.9" height="16" rx="3" fill="#ffffffee"/><text x="1705" y="290" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R5: vende</text><text x="1730" y="320" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(1,1)</text><text x="1680" y="320" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="2080,200 2190,200" fill="none" stroke="#37474f" stroke-width="2"/><line x1="2088" y1="192" x2="2088" y2="208" stroke="#37474f" stroke-width="2"/><line x1="2095" y1="192" x2="2095" y2="208" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="200" x2="2190" y2="209" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="200" x2="2190" y2="200" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="200" x2="2190" y2="191" stroke="#37474f" stroke-width="2"/><circle cx="2165" cy="200" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="2103.55" y="178" width="62.9" height="16" rx="3" fill="#ffffffee"/><text x="2135" y="190" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R6: marca</text><text x="2110" y="220" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(1,1)</text><text x="2160" y="220" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="2080,420 2190,420" fill="none" stroke="#37474f" stroke-width="2"/><line x1="2088" y1="412" x2="2088" y2="428" stroke="#37474f" stroke-width="2"/><line x1="2095" y1="412" x2="2095" y2="428" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="420" x2="2190" y2="429" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="420" x2="2190" y2="420" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="420" x2="2190" y2="411" stroke="#37474f" stroke-width="2"/><circle cx="2165" cy="420" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="2094.4" y="398" width="81.19999999999999" height="16" rx="3" fill="#ffffffee"/><text x="2135" y="410" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R7: solicita</text><text x="2110" y="440" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(1,1)</text><text x="2160" y="440" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="2080,480 2190,480" fill="none" stroke="#37474f" stroke-width="2"/><line x1="2088" y1="472" x2="2088" y2="488" stroke="#37474f" stroke-width="2"/><circle cx="2101" cy="480" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="480" x2="2190" y2="489" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="480" x2="2190" y2="480" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="480" x2="2190" y2="471" stroke="#37474f" stroke-width="2"/><circle cx="2165" cy="480" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="2100.5" y="458" width="69" height="16" rx="3" fill="#ffffffee"/><text x="2135" y="470" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R8: revisa</text><text x="2110" y="500" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,1)</text><text x="2160" y="500" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="2020,514 2020,790 2190,790" fill="none" stroke="#37474f" stroke-width="2"/><line x1="2028" y1="522" x2="2012" y2="522" stroke="#37474f" stroke-width="2"/><circle cx="2020" cy="535" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="790" x2="2190" y2="799" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="790" x2="2190" y2="790" stroke="#37474f" stroke-width="2"/><line x1="2174" y1="790" x2="2190" y2="781" stroke="#37474f" stroke-width="2"/><circle cx="2165" cy="790" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="2026" y="643" width="69" height="17" rx="3" fill="#ffffffee"/><text x="2030" y="656" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f">R9: genera</text><text x="2012" y="552" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(0,1)</text><text x="2160" y="810" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="middle">(0,N)</text>
+<polyline points="1920,120 1920,92 200,92 200,120" fill="none" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><line x1="1912" y1="112" x2="1928" y2="112" stroke="#37474f" stroke-width="2"/><circle cx="1920" cy="99" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><line x1="200" y1="104" x2="191" y2="120" stroke="#37474f" stroke-width="2"/><line x1="200" y1="104" x2="200" y2="120" stroke="#37474f" stroke-width="2"/><line x1="200" y1="104" x2="209" y2="120" stroke="#37474f" stroke-width="2"/><circle cx="200" cy="95" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="1016.35" y="70" width="87.3" height="16" rx="3" fill="#ffffffee"/><text x="1060" y="82" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f" text-anchor="middle">R10: registra</text><text x="1912" y="90" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(0,1)</text><text x="192" y="90" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(0,N)</text>
+<polyline points="630,554 630,640" fill="none" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><line x1="630" y1="570" x2="639" y2="554" stroke="#37474f" stroke-width="2"/><line x1="630" y1="570" x2="630" y2="554" stroke="#37474f" stroke-width="2"/><line x1="630" y1="570" x2="621" y2="554" stroke="#37474f" stroke-width="2"/><circle cx="630" cy="579" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><line x1="630" y1="624" x2="621" y2="640" stroke="#37474f" stroke-width="2"/><line x1="630" y1="624" x2="630" y2="640" stroke="#37474f" stroke-width="2"/><line x1="630" y1="624" x2="639" y2="640" stroke="#37474f" stroke-width="2"/><circle cx="630" cy="615" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><rect x="636" y="588" width="130" height="17" rx="3" fill="#ffffffee"/><text x="640" y="601" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#37474f">R11: es propuesto en</text><text x="622" y="592" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(0,N)</text><text x="622" y="610" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#37474f" text-anchor="end">(0,N)</text>
+<polyline points="790,530 845,530 845,660 900,660" fill="none" stroke="#d9730d" stroke-width="2" stroke-dasharray="7 5"/><line x1="798" y1="522" x2="798" y2="538" stroke="#d9730d" stroke-width="2"/><line x1="805" y1="522" x2="805" y2="538" stroke="#d9730d" stroke-width="2"/><line x1="884" y1="660" x2="900" y2="669" stroke="#d9730d" stroke-width="2"/><line x1="884" y1="660" x2="900" y2="660" stroke="#d9730d" stroke-width="2"/><line x1="884" y1="660" x2="900" y2="651" stroke="#d9730d" stroke-width="2"/><circle cx="875" cy="660" r="5" fill="#fff" stroke="#d9730d" stroke-width="2"/><text x="838" y="595" transform="rotate(-90 838 595)" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#d9730d" text-anchor="middle">R12: tiene pronóstico</text><text x="820" y="550" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#d9730d" text-anchor="middle">(1,1)</text><text x="870" y="680" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#d9730d" text-anchor="middle">(0,N)</text>
+<polyline points="1060,880 1060,794" fill="none" stroke="#d9730d" stroke-width="2" stroke-dasharray="7 5"/><line x1="1052" y1="872" x2="1068" y2="872" stroke="#d9730d" stroke-width="2"/><line x1="1052" y1="865" x2="1068" y2="865" stroke="#d9730d" stroke-width="2"/><line x1="1060" y1="810" x2="1069" y2="794" stroke="#d9730d" stroke-width="2"/><line x1="1060" y1="810" x2="1060" y2="794" stroke="#d9730d" stroke-width="2"/><line x1="1060" y1="810" x2="1051" y2="794" stroke="#d9730d" stroke-width="2"/><circle cx="1060" cy="819" r="5" fill="#fff" stroke="#d9730d" stroke-width="2"/><rect x="1066" y="828" width="75.1" height="17" rx="3" fill="#ffffffee"/><text x="1070" y="841" font-family="Arial, Helvetica, sans-serif" font-size="11" font-style="italic" fill="#d9730d">R13: genera</text><text x="1052" y="850" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#d9730d" text-anchor="end">(1,1)</text><text x="1052" y="832" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#d9730d" text-anchor="end">(0,N)</text>
+<g>
+  <rect x="1764" y="124" width="320" height="396" rx="8" fill="#00000022"/>
+  <rect x="1760" y="120" width="320" height="396" rx="8" fill="#ffffff" stroke="#1e5aa8" stroke-width="2"/>
+  <path d="M1760 128 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#1e5aa8"/>
+  <text x="1920" y="141" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">USUARIO</text>
+  <text x="1920" y="159" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MySQL · usuarios</text>
+  <text x="1770" y="182" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="1802" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">id</text>
+  <text x="2070" y="182" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <rect x="1761" y="188" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1770" y="202" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6a1b9a">UK</text>
+  <text x="1802" y="202" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">username</text>
+  <text x="2070" y="202" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(50)</text>
+  <text x="1802" y="222" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">password</text>
+  <text x="2070" y="222" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <rect x="1761" y="228" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="242" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">rol</text>
+  <text x="2070" y="242" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(20)</text>
+  <text x="1770" y="262" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="1802" y="262" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">email</text>
+  <text x="2070" y="262" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <rect x="1761" y="268" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="282" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">telefono</text>
+  <text x="2070" y="282" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(20)</text>
+  <text x="1802" y="302" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">nombre</text>
+  <text x="2070" y="302" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(100)</text>
+  <rect x="1761" y="308" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="322" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">apellido</text>
+  <text x="2070" y="322" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(100)</text>
+  <text x="1802" y="342" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">email_verificado</text>
+  <text x="2070" y="342" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIT</text>
+  <rect x="1761" y="348" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="362" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">activo</text>
+  <text x="2070" y="362" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIT</text>
+  <text x="1802" y="382" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_creacion</text>
+  <text x="2070" y="382" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+  <rect x="1761" y="388" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="402" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_ultimo_cambio_rol</text>
+  <text x="2070" y="402" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+  <text x="1802" y="422" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_ultimo_cambio_estado</text>
+  <text x="2070" y="422" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+  <rect x="1761" y="428" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="442" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">codigo_2fa</text>
+  <text x="2070" y="442" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <text x="1802" y="462" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">codigo_expiracion</text>
+  <text x="2070" y="462" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+  <rect x="1761" y="468" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1802" y="482" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">codigo_verificado</text>
+  <text x="2070" y="482" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIT</text>
+  <text x="1802" y="502" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">foto_perfil</text>
+  <text x="2070" y="502" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">LONGTEXT</text>
+</g>
+<g>
+  <rect x="2194" y="124" width="320" height="176" rx="8" fill="#00000022"/>
+  <rect x="2190" y="120" width="320" height="176" rx="8" fill="#ffffff" stroke="#1e5aa8" stroke-width="2"/>
+  <path d="M2190 128 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#1e5aa8"/>
+  <text x="2350" y="141" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">ASISTENCIA</text>
+  <text x="2350" y="159" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MySQL · asistencias</text>
+  <text x="2200" y="182" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="2232" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">id</text>
+  <text x="2500" y="182" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <rect x="2191" y="188" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2200" y="202" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#1e5aa8">FK</text>
+  <text x="2232" y="202" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">usuario_id</text>
+  <text x="2500" y="202" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <text x="2232" y="222" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">hora_entrada</text>
+  <text x="2500" y="222" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+  <rect x="2191" y="228" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="242" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">hora_salida</text>
+  <text x="2500" y="242" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+  <text x="2232" y="262" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha</text>
+  <text x="2500" y="262" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATE</text>
+  <rect x="2191" y="268" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="282" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">observaciones</text>
+  <text x="2500" y="282" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+</g>
+<g>
+  <rect x="2194" y="364" width="320" height="256" rx="8" fill="#00000022"/>
+  <rect x="2190" y="360" width="320" height="256" rx="8" fill="#ffffff" stroke="#1e5aa8" stroke-width="2"/>
+  <path d="M2190 368 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#1e5aa8"/>
+  <text x="2350" y="381" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">NOVEDAD</text>
+  <text x="2350" y="399" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MySQL · novedades</text>
+  <text x="2200" y="422" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="2232" y="422" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">id</text>
+  <text x="2500" y="422" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <rect x="2191" y="428" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2200" y="442" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#1e5aa8">FK</text>
+  <text x="2232" y="442" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">usuario_id</text>
+  <text x="2500" y="442" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <text x="2200" y="462" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#1e5aa8">FK</text>
+  <text x="2232" y="462" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">revisado_por_id</text>
+  <text x="2500" y="462" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <rect x="2191" y="468" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="482" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">tipo</text>
+  <text x="2500" y="482" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(20)</text>
+  <text x="2232" y="502" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">estado</text>
+  <text x="2500" y="502" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(20)</text>
+  <rect x="2191" y="508" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="522" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">motivo</text>
+  <text x="2500" y="522" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">TEXT</text>
+  <text x="2232" y="542" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_inicio</text>
+  <text x="2500" y="542" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATE</text>
+  <rect x="2191" y="548" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="562" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_fin</text>
+  <text x="2500" y="562" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATE</text>
+  <text x="2232" y="582" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">comentario_admin</text>
+  <text x="2500" y="582" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">TEXT</text>
+  <rect x="2191" y="588" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="602" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_registro</text>
+  <text x="2500" y="602" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+</g>
+<g>
+  <rect x="2194" y="694" width="320" height="196" rx="8" fill="#00000022"/>
+  <rect x="2190" y="690" width="320" height="196" rx="8" fill="#ffffff" stroke="#1e5aa8" stroke-width="2"/>
+  <path d="M2190 698 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#1e5aa8"/>
+  <text x="2350" y="711" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">AUDITORIA</text>
+  <text x="2350" y="729" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MySQL · auditoria</text>
+  <text x="2200" y="752" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="2232" y="752" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">id</text>
+  <text x="2500" y="752" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <rect x="2191" y="758" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2200" y="772" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#1e5aa8">FK</text>
+  <text x="2232" y="772" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">usuario_id</text>
+  <text x="2500" y="772" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <text x="2232" y="792" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">accion</text>
+  <text x="2500" y="792" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(60)</text>
+  <rect x="2191" y="798" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="812" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">detalle</text>
+  <text x="2500" y="812" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">TEXT</text>
+  <text x="2232" y="832" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">ip</text>
+  <text x="2500" y="832" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(45)</text>
+  <rect x="2191" y="838" width="318" height="20" fill="#f2f5f9"/>
+  <text x="2232" y="852" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">modulo</text>
+  <text x="2500" y="852" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(30)</text>
+  <text x="2232" y="872" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_hora</text>
+  <text x="2500" y="872" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">DATETIME(6)</text>
+</g>
+<g>
+  <rect x="44" y="484" width="320" height="176" rx="8" fill="#00000022"/>
+  <rect x="40" y="480" width="320" height="176" rx="8" fill="#ffffff" stroke="#1e5aa8" stroke-width="2"/>
+  <path d="M40 488 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#1e5aa8"/>
+  <text x="200" y="501" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">CONFIGURACION_SISTEMA</text>
+  <text x="200" y="519" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MySQL · configuracion_sistema</text>
+  <text x="50" y="542" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="82" y="542" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">id</text>
+  <text x="350" y="542" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">BIGINT</text>
+  <rect x="41" y="548" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="562" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">nombre_farmacia</text>
+  <text x="350" y="562" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <text x="82" y="582" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">nit</text>
+  <text x="350" y="582" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <rect x="41" y="588" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="602" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">direccion</text>
+  <text x="350" y="602" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <text x="82" y="622" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">telefono</text>
+  <text x="350" y="622" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">VARCHAR(255)</text>
+  <rect x="41" y="628" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="642" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">umbral_stock_bajo</text>
+  <text x="350" y="642" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">INT</text>
+</g>
+<g>
+  <rect x="474" y="124" width="320" height="436" rx="8" fill="#00000022"/>
+  <rect x="470" y="120" width="320" height="436" rx="8" fill="#ffffff" stroke="#2e7d32" stroke-width="2"/>
+  <path d="M470 128 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#2e7d32"/>
+  <text x="630" y="141" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">PRODUCTO</text>
+  <text x="630" y="159" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · PRODUCTOS</text>
+  <text x="480" y="182" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="512" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="780" y="182" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="471" y="188" width="318" height="20" fill="#f2f5f9"/>
+  <text x="480" y="202" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6a1b9a">UK</text>
+  <text x="512" y="202" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">codigo</text>
+  <text x="780" y="202" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="222" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">nombre</text>
+  <text x="780" y="222" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="471" y="228" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="242" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">precio</text>
+  <text x="780" y="242" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="512" y="262" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">precioOriginal</text>
+  <text x="780" y="262" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="471" y="268" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="282" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">costoCompra</text>
+  <text x="780" y="282" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="512" y="302" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">cantidad</text>
+  <text x="780" y="302" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Int32</text>
+  <rect x="471" y="308" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="322" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">categoria</text>
+  <text x="780" y="322" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="342" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">presentacion</text>
+  <text x="780" y="342" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="471" y="348" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="362" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">concentracion</text>
+  <text x="780" y="362" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="382" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">lote</text>
+  <text x="780" y="382" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="471" y="388" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="402" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">principiosActivos</text>
+  <text x="780" y="402" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="422" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fechaVencimiento</text>
+  <text x="780" y="422" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <rect x="471" y="428" width="318" height="20" fill="#f2f5f9"/>
+  <text x="480" y="442" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="512" y="442" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">proveedorId</text>
+  <text x="780" y="442" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="462" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">descripcion</text>
+  <text x="780" y="462" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="471" y="468" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="482" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">imagenUrl</text>
+  <text x="780" y="482" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="502" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fechaIngreso</text>
+  <text x="780" y="502" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <rect x="471" y="508" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="522" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">activo</text>
+  <text x="780" y="522" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Boolean</text>
+  <text x="512" y="542" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">stockMinimo</text>
+  <text x="780" y="542" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Int32</text>
+</g>
+<g>
+  <rect x="44" y="124" width="320" height="276" rx="8" fill="#00000022"/>
+  <rect x="40" y="120" width="320" height="276" rx="8" fill="#ffffff" stroke="#2e7d32" stroke-width="2"/>
+  <path d="M40 128 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#2e7d32"/>
+  <text x="200" y="141" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">PROVEEDOR</text>
+  <text x="200" y="159" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · proveedores</text>
+  <text x="50" y="182" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="82" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="350" y="182" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="41" y="188" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="202" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">nombre</text>
+  <text x="350" y="202" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="82" y="222" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">empresa</text>
+  <text x="350" y="222" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="41" y="228" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="242" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">telefono</text>
+  <text x="350" y="242" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="82" y="262" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">email</text>
+  <text x="350" y="262" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="41" y="268" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="282" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">direccion</text>
+  <text x="350" y="282" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="82" y="302" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">tipo_productos</text>
+  <text x="350" y="302" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="41" y="308" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="322" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">activo</text>
+  <text x="350" y="322" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Boolean</text>
+  <text x="82" y="342" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_creacion</text>
+  <text x="350" y="342" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <rect x="41" y="348" width="318" height="20" fill="#f2f5f9"/>
+  <text x="82" y="362" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha_actualizacion</text>
+  <text x="350" y="362" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <text x="50" y="382" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="82" y="382" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">creado_por</text>
+  <text x="350" y="382" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+</g>
+<g>
+  <rect x="1334" y="524" width="320" height="256" rx="8" fill="#00000022"/>
+  <rect x="1330" y="520" width="320" height="256" rx="8" fill="#ffffff" stroke="#2e7d32" stroke-width="2"/>
+  <path d="M1330 528 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#2e7d32"/>
+  <text x="1490" y="541" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">CLIENTE</text>
+  <text x="1490" y="559" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · clientes</text>
+  <text x="1340" y="582" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="1372" y="582" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="1640" y="582" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="1331" y="588" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1340" y="602" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6a1b9a">UK</text>
+  <text x="1372" y="602" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">codigo</text>
+  <text x="1640" y="602" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1372" y="622" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">nombre</text>
+  <text x="1640" y="622" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="628" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="642" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">email</text>
+  <text x="1640" y="642" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1372" y="662" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">telefono</text>
+  <text x="1640" y="662" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="668" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1340" y="682" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6a1b9a">UK</text>
+  <text x="1372" y="682" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">identificacion</text>
+  <text x="1640" y="682" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1372" y="702" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">direccion</text>
+  <text x="1640" y="702" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="708" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="722" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">username</text>
+  <text x="1640" y="722" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1372" y="742" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">direccionFisica</text>
+  <text x="1640" y="742" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="748" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="762" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">esConsumidorFinal</text>
+  <text x="1640" y="762" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Boolean</text>
+</g>
+<g>
+  <rect x="1334" y="124" width="320" height="296" rx="8" fill="#00000022"/>
+  <rect x="1330" y="120" width="320" height="296" rx="8" fill="#ffffff" stroke="#2e7d32" stroke-width="2"/>
+  <path d="M1330 128 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#2e7d32"/>
+  <text x="1490" y="141" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">FACTURA</text>
+  <text x="1490" y="159" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · FACTURA</text>
+  <text x="1340" y="182" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="1372" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="1640" y="182" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="1331" y="188" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1340" y="202" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6a1b9a">UK</text>
+  <text x="1372" y="202" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">numeroFactura</text>
+  <text x="1640" y="202" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1340" y="222" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="1372" y="222" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">clienteId</text>
+  <text x="1640" y="222" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="228" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="242" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">clienteNombre</text>
+  <text x="1640" y="242" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1372" y="262" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fecha</text>
+  <text x="1640" y="262" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <rect x="1331" y="268" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="282" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">subtotal</text>
+  <text x="1640" y="282" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="1372" y="302" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">iva</text>
+  <text x="1640" y="302" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="1331" y="308" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="322" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">total</text>
+  <text x="1640" y="322" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="1372" y="342" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">metodoPago</text>
+  <text x="1640" y="342" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="348" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="362" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">observaciones</text>
+  <text x="1640" y="362" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="1340" y="382" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="1372" y="382" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">vendedorEmail</text>
+  <text x="1640" y="382" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="1331" y="388" width="318" height="20" fill="#f2f5f9"/>
+  <text x="1372" y="402" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">detalles</text>
+  <text x="1640" y="402" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Array&lt;DetalleFactura&gt;</text>
+</g>
+<g>
+  <rect x="904" y="204" width="320" height="176" rx="8" fill="#00000022"/>
+  <rect x="900" y="200" width="320" height="176" rx="8" fill="#ffffff" stroke="#00897b" stroke-width="2.5" stroke-dasharray="8 4"/>
+  <path d="M900 208 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#00897b"/>
+  <text x="1060" y="221" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">DETALLE_FACTURA</text>
+  <text x="1060" y="239" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">Subdocumento · FACTURA.detalles[]</text>
+  <text x="910" y="262" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="942" y="262" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">productoId</text>
+  <text x="1210" y="262" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="901" y="268" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="282" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">productoNombre</text>
+  <text x="1210" y="282" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="942" y="302" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">productoCodigo</text>
+  <text x="1210" y="302" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="901" y="308" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="322" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">cantidad</text>
+  <text x="1210" y="322" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Int32</text>
+  <text x="942" y="342" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">precioUnitario</text>
+  <text x="1210" y="342" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="901" y="348" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="362" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">subtotal</text>
+  <text x="1210" y="362" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+</g>
+<g>
+  <rect x="474" y="644" width="320" height="196" rx="8" fill="#00000022"/>
+  <rect x="470" y="640" width="320" height="196" rx="8" fill="#ffffff" stroke="#2e7d32" stroke-width="2"/>
+  <path d="M470 648 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#2e7d32"/>
+  <text x="630" y="661" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">RESULTADO_OPTIMIZACION</text>
+  <text x="630" y="679" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · resultado_optimizacion</text>
+  <text x="480" y="702" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="512" y="702" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="780" y="702" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="471" y="708" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="722" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">score</text>
+  <text x="780" y="722" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="512" y="742" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">hardScore</text>
+  <text x="780" y="742" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Int32</text>
+  <rect x="471" y="748" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="762" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">softScore</text>
+  <text x="780" y="762" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Int32</text>
+  <text x="480" y="782" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="512" y="782" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">propuestas</text>
+  <text x="780" y="782" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Array&lt;Object&gt;</text>
+  <rect x="471" y="788" width="318" height="20" fill="#f2f5f9"/>
+  <text x="512" y="802" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">resumen</text>
+  <text x="780" y="802" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Object</text>
+  <text x="512" y="822" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fechaCalculo</text>
+  <text x="780" y="822" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+</g>
+<g>
+  <rect x="904" y="884" width="320" height="336" rx="8" fill="#00000022"/>
+  <rect x="900" y="880" width="320" height="336" rx="8" fill="#ffffff" stroke="#d9730d" stroke-width="2"/>
+  <path d="M900 888 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#d9730d"/>
+  <text x="1060" y="901" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">MODELO_ML</text>
+  <text x="1060" y="919" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · modelos_ml · PROPUESTA</text>
+  <text x="910" y="942" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="942" y="942" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="1210" y="942" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="901" y="948" width="318" height="20" fill="#f2f5f9"/>
+  <text x="910" y="962" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#6a1b9a">UK</text>
+  <text x="942" y="962" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">version</text>
+  <text x="1210" y="962" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="942" y="982" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">algoritmo</text>
+  <text x="1210" y="982" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="901" y="988" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="1002" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">hiperparametros</text>
+  <text x="1210" y="1002" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Object</text>
+  <text x="942" y="1022" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">features</text>
+  <text x="1210" y="1022" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Array&lt;String&gt;</text>
+  <rect x="901" y="1028" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="1042" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">mae</text>
+  <text x="1210" y="1042" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="942" y="1062" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">rmse</text>
+  <text x="1210" y="1062" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="901" y="1068" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="1082" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">wape</text>
+  <text x="1210" y="1082" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="942" y="1102" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">r2</text>
+  <text x="1210" y="1102" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="901" y="1108" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="1122" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fechaEntrenamiento</text>
+  <text x="1210" y="1122" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <text x="942" y="1142" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">periodoInicio</text>
+  <text x="1210" y="1142" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <rect x="901" y="1148" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="1162" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">periodoFin</text>
+  <text x="1210" y="1162" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <text x="942" y="1182" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">activo</text>
+  <text x="1210" y="1182" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Boolean</text>
+  <rect x="901" y="1188" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="1202" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">artefactoUrl</text>
+  <text x="1210" y="1202" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+</g>
+<g>
+  <rect x="904" y="564" width="320" height="236" rx="8" fill="#00000022"/>
+  <rect x="900" y="560" width="320" height="236" rx="8" fill="#ffffff" stroke="#d9730d" stroke-width="2"/>
+  <path d="M900 568 a8 8 0 0 1 8 -8 h304 a8 8 0 0 1 8 8 v40 h-320 z" fill="#d9730d"/>
+  <text x="1060" y="581" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#fff" text-anchor="middle">PREDICCION_DEMANDA</text>
+  <text x="1060" y="599" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#ffffffdd" text-anchor="middle">MongoDB · predicciones_demanda · PROPUESTA</text>
+  <text x="910" y="622" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#b8860b">PK</text>
+  <text x="942" y="622" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933" font-weight="bold" text-decoration="underline">_id</text>
+  <text x="1210" y="622" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">ObjectId</text>
+  <rect x="901" y="628" width="318" height="20" fill="#f2f5f9"/>
+  <text x="910" y="642" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="942" y="642" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">productoId</text>
+  <text x="1210" y="642" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <text x="910" y="662" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#c62828">FK*</text>
+  <text x="942" y="662" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">modeloVersion</text>
+  <text x="1210" y="662" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">String</text>
+  <rect x="901" y="668" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="682" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">semanaInicio</text>
+  <text x="1210" y="682" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+  <text x="942" y="702" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">demandaPredicha</text>
+  <text x="1210" y="702" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="901" y="708" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="722" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">limiteInferior</text>
+  <text x="1210" y="722" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <text x="942" y="742" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">limiteSuperior</text>
+  <text x="1210" y="742" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Double</text>
+  <rect x="901" y="748" width="318" height="20" fill="#f2f5f9"/>
+  <text x="942" y="762" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">demandaReal</text>
+  <text x="1210" y="762" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Int32</text>
+  <text x="942" y="782" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">fechaGeneracion</text>
+  <text x="1210" y="782" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#6b7785" text-anchor="end">Date</text>
+</g>
+<rect x="40" y="900" width="790" height="320" rx="10" fill="#fafbfc" stroke="#c5ced8"/>
+<text x="60" y="930" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#1f2933">Convenciones</text><rect x="60" y="950" width="34" height="20" rx="4" fill="#1e5aa8"/><text x="104" y="965" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Tabla MySQL (JPA / Hibernate)</text><rect x="60" y="980" width="34" height="20" rx="4" fill="#2e7d32"/><text x="104" y="995" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Colección MongoDB Atlas</text><rect x="60" y="1010" width="34" height="20" rx="4" fill="#00897b" stroke="#004d40" stroke-dasharray="4 2"/><text x="104" y="1025" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Subdocumento embebido (entidad débil)</text><rect x="60" y="1040" width="34" height="20" rx="4" fill="#d9730d"/><text x="104" y="1055" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Colección propuesta – Minería de Datos II</text><line x1="60" y1="1080" x2="94" y2="1080" stroke="#37474f" stroke-width="2"/><text x="104" y="1084" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">FK con integridad referencial (MySQL)</text><line x1="60" y1="1110" x2="94" y2="1110" stroke="#37474f" stroke-width="2" stroke-dasharray="7 5"/><text x="104" y="1114" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Referencia lógica por valor (MongoDB / entre motores)</text><line x1="60" y1="1140" x2="94" y2="1140" stroke="#00897b" stroke-width="3"/><text x="104" y="1144" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Composición (documento embebido)</text><line x1="60" y1="1170" x2="94" y2="1170" stroke="#d9730d" stroke-width="2" stroke-dasharray="7 5"/><text x="104" y="1174" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">Relación nueva propuesta</text><text x="480" y="962" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#1f2933">Cardinalidad (min,max)</text><line x1="480" y1="992" x2="540" y2="992" stroke="#37474f" stroke-width="2"/><line x1="532" y1="1000" x2="532" y2="984" stroke="#37474f" stroke-width="2"/><line x1="525" y1="1000" x2="525" y2="984" stroke="#37474f" stroke-width="2"/><text x="555" y="996" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">(1,1) Uno y solo uno</text><line x1="480" y1="1026" x2="540" y2="1026" stroke="#37474f" stroke-width="2"/><line x1="532" y1="1034" x2="532" y2="1018" stroke="#37474f" stroke-width="2"/><circle cx="519" cy="1026" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><text x="555" y="1030" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">(0,1) Cero o uno</text><line x1="480" y1="1060" x2="540" y2="1060" stroke="#37474f" stroke-width="2"/><line x1="524" y1="1060" x2="540" y2="1069" stroke="#37474f" stroke-width="2"/><line x1="524" y1="1060" x2="540" y2="1060" stroke="#37474f" stroke-width="2"/><line x1="524" y1="1060" x2="540" y2="1051" stroke="#37474f" stroke-width="2"/><line x1="520" y1="1068" x2="520" y2="1052" stroke="#37474f" stroke-width="2"/><text x="555" y="1064" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">(1,N) Uno o muchos</text><line x1="480" y1="1094" x2="540" y2="1094" stroke="#37474f" stroke-width="2"/><line x1="524" y1="1094" x2="540" y2="1103" stroke="#37474f" stroke-width="2"/><line x1="524" y1="1094" x2="540" y2="1094" stroke="#37474f" stroke-width="2"/><line x1="524" y1="1094" x2="540" y2="1085" stroke="#37474f" stroke-width="2"/><circle cx="515" cy="1094" r="5" fill="#fff" stroke="#37474f" stroke-width="2"/><text x="555" y="1098" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933">(0,N) Cero o muchos</text><text x="480" y="1140" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933"><tspan font-weight="bold" fill="#b8860b">PK</tspan> clave primaria   <tspan font-weight="bold" fill="#6a1b9a">UK</tspan> única   <tspan font-weight="bold" fill="#1e5aa8">FK</tspan> foránea</text><text x="480" y="1162" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#1f2933"><tspan font-weight="bold" fill="#c62828">FK*</tspan> foránea lógica (no forzada por el motor)</text>
+</svg>

@@ -1,37 +1,63 @@
 package com.admin.adminlfarma_mini.repository;
 
 import com.admin.adminlfarma_mini.entity.Usuario;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends MongoRepository<Usuario, String> {
+    
     Optional<Usuario> findByUsername(String username);
+    
     Optional<Usuario> findFirstByUsername(String username);
-
+    
     Optional<Usuario> findByEmail(String email);
-
+    
+    boolean existsByUsername(String username);
+    
+    boolean existsByEmail(String email);
+    
+    @Query(value = "{ 'rol': ?0 }", count = true)
+    long countByRol(String rol);
+    
+    @Query(value = "{ 'activo': true }", count = true)
+    long countActivos();
+    
     List<Usuario> findByRol(String rol);
-
-    boolean existsByRol(String rol);
-
-    // Buscar usuarios activos por rol
-    List<Usuario> findByRolAndActivoTrue(String rol);
-
-    // Buscar todos los usuarios activos
+    
+    @Query(value = "{ 'id': ?0 }", fields = "{ 'rol': 1 }")
+    String findRolById(String id);
+    
     List<Usuario> findByActivoTrue();
-
-    // Contar usuarios activos excluyendo un rol específico
+    
+    List<Usuario> findByRolAndActivoTrue(String rol);
+    
+    @Query("{ 'rol': { $regex: ?0, $options: 'i' } }")
+    List<Usuario> findUsuariosByRolContaining(String search);
+    
     long countByRolNotAndActivoTrue(String rol);
+    
+    // Métodos para manejar Clientes unificados
+    Optional<Usuario> findByCodigo(String codigo);
 
-    // Buscar usuarios por rol ignorando mayúsculas
-    @Query("SELECT u FROM Usuario u WHERE UPPER(u.rol) LIKE UPPER(CONCAT('%', :rol, '%')) AND u.activo = true")
-    List<Usuario> findUsuariosByRolContaining(@Param("rol") String rol);
+    Optional<Usuario> findByIdentificacion(String identificacion);
 
-    @Query("SELECT u.rol FROM Usuario u WHERE u.id = :id")
-    String findRolById(@Param("id") Long id);
+    Optional<Usuario> findFirstByEsConsumidorFinalTrue();
+
+    boolean existsByCodigo(String codigo);
+
+    @Query(value = "{ 'rol': 'ROLE_CLIENTE' }", sort = "{ 'nombre': 1 }")
+    List<Usuario> findAllClientesOrderByNombreAsc();
+    
+    @Query(value = "{ 'rol': 'ROLE_CLIENTE' }")
+    Page<Usuario> findAllClientes(Pageable pageable);
+
+    @Query("{ 'rol': 'ROLE_CLIENTE', $or: [ { 'nombre': { $regex: ?0, $options: 'i' } }, { 'codigo': { $regex: ?1, $options: 'i' } } ] }")
+    Page<Usuario> findClientesByNombreOrCodigo(String nombre, String codigo, Pageable pageable);
 }

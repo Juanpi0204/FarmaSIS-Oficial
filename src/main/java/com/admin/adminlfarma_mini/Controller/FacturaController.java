@@ -4,8 +4,10 @@ import com.admin.adminlfarma_mini.DTO.FacturaRequestDTO;
 import com.admin.adminlfarma_mini.entity.Factura;
 import com.admin.adminlfarma_mini.entity.Producto;
 import com.admin.adminlfarma_mini.service.ClienteService;
+import com.admin.adminlfarma_mini.service.ConfiguracionService;
 import com.admin.adminlfarma_mini.service.FacturaService;
 import com.admin.adminlfarma_mini.service.ProductoService;
+import com.admin.adminlfarma_mini.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,13 +23,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -41,8 +41,8 @@ public class FacturaController {
     private final FacturaService facturaService;
     private final ProductoService productoService;
     private final ClienteService clienteService;
-    private final com.admin.adminlfarma_mini.service.ConfiguracionService configuracionService;
-    private final com.admin.adminlfarma_mini.service.UsuarioService usuarioService;
+    private final ConfiguracionService configuracionService;
+    private final UsuarioService usuarioService;
 
     @GetMapping
     public String listarVentas(

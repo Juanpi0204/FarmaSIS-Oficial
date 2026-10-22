@@ -4,7 +4,6 @@ import com.admin.adminlfarma_mini.entity.ConfiguracionSistema;
 import com.admin.adminlfarma_mini.repository.ConfiguracionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,6 @@ public class ConfiguracionService {
                 });
     }
 
-    @Transactional
     public ConfiguracionSistema guardarConfiguracion(ConfiguracionSistema configuracion) {
         ConfiguracionSistema actual = getConfiguracion();
         actual.setNombreFarmacia(configuracion.getNombreFarmacia());

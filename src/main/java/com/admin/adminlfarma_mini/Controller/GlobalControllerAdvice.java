@@ -1,6 +1,5 @@
 package com.admin.adminlfarma_mini.Controller;
 
-import com.admin.adminlfarma_mini.entity.Usuario;
 import com.admin.adminlfarma_mini.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

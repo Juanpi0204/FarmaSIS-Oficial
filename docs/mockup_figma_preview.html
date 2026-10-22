@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FarmaSIS Móvil • Mockups Finales (Figma)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --header-green-1: #134E2C;
+      --header-green-2: #0F3D23;
+      --header-green-3: #092916;
+      --emerald: #10B981;
+      --emerald-dark: #059669;
+      --mint-text: #A7D7B5;
+      --mint-label: #9ECEAF;
+      --bg-light: #F1F5F3;
+      --text-dark: #0F172A;
+      --text-muted: #64748B;
+      --danger: #B91C1C;
+      --warning: #D97706;
+      --border-light: #E2E8F0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: #091D11;
+      color: #E2E8F0;
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 800px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #F8FAFC;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--mint-text);
+      font-size: 1.05rem;
+    }
+
+    .badge-bar {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--emerald);
+      color: #6EE7B7;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .showcase {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+
+    .device-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .device-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #6EE7B7;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    /* Shell del iPhone / Android */
+    .phone {
+      width: 375px;
+      height: 780px;
+      background: var(--bg-light);
+      border-radius: 46px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 0 0 8px #1E293B, inset 0 0 0 10px #091D11;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 4px solid #1E3D2B;
+    }
+
+    .status-bar {
+      height: 44px;
+      padding: 12px 24px 0 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      z-index: 5;
+    }
+
+    .status-bar.dark-text { color: var(--text-dark); }
+    .status-bar.light-text { color: #FFFFFF; }
+
+    /* ================= PANTALLA 1: LOGIN ================= */
+    .screen-login {
+      flex: 1;
+      background: linear-gradient(180deg, var(--header-green-1) 0%, var(--header-green-2) 50%, var(--header-green-3) 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-logo {
+      width: 96px;
+      height: 96px;
+      background: #FFFFFF;
+      border-radius: 26px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+      margin-bottom: 16px;
+    }
+
+    .login-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+    }
+
+    .login-sub {
+      font-size: 0.88rem;
+      color: var(--mint-text);
+      margin-bottom: 28px;
+    }
+
+    .login-card {
+      width: 100%;
+      background: rgba(27, 78, 48, 0.65);
+      border: 1.2px solid rgba(46, 107, 69, 0.7);
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    .input-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--mint-label);
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .login-input {
+      width: 100%;
+      background: rgba(33, 84, 52, 0.85);
+      border: 1px solid #2E6B45;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: #FFFFFF;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .forgot-pass {
+      text-align: center;
+      color: var(--mint-text);
+      font-size: 0.8rem;
+      margin-top: 14px;
+    }
+
+    .mongo-pill {
+      margin-top: 24px;
+      background: rgba(19, 62, 35, 0.7);
+      border: 1px solid rgba(46, 107, 69, 0.7);
+      border-radius: 24px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--mint-text);
+    }
+
+    .mongo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+    }
+
+    /* ================= PANTALLA 2: DASHBOARD ================= */
+    .dashboard-header {
+      background: linear-gradient(180deg, var(--header-green-1) 0%, var(--header-green-2) 100%);
+      padding: 12px 18px 18px 18px;
+      color: #FFFFFF;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-logo {
+      width: 44px;
+      height: 44px;
+      background: #FFFFFF;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-titles h3 {
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .header-titles p {
+      font-size: 0.7rem;
+      color: var(--mint-text);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-bell {
+      width: 36px;
+      height: 36px;
+      background: rgba(27, 78, 48, 0.8);
+      border: 1px solid rgba(46, 107, 69, 0.6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--mint-label);
+    }
+
+    .avatar-j {
+      width: 36px;
+      height: 36px;
+      background: var(--emerald);
+      color: #092916;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .header-user h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+    }
+
+    .header-user p {
+      font-size: 0.7rem;
+      color: var(--mint-text);
+    }
+
+    .dashboard-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .dash-card {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1px solid var(--border-light);
+      padding: 14px;
+      color: var(--text-dark);
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .select-box {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .segmented-tabs {
+      background: #F8FAFC;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 3px;
+      display: flex;
+    }
+
+    .tab-seg {
+      flex: 1;
+      text-align: center;
+      padding: 7px 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-radius: 8px;
+    }
+
+    .tab-seg.active {
+      background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-dark) 100%);
+      color: #FFFFFF;
+    }
+
+    .kpi-grid {
+      display: flex;
+      gap: 10px;
+    }
+
+    .kpi-box {
+      flex: 1;
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid var(--border-light);
+      padding: 12px 14px;
+    }
+
+    .kpi-box.border-red {
+      border-color: #FECACA;
+    }
+
+    .kpi-title {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .kpi-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0F4D2A;
+    }
+
+    .kpi-num.red {
+      color: var(--danger);
+    }
+
+    .kpi-sub-alert {
+      font-size: 0.68rem;
+      color: var(--warning);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    /* SYNCFUSION CARD */
+    .chart-head-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .chart-head-row h4 {
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .sync-badge {
+      background: #ECFDF5;
+      border: 1px solid #6EE7B7;
+      color: #059669;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .svg-syncfusion {
+      width: 100%;
+      height: 160px;
+    }
+
+    .sync-legend {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 4px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .leg-emerald-box {
+      width: 11px;
+      height: 11px;
+      background: #34D399;
+      border-radius: 3px;
+    }
+
+    .leg-forest-line {
+      width: 16px;
+      height: 3px;
+      background: #14532D;
+      border-radius: 2px;
+    }
+
+    /* REABASTECIMIENTO */
+    .reorden-box {
+      background: #FEF2EE;
+      border: 1.1px solid #FED7AA;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .warn-icon {
+      background: #FFEDD5;
+      color: #EA580C;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .warn-content h5 {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #9A3412;
+      margin-bottom: 2px;
+    }
+
+    .warn-content p {
+      font-size: 0.72rem;
+      color: #B45309;
+      line-height: 1.35;
+    }
+
+    .bottom-mongo-pill {
+      background: #FFFFFF;
+      border: 1.2px solid #D1FAE5;
+      border-radius: 20px;
+      padding: 6px 14px;
+      margin: 4px auto 8px auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: #065F46;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>FarmaSIS Móvil • Mockups Finales (Figma)</h1>
+    <p>Diseño adaptado exactamente a las especificaciones y paleta de colores de tu proyecto</p>
+    <div class="badge-bar">
+      <span class="tag">Figma Pixel-Perfect</span>
+      <span class="tag">Syncfusion Flutter Charts</span>
+      <span class="tag">MongoDB Atlas Auth</span>
+      <span class="tag">Puerto Spring Boot: 8092</span>
+    </div>
+  </header>
+
+  <div class="showcase">
+
+    <!-- DISPOSITIVO 1: PANTALLA LOGIN -->
+    <div class="device-wrapper">
+      <div class="device-title">Pantalla 1: Login FarmaSIS</div>
+      <div class="phone">
+        <div class="status-bar light-text">
+          <span>9:41</span>
+          <span>5G 📶 100% 🔋</span>
+        </div>
+        <div class="screen-login">
+          <div class="login-logo"><img src="farmasis_logo.png" alt="FarmaSIS" style="width: 100%; height: 100%; object-fit: cover;"></div>
+          <h2 class="login-title">FarmaSIS</h2>
+          <p class="login-sub">Sistema Inteligente de Farmacia</p>
+
+          <div class="login-card">
+            <label class="input-label">USUARIO O CORREO</label>
+            <input class="login-input" type="text" value="admin" readonly>
+
+            <label class="input-label">CONTRASEÑA</label>
+            <input class="login-input" type="password" value="••••••••" readonly>
+
+            <button class="btn-login">Iniciar Sesión</button>
+            <div class="forgot-pass">¿Olvidaste tu contraseña?</div>
+          </div>
+
+          <div class="mongo-pill">
+            <span class="mongo-dot"></span>
+            <span>Conectado a MongoDB Atlas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISPOSITIVO 2: DASHBOARD PREDICTIVO SYNCFUSION -->
+    <div class="device-wrapper">
+      <div class="device-title">Pantalla 2: Dashboard Predictivo</div>
+      <div class="phone">
+        <div class="status-bar light-text" style="background: var(--header-green-1);">
+          <span>9:41</span>
+          <span>5G 📶 100% 🔋</span>
+        </div>
+
+        <!-- Header Verde Bosque -->
+        <div class="dashboard-header">
+          <div class="header-top">
+            <div class="header-left">
+              <div class="header-logo"><img src="farmasis_logo.png" alt="FarmaSIS" style="width: 100%; height: 100%; object-fit: cover;"></div>
+              <div class="header-titles">
+                <h3>FarmaSIS</h3>
+                <p>Predicción Farmacéutica</p>
+              </div>
+            </div>
+            <div class="header-right">
+              <div class="btn-bell">🔔</div>
+              <div class="avatar-j">J</div>
+            </div>
+          </div>
+          <div class="header-user">
+            <h4>Juan Garces</h4>
+            <p>Rol: ADMIN · FARMASIS</p>
+          </div>
+        </div>
+
+        <!-- Contenido -->
+        <div class="dashboard-body">
+          <!-- Filtro Producto y Tabs -->
+          <div class="dash-card">
+            <div class="card-label">PRODUCTO FARMACÉUTICO</div>
+            <div class="select-box">
+              <span>Acetaminofén 500mg (MED-104)</span>
+              <span>▼</span>
+            </div>
+            <div class="segmented-tabs">
+              <div class="tab-seg">DIARIO</div>
+              <div class="tab-seg active">SEMANAL</div>
+              <div class="tab-seg">MENSUAL</div>
+            </div>
+          </div>
+
+          <!-- KPIs -->
+          <div class="kpi-grid">
+            <div class="kpi-box">
+              <div class="kpi-title">Demanda Estimada</div>
+              <div class="kpi-num">380 <span style="font-size: 0.9rem;">uds</span></div>
+            </div>
+            <div class="kpi-box border-red">
+              <div class="kpi-title">Riesgo Quiebre</div>
+              <div class="kpi-num red">ALTO</div>
+              <div class="kpi-sub-alert">⚠️ Acción requerida</div>
+            </div>
+          </div>
+
+          <!-- Gráfico Syncfusion -->
+          <div class="dash-card">
+            <div class="chart-head-row">
+              <h4>Curva de Predicción (Semanal)</h4>
+              <span class="sync-badge">Syncfusion</span>
+            </div>
+
+            <!-- Gráfico Vectorial fiel a Syncfusion SfCartesianChart -->
+            <svg class="svg-syncfusion" viewBox="0 0 320 160">
+              <line x1="20" y1="30" x2="300" y2="30" stroke="#F1F5F9" stroke-width="1" />
+              <line x1="20" y1="70" x2="300" y2="70" stroke="#F1F5F9" stroke-width="1" />
+              <line x1="20" y1="110" x2="300" y2="110" stroke="#F1F5F9" stroke-width="1" />
+              <line x1="20" y1="130" x2="300" y2="130" stroke="#E2E8F0" stroke-width="1.2" />
+
+              <!-- Barras Ventas Reales (ColumnSeries en Esmeralda) -->
+              <rect x="35" y="75" width="20" height="55" fill="#34D399" rx="4" />
+              <rect x="80" y="65" width="20" height="65" fill="#34D399" rx="4" />
+              <rect x="125" y="55" width="20" height="75" fill="#34D399" rx="4" />
+              <rect x="170" y="45" width="20" height="85" fill="#34D399" rx="4" />
+
+              <!-- Curva Spline Predicción (Verde Bosque Oscuro) -->
+              <path d="M 45 74 Q 68 66, 90 62 T 135 52 T 180 44 T 225 22 T 268 28" fill="none" stroke="#14532D" stroke-width="3" stroke-linecap="round" />
+
+              <!-- Puntos de Predicción -->
+              <circle cx="45" cy="74" r="3.5" fill="#14532D" />
+              <circle cx="90" cy="62" r="3.5" fill="#14532D" />
+              <circle cx="135" cy="52" r="3.5" fill="#14532D" />
+              <circle cx="180" cy="44" r="3.5" fill="#14532D" />
+              <circle cx="225" cy="22" r="4.5" fill="#14532D" stroke="#FFF" stroke-width="1" />
+              <circle cx="268" cy="28" r="3.5" fill="#14532D" />
+
+              <!-- Eje X -->
+              <text x="32" y="146" font-size="8.5" fill="#64748B" font-weight="600">Sem 39</text>
+              <text x="77" y="146" font-size="8.5" fill="#64748B" font-weight="600">Sem 40</text>
+              <text x="122" y="146" font-size="8.5" fill="#64748B" font-weight="600">Sem 41</text>
+              <text x="167" y="146" font-size="8.5" fill="#64748B" font-weight="600">Sem 42</text>
+              <text x="210" y="146" font-size="8.5" fill="#B91C1C" font-weight="800">Sem 43</text>
+              <text x="254" y="146" font-size="8.5" fill="#64748B" font-weight="600">Sem 44</text>
+            </svg>
+
+            <div class="sync-legend">
+              <div class="legend-item"><span class="leg-emerald-box"></span> Ventas Reales</div>
+              <div class="legend-item"><span class="leg-forest-line"></span> Predicción (IA)</div>
+            </div>
+          </div>
+
+          <!-- Reorden Reabastecimiento -->
+          <div class="reorden-box">
+            <div class="warn-icon">⚠️</div>
+            <div class="warn-content">
+              <h5>Reabastecimiento Recomendado</h5>
+              <p>Emitir orden de pedido por <strong>130 unidades</strong> antes de Semana 43 para evitar desabastecimiento en mostradores.</p>
+            </div>
+          </div>
+
+          <div class="bottom-mongo-pill">
+            <span class="mongo-dot"></span>
+            <span>Conectado a MongoDB Atlas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

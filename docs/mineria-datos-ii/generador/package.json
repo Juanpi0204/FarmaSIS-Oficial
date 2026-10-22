@@ -1,0 +1,17 @@
+{
+  "name": "farmasis-mineria-datos-ii",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generador reproducible de los entregables de Mineria de Datos II (Dataset, Modelo E-R y Diccionario de Datos) del proyecto FARMASIS",
+  "main": "src/index.js",
+  "scripts": {
+    "generar": "node src/index.js",
+    "extraer-mongo": "node src/extraerMongo.js"
+  },
+  "dependencies": {
+    "docx": "^9.0.2",
+    "exceljs": "^4.4.0",
+    "mongodb": "^6.8.0",
+    "sharp": "^0.33.5"
+  }
+}

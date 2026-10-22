@@ -114,7 +114,7 @@ public class FacturaService {
     }
     
     public Factura crearFactura(FacturaRequestDTO request, String vendedorEmail) {
-        Cliente cliente;
+        Usuario cliente;
         String cc = request.getClienteCC();
         if (cc == null || cc.trim().isEmpty()) {
             cc = "222222222222";
@@ -122,11 +122,12 @@ public class FacturaService {
             cc = cc.trim();
         }
         
-        Optional<Cliente> clienteOpt = clienteService.obtenerPorIdentificacion(cc);
+        Optional<Usuario> clienteOpt = clienteService.obtenerPorIdentificacion(cc);
         if (clienteOpt.isPresent()) {
             cliente = clienteOpt.get();
         } else {
-            cliente = new Cliente();
+            cliente = new Usuario();
+            cliente.setRol("ROLE_CLIENTE");
             cliente.setIdentificacion(cc);
             if ("222222222222".equals(cc)) {
                 cliente.setNombre("Consumidor Final");

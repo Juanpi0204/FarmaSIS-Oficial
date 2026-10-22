@@ -42,7 +42,7 @@ public class ChatbotController {
             String aiResponse = chatbotService.chat(request.chatId(), request.message(), userRole);
             return ResponseEntity.ok(new ChatResponseDto(aiResponse));
         } catch (org.springframework.web.client.HttpClientErrorException e) {
-            logger.log(Level.WARNING, "Error de API externa (Groq): " + e.getStatusCode(), e);
+            logger.log(Level.WARNING, "Error de API externa (Groq): " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
             if (e.getStatusCode().value() == 429) {
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                         .body(new ChatResponseDto("⏳ El servicio de IA está temporalmente ocupado. Intenta de nuevo en unos segundos."));

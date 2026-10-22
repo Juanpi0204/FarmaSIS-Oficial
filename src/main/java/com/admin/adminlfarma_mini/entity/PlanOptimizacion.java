@@ -10,7 +10,6 @@ import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**

@@ -41,4 +41,15 @@ public interface FacturaRepository extends MongoRepository<Factura, String> {
 
     @Query("{ 'fecha': { $gte: ?0, $lte: ?1 }, 'metodoPago': ?2 }")
     List<Factura> findByFechaRangoAndMetodoPago(LocalDateTime inicio, LocalDateTime fin, String metodoPago);
+
+    // ---- Módulo de predicción ----
+    // Facturas con fecha en [inicio, fin) que contengan al menos una línea del producto indicado.
+    // El POS guarda en cada línea tanto productoCodigo como productoId, por eso se busca por cualquiera de los dos.
+    @Query("{ 'fecha': { $gte: ?0, $lt: ?1 }, $or: [ { 'detalles.productoCodigo': ?2 }, { 'detalles.productoId': ?3 } ] }")
+    List<Factura> findVentasPorProducto(LocalDateTime inicio, LocalDateTime fin, String codigoProducto, String idProducto);
+
+    // Usados por el sembrador de ventas de prueba (las facturas sembradas llevan una marca en 'observaciones').
+    long countByObservaciones(String observaciones);
+
+    long deleteByObservaciones(String observaciones);
 }

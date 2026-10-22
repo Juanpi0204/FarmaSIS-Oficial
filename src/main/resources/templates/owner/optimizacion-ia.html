@@ -4,130 +4,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor de Optimización - Panel Owner | L-Farma</title>
-    <meta name="_csrf" th:content="${_csrf.token}" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <title>Predicción de Demanda e IA - FarmaSIS | L-Farma</title>
+    <meta th:if="${_csrf != null}" name="_csrf" th:content="${_csrf.token}" />
+    <meta th:if="${_csrf != null}" name="_csrf_header" th:content="${_csrf.headerName}" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/sidebar.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>/* Anti-flicker */
     (function(){try{if(localStorage.getItem('sidebarState')==='closed'){document.documentElement.classList.add('sidebar-preload-collapsed');}}catch(e){}}());
     </script>
     <style>
-        body { background-color: #f8f9fa; font-family: 'Inter', sans-serif; }
-        .main-content { background-color: #f8f9fa; min-height: 100vh; }
+        body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; color: #1e293b; }
+        .main-content { background-color: #f4f7f6; min-height: 100vh; }
         
-        .ia-header {
-            background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%);
+        /* Banner IA */
+        .ia-hero-banner {
+            background: linear-gradient(135deg, #093824 0%, #115e41 50%, #1e7e5e 100%);
             color: white;
-            padding: 2.5rem;
-            border-radius: 15px;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(27, 67, 50, 0.15);
+            padding: 2.25rem;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(17, 94, 65, 0.2);
             position: relative;
             overflow: hidden;
         }
-        .ia-header::after {
+        .ia-hero-banner::after {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255,255,255,0.05);
+            top: -50px;
+            right: -50px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%;
         }
 
-        .btn-ia {
-            background-color: #52B788;
+        /* Botón de acción principal */
+        .btn-ia-action {
+            background-color: #10B981;
             color: white;
             border: none;
-            padding: 0.8rem 2rem;
+            padding: 0.65rem 1.4rem;
             font-weight: 600;
             border-radius: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(82, 183, 136, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
-        .btn-ia:hover {
-            background-color: #40916C;
-            transform: translateY(-2px);
+        .btn-ia-action:hover {
+            background-color: #059669;
             color: white;
-            box-shadow: 0 6px 20px rgba(82, 183, 136, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
         }
 
-        .loading-container {
-            display: none;
-            text-align: center;
-            padding: 3rem;
+        /* Tarjetas de Métricas */
+        .kpi-card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            padding: 1.4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
         }
-
-        .result-card {
-            background: white;
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border-color: #cbd5e1;
         }
-        .result-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .stat-icon-ia {
-            width: 48px;
-            height: 48px;
+        .kpi-icon-box {
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+            font-size: 1.35rem;
         }
 
-        #resultsArea {
-            display: none;
-        }
-
-        .table-premium thead {
-            background-color: #f1f3f5;
-        }
-        .table-premium th {
+        /* Temporalidad Pills */
+        .horizonte-btn {
+            padding: 0.45rem 1.1rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            text-transform: uppercase;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .horizonte-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .horizonte-btn.active {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.35);
+        }
+
+        /* Tabla de Series */
+        .table-prediction thead th {
+            background-color: #f8fafc;
+            color: #64748b;
             font-size: 0.75rem;
-            letter-spacing: 0.5px;
-            color: #6c757d;
-            border: none;
-            padding: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.85rem 1rem;
+            border-bottom: 2px solid #e2e8f0;
         }
-        .table-premium td {
+        .table-prediction tbody td {
+            padding: 0.85rem 1rem;
             vertical-align: middle;
-            padding: 1rem;
-            border-bottom: 1px solid #f1f3f5;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.875rem;
+        }
+        .table-prediction tbody tr.row-futura {
+            background-color: #f0fdf4;
+            font-weight: 500;
         }
 
-        .badge-discount {
-            background-color: #d8f3dc;
-            color: #1b4332;
-            font-weight: 600;
-        }
-        .badge-stock {
-            background-color: #e9ecef;
-            color: #495057;
-        }
-        .text-utility {
-            color: #2d6a4f;
+        /* Badges de Riesgo */
+        .badge-riesgo-alto {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
             font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .badge-riesgo-medio {
+            background-color: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .badge-riesgo-bajo {
+            background-color: #d1fae5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        /* Spinner custom */
-        .spinner-ia {
-            width: 3rem;
-            height: 3rem;
-            color: #52B788;
+        /* Card contenedora de gráfico */
+        .chart-container-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+        }
+
+        /* Loader */
+        .spinner-pulse {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-width: 0.25em;
+            color: #10B981;
+        }
+
+        /* Formula box */
+        .formula-box {
+            background: #0f172a;
+            color: #38bdf8;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -138,312 +198,766 @@
     <div th:replace="~{fragments/sidebar :: logoutModal}"></div>
 
     <div class="main-content no-transition" id="mainContent">
-        <div class="container-fluid px-4 py-4">
+        <div class="container-fluid px-3 px-md-4 py-4">
             
-            <!-- Contenedor Sticky Global -->
-            <div class="global-sticky-header mb-4">
-                <!-- IA Header -->
-                <div class="ia-header mb-0">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h1 class="display-6 fw-bold mb-2">
-                                <i class="bi bi-cpu-fill me-2"></i> Motor de Optimización
-                            </h1>
-                            <p class="lead mb-0 opacity-75">
-                                Optimización avanzada para maximizar la utilidad de tu inventario. Pre-filtra productos con stock bajo.
-                            </p>
-                            <small id="draftBadge" class="badge bg-light text-dark mt-2" style="display:none;"></small>
+            <!-- 1. HERO BANNER PRINCIPAL -->
+            <div class="ia-hero-banner mb-4">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                            <span class="badge bg-white text-emerald-800 fw-bold px-2 py-1" style="color: #065f46 !important; font-size: 0.72rem;">
+                                <i class="bi bi-cpu-fill me-1"></i> IA & SERIES TEMPORALES
+                            </span>
+                            <span class="badge bg-black/30 text-white px-2 py-1" style="font-size: 0.72rem;">
+                                <i class="bi bi-database-check me-1"></i> DATOS REALES DE MONGODB
+                            </span>
+                            <span class="badge bg-emerald-400 text-emerald-950 fw-bold px-2 py-1" style="font-size: 0.72rem;">
+                                MODELO DAMPED HOLT (1985)
+                            </span>
                         </div>
-                        <div class="col-md-4 text-md-end mt-4 mt-md-0">
-                            <button id="btnEjecutar" class="btn btn-ia">
-                                <i class="bi bi-play-circle-fill me-2"></i> Ejecutar Optimización
+                        <h1 class="display-6 fw-bold mb-2 text-white">
+                            Predicción de Demanda e Inteligencia de Inventario
+                        </h1>
+                        <p class="mb-0 text-white-50" style="font-size: 0.95rem; max-width: 820px;">
+                            Pronóstico estocástico de ventas futuras y simulación de rotación de stock. Calcula el riesgo inminente de quiebre, el día crítico de desabastecimiento y sugiere órdenes de reposición basadas en facturación real de FarmaSIS.
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                        <button type="button" class="btn btn-outline-light btn-sm fw-semibold rounded-pill px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalExplicacion">
+                            <i class="bi bi-journal-text me-1"></i> Sustentación del Modelo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. BARRA DE CONTROL Y SELECTOR DE PRODUCTO -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: #ffffff; border: 1px solid #e2e8f0;">
+                <div class="card-body p-3 p-md-4">
+                    <div class="row g-3 align-items-center">
+                        <!-- Selector de Producto -->
+                        <div class="col-lg-6 col-md-7">
+                            <label for="selectProducto" class="form-label fw-bold small text-muted mb-1">
+                                <i class="bi bi-search me-1 text-emerald-600"></i> Seleccionar Medicamento / Producto de MongoDB:
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="bi bi-capsule"></i>
+                                </span>
+                                <select id="selectProducto" class="form-select border-start-0 ps-0 fw-semibold" style="box-shadow: none;">
+                                    <option value="" disabled selected>Cargando catálogo activo...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Selector de Granularidad / Temporalidad -->
+                        <div class="col-lg-4 col-md-5">
+                            <label class="form-label fw-bold small text-muted mb-1 d-block">
+                                <i class="bi bi-calendar3 me-1 text-emerald-600"></i> Horizonte Temporal:
+                            </label>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="horizonte-btn" data-temporalidad="DIARIO" onclick="cambiarTemporalidad('DIARIO')">
+                                    Diario (7d)
+                                </button>
+                                <button type="button" class="horizonte-btn active" data-temporalidad="SEMANAL" onclick="cambiarTemporalidad('SEMANAL')">
+                                    Semanal (4s)
+                                </button>
+                                <button type="button" class="horizonte-btn" data-temporalidad="MENSUAL" onclick="cambiarTemporalidad('MENSUAL')">
+                                    Mensual (3m)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Botón Recalcular -->
+                        <div class="col-lg-2 text-lg-end">
+                            <label class="form-label d-none d-lg-block mb-1">&nbsp;</label>
+                            <button id="btnRecalcular" class="btn btn-ia-action w-100" onclick="cargarPrediccionActual()">
+                                <i class="bi bi-arrow-repeat me-1" id="iconRecalcular"></i> Actualizar
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Results Summary (Fijo arriba al optimizar) -->
-                <div id="resultsAreaSummary" style="display: none;" class="mt-4">
-                    <!-- Summary Cards -->
-                    <div class="row mb-3">
-                        <div class="col-md-4 mb-3">
-                            <div class="card result-card h-100 p-4 shadow-sm border-0">
-                                <div class="stat-icon-ia bg-primary-subtle text-primary">
-                                    <i class="bi bi-cash-stack"></i>
-                                </div>
-                                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Presupuesto Usado</h6>
-                                <h3 id="resumenPresupuesto" class="fw-bold mb-0">$0.00</h3>
-                                <small id="resumenPresupuestoPct" class="text-muted mt-1">0% del presupuesto</small>
-                            </div>
+                    <!-- Fila con información rápida del producto seleccionado -->
+                    <div id="infoProductoStrip" class="d-flex flex-wrap align-items-center gap-3 pt-3 mt-3 border-top" style="display: none !important;">
+                        <div class="small">
+                            <span class="text-muted">Código:</span> 
+                            <strong id="badgeCodigo" class="text-dark bg-light px-2 py-1 rounded">--</strong>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card result-card h-100 p-4 shadow-sm border-0">
-                                <div class="stat-icon-ia bg-success-subtle text-success">
-                                    <i class="bi bi-box-seam"></i>
-                                </div>
-                                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Total Unidades a Pedir</h6>
-                                <h3 id="resumenUnidades" class="fw-bold mb-0">0</h3>
-                                <small class="text-muted mt-1">Unidades sugeridas por la IA</small>
-                                <div class="mt-2"><span id="productosAOptimizarBadge" class="badge bg-info text-white" style="font-size: 0.8rem;">Productos a Optimizar: 0</span></div>
-                            </div>
+                        <div class="small">
+                            <span class="text-muted">Categoría:</span> 
+                            <strong id="badgeCategoria" class="text-dark">--</strong>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card result-card h-100 p-4 shadow-sm border-0">
-                                <div class="stat-icon-ia bg-warning-subtle text-warning">
+                        <div class="small">
+                            <span class="text-muted">Stock Actual en Bodega:</span> 
+                            <span id="badgeStockActual" class="badge bg-emerald-100 text-emerald-800 fw-bold px-2 py-1" style="background-color: #d1fae5; color: #065f46;">-- uds</span>
+                        </div>
+                        <div class="small">
+                            <span class="text-muted">Stock Mínimo de Seguridad:</span> 
+                            <span id="badgeStockMinimo" class="badge bg-secondary-subtle text-secondary fw-semibold px-2 py-1">-- uds</span>
+                        </div>
+                        <div class="ms-auto small text-muted">
+                            <i class="bi bi-clock-history me-1"></i> Predicción generada sobre facturación viva
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. SPINNER DE CARGA -->
+            <div id="loadingState" class="text-center py-5 my-3" style="display: none;">
+                <div class="spinner-border spinner-pulse mb-3" role="status">
+                    <span class="visually-hidden">Calculando...</span>
+                </div>
+                <h5 class="fw-bold text-slate-800">Procesando Serie Temporal en MongoDB...</h5>
+                <p class="text-muted small">Optimizando hiperparámetros (α, β) con ajuste de tendencia amortiguada.</p>
+            </div>
+
+            <!-- 4. ESTADO VACÍO (SIN_DATOS) -->
+            <div id="sinDatosState" class="card border-0 shadow-sm rounded-4 p-5 text-center mb-4" style="display: none; background: #fffdf5; border: 1px dashed #f59e0b !important;">
+                <div class="mx-auto mb-3" style="width: 64px; height: 64px; border-radius: 50%; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #d97706;">
+                    <i class="bi bi-database-exclamation"></i>
+                </div>
+                <h4 class="fw-bold text-dark mb-2">Historial de Ventas Insuficiente en MongoDB</h4>
+                <p id="sinDatosMensaje" class="text-muted mx-auto mb-4" style="max-width: 650px;">
+                    Este producto no cuenta con registros de facturación suficientes en la base de datos para el horizonte seleccionado. El sistema no inventa datos ficticios para preservar la integridad analítica.
+                </p>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="cambiarTemporalidad('DIARIO')">
+                        <i class="bi bi-calendar-event me-1"></i> Probar Horizonte Diario
+                    </button>
+                    <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="seleccionarProductoSiguiente()">
+                        <i class="bi bi-arrow-right-circle me-1"></i> Probar Siguiente Producto
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5. CONTENIDO PRINCIPAL DE LA PREDICCIÓN (KPIS + GRÁFICO + TABLA) -->
+            <div id="prediccionContent" style="display: none;">
+                
+                <!-- 4 TARJETAS DE KPIS -->
+                <div class="row g-3 mb-4">
+                    <!-- KPI 1: Demanda Total Proyectada -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Demanda Proyectada</span>
+                                <div class="kpi-icon-box bg-emerald-50 text-emerald-600" style="background: #ecfdf5; color: #059669;">
                                     <i class="bi bi-graph-up-arrow"></i>
                                 </div>
-                                <h6 class="text-muted text-uppercase mb-1" style="font-size: 0.8rem;">Utilidad Total Estimada</h6>
-                                <h3 id="resumenUtilidad" class="fw-bold mb-0 text-utility">$0.00</h3>
-                                <small class="text-muted mt-1">Ganancia proyectada optimizada</small>
+                            </div>
+                            <div class="d-flex align-items-baseline gap-2">
+                                <h2 id="kpiDemandaTotal" class="fw-bold mb-0 text-dark">0</h2>
+                                <span class="text-muted small">unidades</span>
+                            </div>
+                            <div class="mt-2 text-muted small d-flex align-items-center gap-1">
+                                <i class="bi bi-info-circle"></i>
+                                <span id="kpiDemandaSub">Para el horizonte seleccionado</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Fila de Título y Filtro de Categoría (Fijo arriba) -->
-                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 bg-white p-3 rounded-3 shadow-sm border border-secondary-subtle">
-                        <h5 class="fw-bold mb-0"><i class="bi bi-list-stars me-2 text-success"></i> Propuestas de Pedido Optimizadas</h5>
-                        <div class="d-flex align-items-center" style="max-width: 250px;">
-                            <label for="filtroCategoria" class="me-2 text-muted fw-semibold small mb-0">Categoría:</label>
-                            <select id="filtroCategoria" class="form-select form-select-sm border-secondary-subtle rounded-3">
-                                <option value="Todos">Todos</option>
-                                <option value="Cosmético">Cosmético</option>
-                                <option value="Higiene">Higiene</option>
-                                <option value="Medicamento">Medicamento</option>
-                                <option value="Otros">Otros</option>
-                                <option value="Suplemento">Suplemento</option>
-                            </select>
+                    <!-- KPI 2: Riesgo de Quiebre de Stock -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Riesgo de Quiebre</span>
+                                <div class="kpi-icon-box" id="kpiRiesgoIconBox" style="background: #f1f5f9; color: #475569;">
+                                    <i class="bi bi-shield-check" id="kpiRiesgoIcon"></i>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <span id="kpiRiesgoBadge" class="badge-riesgo-bajo">
+                                    <i class="bi bi-check-circle-fill"></i> BAJO
+                                </span>
+                            </div>
+                            <div class="mt-2 text-muted small" id="kpiRiesgoSub">
+                                Stock suficiente para cubrir la demanda
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Período Crítico de Agotamiento -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Punto Crítico</span>
+                                <div class="kpi-icon-box bg-amber-50 text-amber-600" style="background: #fffbeb; color: #d97706;">
+                                    <i class="bi bi-exclamation-diamond"></i>
+                                </div>
+                            </div>
+                            <h3 id="kpiPeriodoCritico" class="fw-bold mb-0 text-dark" style="font-size: 1.45rem;">--</h3>
+                            <div class="mt-2 text-muted small">
+                                Momento estimado de alerta o agotamiento
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Sugerencia de Reorden -->
+                    <div class="col-xl-3 col-md-6">
+                        <div class="kpi-card h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Sugerencia de Compra</span>
+                                <div class="kpi-icon-box bg-blue-50 text-blue-600" style="background: #eff6ff; color: #2563eb;">
+                                    <i class="bi bi-cart-check"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-baseline gap-2">
+                                <h2 id="kpiSugerenciaReorden" class="fw-bold mb-0 text-primary">0</h2>
+                                <span class="text-muted small">uds sugeridas</span>
+                            </div>
+                            <div class="mt-2 text-muted small">
+                                Para garantizar stock de seguridad
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Loading State -->
-            <div id="loadingArea" class="loading-container mb-4">
-                <div class="spinner-border spinner-ia mb-3" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                <!-- GRÁFICO INTERACTIVO CHART.JS -->
+                <div class="chart-container-card mb-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark">
+                                <i class="bi bi-activity text-emerald-600 me-2"></i> Curva de Facturación Real vs Predicción IA
+                            </h5>
+                            <small class="text-muted">Barras verdes: ventas históricas facturadas | Línea verde esmeralda: pronóstico con intervalo de confianza al 95%</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-light text-dark border small fw-normal py-2 px-3">
+                                <i class="bi bi-funnel me-1"></i> <span id="badgeFiltroGrafico">Horizonte: SEMANAL</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor Responsive de Chart.js -->
+                    <div style="position: relative; height: 380px; width: 100%;">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
                 </div>
-                <h4 class="fw-bold">Analizando combinaciones...</h4>
-                <p class="text-muted">Esto tomará aproximadamente 5 segundos. El motor de Timefold está calculando el escenario más rentable.</p>
-            </div>
 
-            <!-- Results Table Area (Hace Scroll) -->
-            <div id="resultsAreaTable" style="display: none;">
-                <!-- Table -->
-                <div class="card border-0 shadow-sm" style="border-radius: 15px; overflow: hidden;">
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-premium mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th class="text-center">Stock Actual</th>
-                                        <th class="text-center">Sugerencia Pedido</th>
-                                        <th class="text-center">Stock Final</th>
-                                        <th class="text-center">Desc. Proximidad</th>
-                                        <th class="text-end">Utilidad Est.</th>
-                                        <th class="text-center">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaResultados">
-                                    <!-- Dinámico -->
-                                </tbody>
-                            </table>
+                <!-- FILA INFERIOR: TABLA DETALLADA Y FICHA CIENTÍFICA -->
+                <div class="row g-4">
+                    <!-- Tabla de Desglose Período a Período -->
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm rounded-4 h-100" style="border: 1px solid #e2e8f0;">
+                            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold mb-0 text-dark">
+                                    <i class="bi bi-table me-2 text-emerald-600"></i> Desglose Temporal de Datos
+                                </h6>
+                                <span class="badge bg-secondary-subtle text-secondary small fw-normal" id="badgeTotalPeriodos">0 períodos</span>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                    <table class="table table-prediction mb-0 align-middle">
+                                        <thead class="sticky-top">
+                                            <tr>
+                                                <th>Período</th>
+                                                <th>Tipo</th>
+                                                <th class="text-center">Venta Real</th>
+                                                <th class="text-center">Predicción</th>
+                                                <th class="text-center">Rango 95%</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tablaSerieDatos">
+                                            <!-- Filas dinámicas -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ficha Científica del Modelo (Para defensa académica) -->
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100" style="border: 1px solid #e2e8f0; background: #ffffff;">
+                            <div class="card-header bg-white border-0 py-3 px-4">
+                                <h6 class="fw-bold mb-0 text-dark">
+                                    <i class="bi bi-shield-check me-2 text-emerald-600"></i> Parámetros del Modelo
+                                </h6>
+                                <small class="text-muted">Ajustados dinámicamente mediante Grid Search</small>
+                            </div>
+                            <div class="card-body px-4 pt-1 pb-4">
+                                <ul class="list-group list-group-flush small">
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Algoritmo:</span>
+                                        <span class="fw-bold text-dark text-end" id="metricaAlgoritmo">Damped Holt</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Alfa (&alpha; - Nivel):</span>
+                                        <span class="fw-bold text-emerald-700" id="metricaAlfa">--</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Beta (&beta; - Tendencia):</span>
+                                        <span class="fw-bold text-emerald-700" id="metricaBeta">--</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Phi (&phi; - Amortiguación):</span>
+                                        <span class="fw-bold text-dark" id="metricaPhi">0.90</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Error RMSE (unidades):</span>
+                                        <span class="fw-bold text-dark" id="metricaRmse">--</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Error WAPE (% ponderado):</span>
+                                        <span class="fw-bold text-dark" id="metricaWape">--</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Períodos Históricos:</span>
+                                        <span class="fw-bold text-dark" id="metricaPeriodos">--</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between px-0 py-2">
+                                        <span class="text-muted">Nivel de Confianza:</span>
+                                        <span class="badge bg-success-subtle text-success fw-bold">95% (&plusmn;1.96&sigma;)</span>
+                                    </li>
+                                </ul>
+
+                                <div class="p-3 bg-light rounded-3 mt-3">
+                                    <div class="fw-bold text-dark small mb-1">
+                                        <i class="bi bi-info-circle me-1 text-primary"></i> Fuente de Datos
+                                    </div>
+                                    <p class="mb-0 text-muted" style="font-size: 0.78rem;">
+                                        Registros reales de facturas emitidas en MongoDB Atlas (<code class="text-dark">colección FACTURA</code>). No se emplean estimaciones heurísticas arbitrarias.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
         </div>
     </div>
 
+    <!-- MODAL DE SUSTENTACIÓN MATEMÁTICA PARA EL PROFESOR -->
+    <div class="modal fade" id="modalExplicacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow rounded-4">
+                <div class="modal-header bg-emerald-900 text-white rounded-top-4" style="background: linear-gradient(135deg, #093824, #1B4332);">
+                    <h5 class="modal-title fw-bold text-white">
+                        <i class="bi bi-mortarboard-fill me-2"></i> Fundamentación Matemática del Módulo de Predicción
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4" style="font-size: 0.9rem; line-height: 1.6;">
+                    
+                    <h6 class="fw-bold text-emerald-800 mb-2">1. ¿Qué modelo se implementó y por qué?</h6>
+                    <p class="text-muted mb-3">
+                        Se implementó el <strong>Modelo de Tendencia Lineal Amortiguada de Holt (Damped Holt)</strong> propuesto por <em>Gardner & McKenzie (1985)</em>, recomendado por la literatura científica de pronóstico (Makridakis Competitions M3/M4) por su alta precisión en series de demanda con ruido y ventas intermitentes. A diferencia de Holt estándar o regresiones lineales, evita la sobreproyección asintótica a mediano y largo plazo.
+                    </p>
+
+                    <h6 class="fw-bold text-emerald-800 mb-2">2. Ecuaciones de Recurrencia</h6>
+                    <div class="formula-box mb-3">
+                        Nivel (L_t):     L_t = &alpha; &middot; y_t + (1 - &alpha;) &middot; (L_{t-1} + &phi; &middot; b_{t-1})<br>
+                        Tendencia (b_t): b_t = &beta; &middot; (L_t - L_{t-1}) + (1 - &beta;) &middot; &phi; &middot; b_{t-1}<br>
+                        Previsión k-pasos: &ycirc;_{t+k} = L_t + &sum;_{i=1}^k (&phi;^i &middot; b_t)
+                    </div>
+
+                    <h6 class="fw-bold text-emerald-800 mb-2">3. Optimización de Parámetros (&alpha;, &beta;)</h6>
+                    <p class="text-muted mb-3">
+                        Los hiperparámetros &alpha; y &beta; no son fijos: se calculan en cada consulta mediante una búsqueda en rejilla (<em>Grid Search</em>) en el espacio [0.1, 0.9], seleccionando la combinación que minimiza la suma de errores cuadráticos de un paso adelante (<em>One-Step-Ahead SSE</em>). El coeficiente de amortiguamiento &phi; se fija en 0.90 (valor canónico en la industria).
+                    </p>
+
+                    <h6 class="fw-bold text-emerald-800 mb-2">4. Intervalos de Confianza al 95%</h6>
+                    <p class="text-muted mb-3">
+                        Para cada previsión futura a <em>k</em> períodos se estima la varianza acumulada del error:
+                        <br>
+                        <code>IC_{95%} = &ycirc;_{t+k} &plusmn; 1.96 &middot; RMSE &middot; &radic;k</code>
+                    </p>
+
+                    <h6 class="fw-bold text-emerald-800 mb-2">5. Detección de Quiebre y Sugerencia de Reorden</h6>
+                    <p class="text-muted mb-0">
+                        El sistema proyecta el saldo de inventario restando la demanda esperada período a período:
+                        <code>Stock_{t+k} = Stock_{t+k-1} - &ycirc;_{t+k}</code>. Si el stock cae por debajo del stock mínimo de seguridad, se emite alerta crítica indicando el momento exacto y la cantidad requerida para reponer el inventario.
+                    </p>
+
+                </div>
+                <div class="modal-footer bg-light border-0 rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/js/sidebar.js"></script>
+
     <script>
-        document.getElementById('btnEjecutar').addEventListener('click', function() {
-            const btn = this;
-            const loadingArea = document.getElementById('loadingArea');
-            const summaryArea = document.getElementById('resultsAreaSummary');
-            const tableArea = document.getElementById('resultsAreaTable');
-            const tabla = document.getElementById('tablaResultados');
+        // Estado de la aplicación
+        let catalogoProductos = [];
+        let temporalidadActual = 'SEMANAL';
+        let productoSeleccionadoId = '0846';
+        let chartInstance = null;
 
-            // 1. UI State: Loading
-            btn.style.display = 'none';
-            summaryArea.style.display = 'none';
-            tableArea.style.display = 'none';
-            loadingArea.style.display = 'block';
+        // Inicialización al cargar el DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarCatalogoProductos();
+        });
 
-            // 2. Fetch API
-            fetch('/api/optimizar')
+        // 1. Cargar lista de productos activos desde el backend
+        function cargarCatalogoProductos() {
+            fetch('/api/v1/productos')
                 .then(response => {
-                    if (!response.ok) throw new Error('Error en el motor de optimización');
+                    if (!response.ok) throw new Error('Error al listar productos');
                     return response.json();
                 })
                 .then(data => {
-                    // 3. UI State: Show Results
-                    loadingArea.style.display = 'none';
-                    summaryArea.style.display = 'block';
-                    tableArea.style.display = 'block';
-                    btn.style.display = 'inline-block';
-                    btn.innerHTML = '<i class="bi bi-arrow-repeat me-2"></i> Recalcular Optimización';
+                    catalogoProductos = data.productos || [];
+                    const select = document.getElementById('selectProducto');
+                    select.innerHTML = '';
 
-                    // 4. Fill Summary
-                    const resumen = data.resumen;
-                    document.getElementById('resumenPresupuesto').innerText = '$' + resumen.costoTotalPedidos.toLocaleString('es-CO', {maximumFractionDigits: 0});
-                    document.getElementById('resumenPresupuestoPct').innerText = resumen.presupuestoUsadoPorcentaje + ' del presupuesto máximo';
-                    document.getElementById('resumenUnidades').innerText = resumen.totalUnidadesAPedir.toLocaleString('es-CO');
-                    document.getElementById('resumenUtilidad').innerText = '$' + resumen.utilidadTotalEstimada.toLocaleString('es-CO', {maximumFractionDigits: 0});
-                    if (data.propuestas) {
-                        document.getElementById('productosAOptimizarBadge').innerText = 'Productos a Optimizar: ' + data.propuestas.length;
+                    if (catalogoProductos.length === 0) {
+                        select.innerHTML = '<option value="">No hay productos activos en MongoDB</option>';
+                        return;
                     }
 
-                    // 5. Fill Table
-                    tabla.innerHTML = '';
-                    document.getElementById('filtroCategoria').value = 'Todos';
-                    data.propuestas.forEach(p => {
-                        if (p.cantidadAPedir === 0 && p.descuentoProximidad === 0) return;
-                        
-                        const row = document.createElement('tr');
-                        row.setAttribute('data-categoria', p.productoCategoria || 'Otros');
-                        row.innerHTML = `
-                            <td>
-                                <div class="fw-bold">${p.productoNombre}</div>
-                                <small class="text-muted">Cód: ${p.productoCodigo}</small>
-                                <span class="badge bg-secondary-subtle text-secondary ms-2" style="font-size: 0.7rem;">${p.productoCategoria || 'Otros'}</span>
-                            </td>
-                            <td class="text-center"><span class="badge badge-stock">${p.cantidadActual}</span></td>
-                            <td class="text-center"><span class="badge bg-success text-white" style="font-size: 0.9rem;">+${p.cantidadAPedir}</span></td>
-                            <td class="text-center fw-bold">${p.stockResultante}</td>
-                            <td class="text-center">
-                                <span class="badge badge-discount">${p.descuentoPorcentaje}</span>
-                            </td>
-                            <td class="text-end text-utility">$${Number(p.utilidadEstimada).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td>
-                            <td class="text-center">
-                                ${p.productoId && parseFloat(p.descuentoPorcentaje) > 0 ? (
-                                    p.precioOriginal != null ? 
-                                    `<button class="btn btn-sm btn-secondary" disabled><i class="bi bi-check2"></i> Aplicado</button>` :
-                                    `<button class="btn btn-sm btn-outline-success aplicar-descuento-btn" 
-                                            data-id="${p.productoId}" 
-                                            data-nombre="${p.productoNombre}" 
-                                            data-pct="${parseFloat(p.descuentoPorcentaje)}">
-                                        <i class="bi bi-tag-fill me-1"></i> Aplicar
-                                    </button>`
-                                ) : `<span class="text-muted small">Sin Descuento</span>`}
-                            </td>
-                        `;
-                        tabla.appendChild(row);
+                    // Llenar select
+                    catalogoProductos.forEach((prod, index) => {
+                        const opt = document.createElement('option');
+                        opt.value = prod.id;
+                        opt.textContent = `${prod.nombre} [${prod.categoria || 'General'}]`;
+                        select.appendChild(opt);
                     });
+
+                    // Si existe el producto por defecto "0846", seleccionarlo, o el primero
+                    const existeDefault = catalogoProductos.some(p => p.id === productoSeleccionadoId);
+                    if (existeDefault) {
+                        select.value = productoSeleccionadoId;
+                    } else {
+                        productoSeleccionadoId = catalogoProductos[0].id;
+                        select.value = productoSeleccionadoId;
+                    }
+
+                    // Listener de cambio
+                    select.addEventListener('change', function() {
+                        productoSeleccionadoId = this.value;
+                        cargarPrediccionActual();
+                    });
+
+                    // Ejecutar primera predicción de inmediato
+                    cargarPrediccionActual();
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    loadingArea.style.display = 'none';
-                    btn.style.display = 'inline-block';
-                    alert('Ocurrió un error al ejecutar la optimización: ' + error.message);
+                .catch(err => {
+                    console.error('Error cargando catálogo:', err);
+                    const select = document.getElementById('selectProducto');
+                    select.innerHTML = '<option value="0846">Accu-Chek 250mg (MK) (0846)</option>';
+                    productoSeleccionadoId = '0846';
+                    cargarPrediccionActual();
                 });
-        });
+        }
 
-        // Load last draft on page load
-        (function loadDraft() {
-            fetch('/api/optimizacion/ultimo')
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status === 'OK') {
-                        const dt = new Date(data.fechaCalculo);
-                        document.getElementById('draftBadge').style.display = 'inline-block';
-                        document.getElementById('draftBadge').innerHTML = '<i class="bi bi-clock-history me-1"></i> Último cálculo: ' + dt.toLocaleDateString('es') + ' ' + dt.toLocaleTimeString('es', {hour:'2-digit', minute:'2-digit'});
-                        document.getElementById('btnEjecutar').innerHTML = '<i class="bi bi-arrow-repeat me-2"></i> Recalcular Optimización';
-                        // Show saved results
-                        const summaryArea = document.getElementById('resultsAreaSummary');
-                        const tableArea = document.getElementById('resultsAreaTable');
-                        const tabla = document.getElementById('tablaResultados');
-                        summaryArea.style.display = 'block';
-                        tableArea.style.display = 'block';
-                        const resumen = data.resumen;
-                        document.getElementById('resumenPresupuesto').innerText = '$' + Number(resumen.costoTotalPedidos).toLocaleString('es-CO', {maximumFractionDigits: 0});
-                        document.getElementById('resumenPresupuestoPct').innerText = resumen.presupuestoUsadoPorcentaje + ' del presupuesto máximo';
-                        document.getElementById('resumenUnidades').innerText = Number(resumen.totalUnidadesAPedir).toLocaleString('es-CO');
-                        document.getElementById('resumenUtilidad').innerText = '$' + Number(resumen.utilidadTotalEstimada).toLocaleString('es-CO', {maximumFractionDigits: 0});
-                        if (data.propuestas) {
-                            document.getElementById('productosAOptimizarBadge').innerText = 'Productos a Optimizar: ' + data.propuestas.length;
-                        }
-                        tabla.innerHTML = '';
-                        document.getElementById('filtroCategoria').value = 'Todos';
-                        data.propuestas.forEach(p => {
-                            if (p.cantidadAPedir === 0 && p.descuentoProximidad === 0) return;
-                            
-                            const row = document.createElement('tr');
-                            row.setAttribute('data-categoria', p.productoCategoria || 'Otros');
-                            row.innerHTML = `<td><div class="fw-bold">${p.productoNombre}</div><small class="text-muted">Cód: ${p.productoCodigo}</small><span class="badge bg-secondary-subtle text-secondary ms-2" style="font-size:0.7rem;">${p.productoCategoria || 'Otros'}</span></td><td class="text-center"><span class="badge badge-stock">${p.cantidadActual}</span></td><td class="text-center"><span class="badge bg-success text-white" style="font-size:0.9rem;">+${p.cantidadAPedir}</span></td><td class="text-center fw-bold">${p.stockResultante}</td><td class="text-center"><span class="badge badge-discount">${p.descuentoPorcentaje}</span></td><td class="text-end text-utility">$${Number(p.utilidadEstimada).toLocaleString('es-CO', {maximumFractionDigits: 0})}</td><td class="text-center">${p.productoId && parseFloat(p.descuentoPorcentaje) > 0 ? (p.precioOriginal != null ? `<button class="btn btn-sm btn-secondary" disabled><i class="bi bi-check2"></i> Aplicado</button>` : `<button class="btn btn-sm btn-outline-success aplicar-descuento-btn" data-id="${p.productoId}" data-nombre="${p.productoNombre}" data-pct="${parseFloat(p.descuentoPorcentaje)}"><i class="bi bi-tag-fill me-1"></i> Aplicar</button>`) : `<span class="text-muted small">Sin Descuento</span>`}</td>`;
-                            tabla.appendChild(row);
-                        });
-                    }
-                }).catch(() => {});
-        })();
-
-        $(document).on('click', '.aplicar-descuento-btn', function () {
-            const id = $(this).data('id');
-            const nombre = $(this).data('nombre');
-            const pct = $(this).data('pct');
-            
-            Swal.fire({
-                title: '¿Aplicar descuento?',
-                text: `Se aplicará un descuento del ${pct}% al producto "${nombre}".`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, aplicar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const csrfToken = $("meta[name='_csrf']").attr("content") || '';
-                    const csrfHeader = $("meta[name='_csrf_header']").attr("content") || '';
-                    
-                    const headers = {};
-                    if (csrfToken && csrfHeader) {
-                        headers[csrfHeader] = csrfToken;
-                    }
-                    
-                    fetch('/productos/aplicar-descuento/' + encodeURIComponent(id) + '?porcentaje=' + encodeURIComponent(pct), {
-                        method: 'POST',
-                        headers: headers
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: 'Descuento Aplicado',
-                                text: `El nuevo precio es $${data.nuevoPrecio.toLocaleString(undefined, {minimumFractionDigits: 2})}`,
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false
-                            });
-                        } else {
-                            Swal.fire('Error', data.message || 'No se pudo aplicar el descuento.', 'error');
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        Swal.fire('Error', 'Ocurrió un error en el servidor.', 'error');
-                    });
-                }
-            });
-        });
-
-        // Listener para el filtro por categoría client-side
-        document.getElementById('filtroCategoria').addEventListener('change', function() {
-            const categoriaSeleccionada = this.value;
-            const filas = document.querySelectorAll('#tablaResultados tr');
-            filas.forEach(row => {
-                const rowCategoria = row.getAttribute('data-categoria') || 'Otros';
-                if (categoriaSeleccionada === 'Todos' || rowCategoria === categoriaSeleccionada) {
-                    row.style.display = '';
+        // 2. Cambiar temporalidad
+        function cambiarTemporalidad(temp) {
+            temporalidadActual = temp;
+            document.querySelectorAll('.horizonte-btn').forEach(btn => {
+                if (btn.getAttribute('data-temporalidad') === temp) {
+                    btn.classList.add('active');
                 } else {
-                    row.style.display = 'none';
+                    btn.classList.remove('active');
                 }
             });
-        });
+            document.getElementById('badgeFiltroGrafico').innerText = 'Horizonte: ' + temp;
+            cargarPrediccionActual();
+        }
+
+        // 3. Pasar al siguiente producto en caso de SIN_DATOS
+        function seleccionarProductoSiguiente() {
+            const select = document.getElementById('selectProducto');
+            if (select.selectedIndex < select.options.length - 1) {
+                select.selectedIndex += 1;
+            } else {
+                select.selectedIndex = 0;
+            }
+            productoSeleccionadoId = select.value;
+            cargarPrediccionActual();
+        }
+
+        // 4. Consultar y renderizar predicción
+        function cargarPrediccionActual() {
+            if (!productoSeleccionadoId) return;
+
+            const loadingState = document.getElementById('loadingState');
+            const sinDatosState = document.getElementById('sinDatosState');
+            const prediccionContent = document.getElementById('prediccionContent');
+            const infoProductoStrip = document.getElementById('infoProductoStrip');
+            const iconRecalcular = document.getElementById('iconRecalcular');
+
+            // UI: Activar carga
+            loadingState.style.display = 'block';
+            sinDatosState.style.display = 'none';
+            prediccionContent.style.display = 'none';
+            if (iconRecalcular) iconRecalcular.classList.add('bi-spin');
+
+            const url = `/api/v1/prediccion/ventas?productoId=${encodeURIComponent(productoSeleccionadoId)}&temporalidad=${encodeURIComponent(temporalidadActual)}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errData => { throw errData; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loadingState.style.display = 'none';
+                    if (iconRecalcular) iconRecalcular.classList.remove('bi-spin');
+
+                    // Verificar status devuelto
+                    if (data.status === 'SIN_DATOS') {
+                        sinDatosState.style.display = 'block';
+                        document.getElementById('sinDatosMensaje').innerText = data.mensaje || 
+                            'Este producto no cuenta con ventas registradas suficientes en la base de datos para este horizonte temporal.';
+                        infoProductoStrip.style.display = 'none';
+                        return;
+                    }
+
+                    // Renderizar datos exitosos
+                    renderizarResultado(data);
+                })
+                .catch(err => {
+                    loadingState.style.display = 'none';
+                    if (iconRecalcular) iconRecalcular.classList.remove('bi-spin');
+                    console.error('Error al obtener predicción:', err);
+                    
+                    sinDatosState.style.display = 'block';
+                    document.getElementById('sinDatosMensaje').innerText = err.mensaje || 
+                        'No fue posible obtener la predicción para este producto.';
+                    infoProductoStrip.style.display = 'none';
+                });
+        }
+
+        // 5. Renderizar vista de resultados
+        function renderizarResultado(data) {
+            const prediccionContent = document.getElementById('prediccionContent');
+            const infoProductoStrip = document.getElementById('infoProductoStrip');
+            prediccionContent.style.display = 'block';
+            infoProductoStrip.style.display = 'flex';
+
+            const prod = data.producto || {};
+            const resumen = data.resumen || {};
+            const serie = data.serie_datos || [];
+            const modelo = data.modelo || {};
+
+            // A. Info Strip
+            document.getElementById('badgeCodigo').innerText = prod.codigo || '--';
+            document.getElementById('badgeCategoria').innerText = prod.categoria || 'General';
+            document.getElementById('badgeStockActual').innerText = (prod.stock_actual ?? 0) + ' uds';
+            document.getElementById('badgeStockMinimo').innerText = (prod.stock_minimo ?? 0) + ' uds';
+
+            // B. KPIs
+            document.getElementById('kpiDemandaTotal').innerText = resumen.total_predicho ?? 0;
+            document.getElementById('kpiDemandaSub').innerText = `Tendencia: ${resumen.tendencia || 'ESTABLE'}`;
+
+            // Riesgo de quiebre
+            const riesgo = (resumen.riesgo_quiebre || 'BAJO').toUpperCase();
+            const badgeRiesgo = document.getElementById('kpiRiesgoBadge');
+            const iconBox = document.getElementById('kpiRiesgoIconBox');
+            const kpiRiesgoSub = document.getElementById('kpiRiesgoSub');
+
+            if (riesgo === 'ALTO') {
+                badgeRiesgo.className = 'badge-riesgo-alto';
+                badgeRiesgo.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i> CRÍTICO / ALTO';
+                iconBox.style.background = '#fee2e2';
+                iconBox.style.color = '#dc2626';
+                kpiRiesgoSub.innerText = 'Riesgo inminente de desabastecimiento';
+            } else if (riesgo === 'MEDIO') {
+                badgeRiesgo.className = 'badge-riesgo-medio';
+                badgeRiesgo.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i> MODERADO';
+                iconBox.style.background = '#fef3c7';
+                iconBox.style.color = '#d97706';
+                kpiRiesgoSub.innerText = 'Stock ajustado al límite de seguridad';
+            } else {
+                badgeRiesgo.className = 'badge-riesgo-bajo';
+                badgeRiesgo.innerHTML = '<i class="bi bi-shield-check"></i> SEGURO / BAJO';
+                iconBox.style.background = '#d1fae5';
+                iconBox.style.color = '#059669';
+                kpiRiesgoSub.innerText = 'Stock suficiente para el horizonte';
+            }
+
+            // Punto crítico
+            const periodoCritico = resumen.dia_critico || resumen.semana_critica || resumen.mes_critico || resumen.periodo_critico || 'Sin quiebre';
+            document.getElementById('kpiPeriodoCritico').innerText = periodoCritico;
+
+            // Sugerencia de reorden
+            document.getElementById('kpiSugerenciaReorden').innerText = resumen.sugerencia_reorden_unidades ?? 0;
+
+            // C. Parámetros del Modelo
+            document.getElementById('metricaAlgoritmo').innerText = modelo.modelo ? (modelo.modelo.includes('Holt') ? 'Holt Amortiguado' : modelo.modelo) : 'Damped Holt';
+            document.getElementById('metricaAlfa').innerText = modelo.alfa !== undefined ? modelo.alfa : '--';
+            document.getElementById('metricaBeta').innerText = modelo.beta !== undefined ? modelo.beta : '--';
+            document.getElementById('metricaPhi').innerText = modelo.phi !== undefined ? modelo.phi : '0.90';
+            document.getElementById('metricaRmse').innerText = modelo.rmse !== undefined ? Number(modelo.rmse).toFixed(2) : '--';
+            document.getElementById('metricaWape').innerText = modelo.wape !== undefined ? (Number(modelo.wape) * 100).toFixed(1) + '%' : '--';
+            document.getElementById('metricaPeriodos').innerText = (modelo.periodos_usados || serie.length) + ' períodos';
+
+            // D. Renderizar Tabla de Desglose
+            const tbody = document.getElementById('tablaSerieDatos');
+            tbody.innerHTML = '';
+            document.getElementById('badgeTotalPeriodos').innerText = serie.length + ' períodos';
+
+            serie.forEach(item => {
+                const tr = document.createElement('tr');
+                const esFuturo = item.ventas_reales === null || item.ventas_reales === undefined;
+                if (esFuturo) tr.classList.add('row-futura');
+
+                const tipoHtml = esFuturo 
+                    ? '<span class="badge bg-emerald-100 text-emerald-800 fw-bold px-2 py-1" style="background:#d1fae5; color:#065f46;"><i class="bi bi-stars me-1"></i>Pronóstico</span>'
+                    : '<span class="badge bg-light text-secondary border px-2 py-1">Histórico</span>';
+
+                const ventasRealesVal = esFuturo ? '<span class="text-muted">--</span>' : `<strong>${item.ventas_reales}</strong>`;
+                const predichaVal = item.ventas_predichas !== null && item.ventas_predichas !== undefined ? item.ventas_predichas : '--';
+                const rangoVal = (item.limite_inferior !== null && item.limite_superior !== null)
+                    ? `<span class="badge bg-light text-dark border small">[${item.limite_inferior} - ${item.limite_superior}]</span>`
+                    : '<span class="text-muted">--</span>';
+
+                tr.innerHTML = `
+                    <td class="fw-semibold">${item.periodo}</td>
+                    <td>${tipoHtml}</td>
+                    <td class="text-center">${ventasRealesVal}</td>
+                    <td class="text-center fw-bold text-emerald-700" style="color: #047857;">${predichaVal}</td>
+                    <td class="text-center">${rangoVal}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // E. Renderizar Gráfico con Chart.js
+            renderizarChart(serie);
+        }
+
+        // 6. Construir Gráfico Chart.js
+        function renderizarChart(serie) {
+            const ctx = document.getElementById('predictionChart').getContext('2d');
+
+            const labels = serie.map(s => s.periodo);
+            const dataReales = serie.map(s => s.ventas_reales !== undefined ? s.ventas_reales : null);
+            const dataPredichas = serie.map(s => s.ventas_predichas !== undefined ? s.ventas_predichas : null);
+            const dataMin = serie.map(s => s.limite_inferior !== undefined ? s.limite_inferior : null);
+            const dataMax = serie.map(s => s.limite_superior !== undefined ? s.limite_superior : null);
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Ventas Reales (MongoDB)',
+                            data: dataReales,
+                            backgroundColor: 'rgba(16, 185, 129, 0.45)',
+                            borderColor: '#10B981',
+                            borderWidth: 1.5,
+                            borderRadius: 6,
+                            order: 3
+                        },
+                        {
+                            type: 'line',
+                            label: 'Predicción Modelo Holt',
+                            data: dataPredichas,
+                            borderColor: '#047857',
+                            backgroundColor: '#047857',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#047857',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3,
+                            fill: false,
+                            order: 1
+                        },
+                        {
+                            type: 'line',
+                            label: 'Límite Superior (95%)',
+                            data: dataMax,
+                            borderColor: 'rgba(52, 211, 153, 0.4)',
+                            borderDash: [4, 4],
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            fill: false,
+                            order: 2
+                        },
+                        {
+                            type: 'line',
+                            label: 'Límite Inferior (95%)',
+                            data: dataMin,
+                            borderColor: 'rgba(52, 211, 153, 0.4)',
+                            borderDash: [4, 4],
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            fill: '-1', // Rellena el área entre superior e inferior
+                            backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                            order: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                font: {
+                                    family: 'Inter',
+                                    size: 12,
+                                    weight: 500
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { family: 'Inter', size: 13, weight: 700 },
+                            bodyFont: { family: 'Inter', size: 12 },
+                            padding: 10,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.parsed.y;
+                                    if (val === null || val === undefined) return null;
+                                    return ` ${context.dataset.label}: ${val} uds`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f5f9'
+                            },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 },
+                                precision: 0
+                            },
+                            title: {
+                                display: true,
+                                text: 'Unidades Vendidas / Proyectadas',
+                                font: { family: 'Inter', size: 11, weight: 600 },
+                                color: '#64748b'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { family: 'Inter', size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 
