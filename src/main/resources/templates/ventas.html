@@ -49,26 +49,34 @@
 
                 <!-- Estadísticas -->
                 <div class="row mb-4">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
                         <div class="card bg-success text-white shadow-sm border-0">
                             <div class="card-body">
-                                <h6>Ventas Hoy</h6>
+                                <h6 th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas Hoy' : 'Ventas Hoy'}">Ventas Hoy</h6>
                                 <h3><span th:text="'$ ' + ${#numbers.formatDecimal(ventasDelDia, 1, 'POINT', 0, 'COMMA')}">0</span></h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
                         <div class="card bg-info text-white shadow-sm border-0">
                             <div class="card-body">
-                                <h6>Transacciones Hoy</h6>
+                                <h6 th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Facturas Hoy' : 'Transacciones Hoy'}">Transacciones Hoy</h6>
                                 <h3 th:text="${cantidadVentasDelDia}">0</h3>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="card bg-secondary text-white shadow-sm border-0">
+                            <div class="card-body">
+                                <h6>Productos Vendidos Hoy</h6>
+                                <h3 th:text="${(unidadesVendidasHoy != null ? unidadesVendidasHoy : 0) + ' uds'}">0 uds</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
                         <div class="card bg-primary text-white shadow-sm border-0">
                             <div class="card-body">
-                                <h6>Total Ventas</h6>
+                                <h6 th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Total Mis Ventas' : 'Total Ventas'}">Total Ventas</h6>
                                 <h3 th:text="${totalItems}">0</h3>
                             </div>
                         </div>

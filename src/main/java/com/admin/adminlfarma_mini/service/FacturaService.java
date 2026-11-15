@@ -3,6 +3,7 @@ package com.admin.adminlfarma_mini.service;
 import com.admin.adminlfarma_mini.DTO.FacturaRequestDTO;
 import com.admin.adminlfarma_mini.entity.*;
 import com.admin.adminlfarma_mini.repository.FacturaRepository;
+import com.admin.adminlfarma_mini.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ public class FacturaService {
     private final FacturaRepository facturaRepository;
     private final ProductoService productoService;
     private final ClienteService clienteService;
+    private final UsuarioRepository usuarioRepository;
     private final MongoTemplate mongoTemplate;
     
     public Page<Factura> listarFacturas(Pageable pageable) {
@@ -104,13 +106,40 @@ public class FacturaService {
         LocalDateTime inicio = LocalDate.now().atStartOfDay();
         LocalDateTime fin = inicio.plusDays(1);
         List<Factura> ventas = facturaRepository.findVentasDelDia(inicio, fin);
-        return ventas.stream().mapToDouble(Factura::getTotal).sum();
+        return ventas.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
     }
     
     public Long getCantidadVentasDelDia() {
         LocalDateTime inicio = LocalDate.now().atStartOfDay();
         LocalDateTime fin = inicio.plusDays(1);
         return facturaRepository.countVentasDelDia(inicio, fin);
+    }
+
+    public List<Factura> getFacturasDelDiaPorVendedores(List<String> vendedores) {
+        LocalDateTime inicio = LocalDate.now().atStartOfDay();
+        LocalDateTime fin = inicio.plusDays(1);
+        List<Factura> ventasHoy = facturaRepository.findVentasDelDia(inicio, fin);
+        if (vendedores != null && !vendedores.isEmpty()) {
+            ventasHoy = ventasHoy.stream()
+                    .filter(f -> f.getVendedorEmail() != null &&
+                            vendedores.stream().anyMatch(v -> v.equalsIgnoreCase(f.getVendedorEmail())))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        ventasHoy.sort((f1, f2) -> {
+            if (f1.getFecha() == null) return 1;
+            if (f2.getFecha() == null) return -1;
+            return f2.getFecha().compareTo(f1.getFecha());
+        });
+        return ventasHoy;
+    }
+
+    public int calcularUnidadesVendidas(List<Factura> facturas) {
+        if (facturas == null) return 0;
+        return facturas.stream()
+                .filter(f -> f.getDetalles() != null)
+                .flatMap(f -> f.getDetalles().stream())
+                .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
+                .sum();
     }
     
     public Factura crearFactura(FacturaRequestDTO request, String vendedorEmail) {
@@ -147,6 +176,34 @@ public class FacturaService {
         factura.setMetodoPago(request.getMetodoPago() != null ? request.getMetodoPago() : "EFECTIVO");
         factura.setObservaciones(request.getObservaciones());
         factura.setVendedorEmail(vendedorEmail);
+
+        String origen = (request.getOrigenVenta() != null && !request.getOrigenVenta().trim().isEmpty())
+                ? request.getOrigenVenta().trim()
+                : "WEB";
+        factura.setOrigenVenta(origen);
+
+        String nombreVendedor = request.getVendedorNombre();
+        String rolVendedor = request.getVendedorRol();
+        if (vendedorEmail != null && !vendedorEmail.trim().isEmpty()) {
+            Optional<Usuario> vendOpt = usuarioRepository.findFirstByUsername(vendedorEmail.trim());
+            if (vendOpt.isEmpty()) {
+                vendOpt = usuarioRepository.findByEmail(vendedorEmail.trim());
+            }
+            if (vendOpt.isPresent()) {
+                Usuario v = vendOpt.get();
+                factura.setVendedorEmail(v.getEmail() != null && !v.getEmail().isBlank() ? v.getEmail() : v.getUsername());
+                String full = ((v.getNombre() != null ? v.getNombre() : "") + " " +
+                        (v.getApellido() != null ? v.getApellido() : "")).trim();
+                if (!full.isEmpty()) {
+                    nombreVendedor = full;
+                }
+                if (v.getRol() != null && !v.getRol().isBlank()) {
+                    rolVendedor = v.getRol().replace("ROLE_", "");
+                }
+            }
+        }
+        factura.setVendedorNombre(nombreVendedor != null && !nombreVendedor.isBlank() ? nombreVendedor : vendedorEmail);
+        factura.setVendedorRol(rolVendedor != null && !rolVendedor.isBlank() ? rolVendedor.replace("ROLE_", "") : "EMPLEADO");
         
         double subtotal = 0.0;
         

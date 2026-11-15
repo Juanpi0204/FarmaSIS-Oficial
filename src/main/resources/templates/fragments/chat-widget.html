@@ -1,4 +1,4 @@
-<th:block sec:authorize="hasAnyAuthority('ROLE_OWNER', 'ROLE_ADMIN', 'OWNER', 'ADMIN')">
+<th:block sec:authorize="hasAnyAuthority('ROLE_OWNER', 'ROLE_ADMIN', 'ROLE_EMPLEADO', 'OWNER', 'ADMIN', 'EMPLEADO')">
 <!-- Import Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
@@ -507,9 +507,10 @@
         </div>
         <div class="quick-replies" id="quick-replies">
             <button class="quick-reply-btn" onclick="sendQuickReply('Ver inventario de productos')">Ver inventario</button>
-            <button class="quick-reply-btn" onclick="sendQuickReply('Revisar las ventas del día')">Ventas de hoy</button>
+            <button class="quick-reply-btn" onclick="sendQuickReply('Revisar mis ventas del día')">Mis ventas de hoy</button>
             <button class="quick-reply-btn" onclick="sendQuickReply('Mostrar productos con bajo stock')">Bajo stock</button>
-            <button class="quick-reply-btn" onclick="sendQuickReply('Lista de proveedores activos')">Proveedores</button>
+            <button th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}"
+                    class="quick-reply-btn" onclick="sendQuickReply('Lista de proveedores activos')">Proveedores</button>
             <button class="quick-reply-btn" onclick="sendQuickReply('Consultar ofertas y descuentos')">Ofertas activas</button>
         </div>
     </div>

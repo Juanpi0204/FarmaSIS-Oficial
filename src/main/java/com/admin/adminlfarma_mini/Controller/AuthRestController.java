@@ -35,31 +35,11 @@ public class AuthRestController {
         }
 
         if (usuarioOpt.isEmpty()) {
-            // Si el usuario es el administrador por defecto de demostración
-            if ("admin".equalsIgnoreCase(request.getUsername()) && "admin123".equals(request.getPassword())) {
-                log.info("Login exitoso con usuario administrador por defecto");
-                return ResponseEntity.ok(
-                        LoginResponseDTO.builder()
-                                .status("success")
-                                .message("Inicio de sesión exitoso (Admin por defecto)")
-                                .usuario(LoginResponseDTO.UsuarioDTO.builder()
-                                        .id("admin-default-id")
-                                        .username("admin")
-                                        .nombre("Juan")
-                                        .apellido("Garces")
-                                        .email("juan.garces028@gmail.com")
-                                        .rol("ADMIN")
-                                        .activo(true)
-                                        .build())
-                                .build()
-                );
-            }
-
-            log.warn("Login fallido: usuario {} no encontrado", request.getUsername());
+            log.warn("Login fallido: usuario {} no encontrado en MongoDB", request.getUsername());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     LoginResponseDTO.builder()
                             .status("error")
-                            .message("Credenciales inválidas: usuario no encontrado")
+                            .message("Credenciales inválidas: usuario no encontrado en la base de datos")
                             .build()
             );
         }

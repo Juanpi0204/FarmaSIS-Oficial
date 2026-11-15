@@ -14,6 +14,6 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const FarmasisApp());
 
-    expect(find.text('FarmaSIS'), findsOneWidget);
+    expect(find.text('FarmaSIS', findRichText: true), findsOneWidget);
   });
 }

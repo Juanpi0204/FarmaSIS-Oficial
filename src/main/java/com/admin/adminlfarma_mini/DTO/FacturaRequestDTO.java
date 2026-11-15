@@ -11,6 +11,9 @@ public class FacturaRequestDTO {
     private Double total;
     private String metodoPago;
     private String observaciones;
+    private String origenVenta;
+    private String vendedorNombre;
+    private String vendedorRol;
     private List<DetalleDTO> detalles;
 
     @Data

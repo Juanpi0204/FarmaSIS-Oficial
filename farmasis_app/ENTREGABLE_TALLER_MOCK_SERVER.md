@@ -192,12 +192,13 @@ La aplicación fue desarrollada en **Flutter** bajo un sistema de diseño instit
 * **Melocotón Advertencia (`#FEF2EE` / `#FED7AA`):** Tarjeta de reabastecimiento asistido.
 * **Blanco / Gris Claro (`#FFFFFF` / `#F1F5F3`):** Tarjetas redondeadas de contenido (Squircle 22px).
 
-### 4.2. Pantalla 1: Inicio de Sesión (Login)
+### 4.2. Pantalla 1: Inicio de Sesión (Login y Biometría)
 * **Objetivo:** Autenticación de usuarios administradores y empleados con acceso a la farmacia.
 * **Componentes:**
   * Logotipo oficial squircle de FarmaSIS.
   * Formulario con validación de credenciales y botón para mostrar/ocultar contraseña.
-  * Conexión híbrida: Integra consumo real contra la base de datos de **MongoDB Atlas** (Spring Boot) con mecanismo de contingencia para pruebas.
+  * **Herramienta Avanzada (Lector de Huella Digital - `local_auth`):** Permite el ingreso biométrico validando la huella del usuario en el sensor del dispositivo y autenticando las credenciales vinculadas directamente contra el endpoint `/api/v1/auth/login` de la API.
+  * Conexión híbrida: Integra consumo real contra la base de datos de **MongoDB Atlas** (Spring Boot en puerto `8092`) con conmutación y contingencia automática hacia el Mock Server (`3000`).
 
 ### 4.3. Pantalla 2: Dashboard Predictivo (Consumo del Contrato)
 * **Objetivo:** Presentación ejecutiva del análisis de demanda y decisiones de inventario.

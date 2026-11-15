@@ -250,10 +250,9 @@ public class UsuarioService {
     }
 
     public void validarPassword(String password) {
-        String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$";
-        if (password == null || !password.matches(regex)) {
+        if (password == null || password.trim().length() < 8) {
             throw new RuntimeException(
-                    "La contraseña debe tener al menos 8 caracteres, incluir un número y un carácter especial.");
+                    "La contraseña debe tener al menos 8 caracteres.");
         }
     }
 }

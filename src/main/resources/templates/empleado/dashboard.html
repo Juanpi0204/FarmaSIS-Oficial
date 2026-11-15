@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Mi Panel - L-Farma</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>(function(){try{if(localStorage.getItem('sidebarState')==='closed'){document.documentElement.classList.add('sidebar-preload-collapsed');}}catch(e){}}());</script>
+    <style>
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .kpi-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eef2f6;
+            height: 100%;
+            transition: transform 0.2s;
+        }
+        .kpi-card:hover { transform: translateY(-2px); }
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eef2f6;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+    <div th:replace="~{fragments/sidebar :: topbar}"></div>
+    <div th:replace="~{fragments/sidebar :: logoutModal}"></div>
+
+    <div class="main-content no-transition" id="mainContent">
+        <div class="container-fluid px-4 py-4">
+            <!-- Banner de Bienvenida del Empleado -->
+            <div class="welcome-card d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <h2 class="mb-1"><i class="bi bi-person-badge me-2"></i> ¡Hola, <span th:text="${nombreEmpleado}">Colaborador</span>!</h2>
+                    <p class="mb-0 opacity-75">Resumen personal de tus ventas realizadas, productos vendidos y facturas del día.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/ventas/nueva" class="btn btn-light fw-bold px-3 py-2" style="color: #1B4332; border-radius: 10px;">
+                        <i class="bi bi-cart-plus me-1"></i> Ir al Punto de Venta
+                    </a>
+                    <a href="/ventas" class="btn btn-outline-light fw-semibold px-3 py-2" style="border-radius: 10px;">
+                        <i class="bi bi-receipt me-1"></i> Mi Historial
+                    </a>
+                </div>
+            </div>
+
+            <!-- Tarjetas KPI Personales -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="text-muted small fw-semibold">Mis Ventas de Hoy</span>
+                                <h3 class="fw-bold mt-1 mb-1 text-success" th:text="'$ ' + ${#numbers.formatDecimal(ventasHoyMonto, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                                <small class="text-muted"><i class="bi bi-receipt me-1"></i><span th:text="${cantidadFacturasHoy}">0</span> facturas hoy</small>
+                            </div>
+                            <div class="kpi-icon" style="background: #d1e7dd; color: #0f5132;">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="text-muted small fw-semibold">Productos Vendidos Hoy</span>
+                                <h3 class="fw-bold mt-1 mb-1" style="color: #0d6efd;" th:text="${productosVendidosHoy + ' uds'}">0 uds</h3>
+                                <small class="text-muted">Acumulado total: <strong th:text="${totalProductosVendidosHistorico + ' uds'}">0 uds</strong></small>
+                            </div>
+                            <div class="kpi-icon" style="background: #cfe2ff; color: #084298;">
+                                <i class="bi bi-capsule-pill"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="text-muted small fw-semibold">Mis Ventas Totales</span>
+                                <h3 class="fw-bold mt-1 mb-1" style="color: #1B4332;" th:text="'$ ' + ${#numbers.formatDecimal(totalHistoricoMonto, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                                <small class="text-muted"><span th:text="${totalFacturasHistorico}">0</span> facturas realizadas por ti</small>
+                            </div>
+                            <div class="kpi-icon" style="background: #e2e3e5; color: #1B4332;">
+                                <i class="bi bi-award"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <span class="text-muted small fw-semibold">Mi Ticket Promedio</span>
+                                <h3 class="fw-bold mt-1 mb-1" style="color: #6f42c1;" th:text="'$ ' + ${#numbers.formatDecimal(ticketPromedio, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                                <small class="text-muted">Promedio por venta realizada</small>
+                            </div>
+                            <div class="kpi-icon" style="background: #e0cffc; color: #3d0a91;">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfica de Rendimiento Personal y Top Productos Vendidos por el Empleado -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="section-card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0"><i class="bi bi-bar-chart-line me-2 text-success"></i>Mis Ventas (Últimos 7 días)</h5>
+                            <span class="badge bg-light text-dark border">Rendimiento personal</span>
+                        </div>
+                        <div style="height: 250px;">
+                            <canvas id="misVentasChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="section-card h-100">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-trophy me-2 text-warning"></i>Productos Más Vendidos por Mí</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th class="text-center">Unidades</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="prod : ${topMisProductos}">
+                                        <td>
+                                            <div class="fw-semibold" th:text="${prod.nombre}">Producto</div>
+                                            <small class="text-muted" th:text="'Cod: ' + ${prod.codigo}">Cod</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary" th:text="${prod.unidades + ' uds'}">0 uds</span>
+                                        </td>
+                                        <td class="text-end fw-bold text-success" th:text="'$ ' + ${#numbers.formatDecimal(prod.recaudado, 1, 'POINT', 0, 'COMMA')}">$ 0</td>
+                                    </tr>
+                                    <tr th:if="${topMisProductos.isEmpty()}">
+                                        <td colspan="3" class="text-center py-4 text-muted">
+                                            Aún no has registrado ventas de productos.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Mis Facturas del Día -->
+            <div class="section-card mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0"><i class="bi bi-receipt-cutoff me-2 text-success"></i>Mis Facturas del Día</h5>
+                        <small class="text-muted">Facturas generadas por ti durante la jornada de hoy</small>
+                    </div>
+                    <a href="/ventas" class="btn btn-sm btn-outline-primary fw-semibold" style="border-radius: 10px;">
+                        <i class="bi bi-clock-history me-1"></i> Ver Todo Mi Historial
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th># Factura</th>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Productos Vendidos</th>
+                                <th>Método Pago</th>
+                                <th>Total</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="f : ${facturasHoy}">
+                                <td><span class="badge bg-secondary" th:text="${f.numeroFactura}">FAC-000001</span></td>
+                                <td th:text="${f.fecha != null ? #temporals.format(f.fecha, 'HH:mm') : '-'}">00:00</td>
+                                <td th:text="${f.clienteNombre}">Consumidor Final</td>
+                                <td>
+                                    <span class="badge bg-success me-1" th:text="${(f.detalles != null ? #aggregates.sum(f.detalles.![cantidad]) : 0) + ' uds'}">0 uds</span>
+                                    <small class="text-muted" th:if="${f.detalles != null and !f.detalles.isEmpty()}"
+                                           th:text="${#strings.abbreviate(#strings.listJoin(f.detalles.![productoNombre], ', '), 55)}"></small>
+                                </td>
+                                <td><span class="badge bg-info text-dark" th:text="${f.metodoPago}">EFECTIVO</span></td>
+                                <td><strong class="text-success" th:text="'$ ' + ${#numbers.formatDecimal(f.total, 1, 'POINT', 0, 'COMMA')}">$ 0</strong></td>
+                                <td class="text-center">
+                                    <a th:href="@{/ventas/{id}/factura(id=${f.id})}" class="btn btn-sm btn-outline-primary" title="Ver e Imprimir Factura">
+                                        <i class="bi bi-printer me-1"></i> Ver Ticket
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${facturasHoy.isEmpty()}">
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    No has emitido facturas el día de hoy. <a href="/ventas/nueva" class="fw-semibold">Ir al Punto de Venta</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script th:inline="javascript">
+        const labels7 = /*[[${labels7Dias}]]*/ [];
+        const montos7 = /*[[${montos7Dias}]]*/ [];
+        const unidades7 = /*[[${unidades7Dias}]]*/ [];
+
+        const ctx = document.getElementById('misVentasChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels7,
+                    datasets: [
+                        {
+                            label: 'Mis Ventas ($ COP)',
+                            data: montos7,
+                            backgroundColor: 'rgba(27, 67, 50, 0.82)',
+                            borderRadius: 8,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Productos Vendidos (uds)',
+                            data: unidades7,
+                            type: 'line',
+                            borderColor: '#0d6efd',
+                            backgroundColor: '#0d6efd',
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            beginAtZero: true,
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
+

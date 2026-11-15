@@ -32,6 +32,9 @@ public class Factura {
     private String metodoPago = "EFECTIVO";
     private String observaciones;
     private String vendedorEmail;
+    private String vendedorNombre;
+    private String vendedorRol;
+    private String origenVenta = "WEB"; // "WEB" o "APP MÓVIL"
 
     private List<DetalleFactura> detalles = new ArrayList<>();
 }

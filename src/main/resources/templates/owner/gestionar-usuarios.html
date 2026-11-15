@@ -229,9 +229,9 @@
                         <div class="mb-3">
                             <label class="form-label">Contraseña *</label>
                             <input type="password" class="form-control" id="password" name="password" required 
-                                   pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
-                                   title="La contraseña debe tener al menos 8 caracteres, incluir un número y un carácter especial.">
-                            <small class="text-muted">Mínimo 8 caracteres, un número y un símbolo.</small>
+                                   minlength="8"
+                                   title="La contraseña debe tener al menos 8 caracteres.">
+                            <small class="text-muted">Mínimo 8 caracteres.</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email *</label>

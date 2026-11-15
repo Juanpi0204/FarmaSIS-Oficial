@@ -160,9 +160,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">Nueva Contraseña</label>
                                     <input type="password" name="nuevaPassword" id="newPass" class="form-control" 
-                                           pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
-                                           placeholder="Mínimo 8 caracteres, número y símbolo">
-                                    <div class="form-text">La contraseña debe tener al menos 8 caracteres, un número y un símbolo especial.</div>
+                                           minlength="8"
+                                           placeholder="Mínimo 8 caracteres">
+                                    <div class="form-text">La contraseña debe tener al menos 8 caracteres.</div>
                                 </div>
                                 
                                 <div class="mb-4">

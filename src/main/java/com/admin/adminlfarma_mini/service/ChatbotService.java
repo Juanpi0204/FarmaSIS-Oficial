@@ -86,10 +86,14 @@ public class ChatbotService {
         return chat(chatId, userMessage, "OWNER");
     }
 
+    public String chat(String chatId, String userMessage, String userRole) {
+        return chat(chatId, userMessage, userRole, null);
+    }
+
     /**
      * Método principal que maneja el chat inyectando contexto inteligente, memoria acotada y conciencia de roles.
      */
-    public String chat(String chatId, String userMessage, String userRole) {
+    public String chat(String chatId, String userMessage, String userRole, String loggedUsername) {
         String safeChatId = chatId != null ? chatId : "default-session";
         String cleanMsg = userMessage != null ? userMessage.toLowerCase().trim() : "";
         String roleStr = userRole != null ? userRole.toUpperCase() : "EMPLEADO";
@@ -459,10 +463,29 @@ public class ChatbotService {
         // --- VENTAS ---
         } else if (intention.equals("Ventas")) {
             List<Factura> facturas = facturaRepository.findAll();
+            boolean isEmpleadoRole = !roleStr.contains("OWNER") && !roleStr.contains("ADMIN");
+            if (isEmpleadoRole && loggedUsername != null && !loggedUsername.isBlank()) {
+                Set<String> misIds = new HashSet<>();
+                misIds.add(loggedUsername.trim().toLowerCase());
+                usuarioRepository.findFirstByUsername(loggedUsername.trim()).ifPresent(u -> {
+                    if (u.getEmail() != null && !u.getEmail().isBlank()) {
+                        misIds.add(u.getEmail().trim().toLowerCase());
+                    }
+                });
+                facturas = facturas.stream()
+                        .filter(f -> f.getVendedorEmail() != null && misIds.contains(f.getVendedorEmail().trim().toLowerCase()))
+                        .toList();
+            }
+
             double totalFacturado = facturas.stream()
                     .mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0)
                     .sum();
             long totalVentasCount = facturas.size();
+            int totalUnidadesHist = facturas.stream()
+                    .filter(f -> f.getDetalles() != null)
+                    .flatMap(f -> f.getDetalles().stream())
+                    .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
+                    .sum();
 
             java.time.LocalDate hoy = java.time.LocalDate.now();
             List<Factura> facturasHoy = facturas.stream()
@@ -471,12 +494,20 @@ public class ChatbotService {
             double totalHoy = facturasHoy.stream()
                     .mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0)
                     .sum();
+            int unidadesHoy = facturasHoy.stream()
+                    .filter(f -> f.getDetalles() != null)
+                    .flatMap(f -> f.getDetalles().stream())
+                    .mapToInt(d -> d.getCantidad() != null ? d.getCantidad() : 0)
+                    .sum();
 
             StringBuilder sb = new StringBuilder();
-            sb.append(String.format("El total facturado en ventas históricas es: $%,.2f COP\n", totalFacturado));
+            if (isEmpleadoRole) {
+                sb.append("RESUMEN DE TUS VENTAS PERSONALES (ROL EMPLEADO):\n");
+            }
+            sb.append(String.format("El total facturado en ventas históricas es: $%,.2f COP (%d unidades de productos vendidas)\n", totalFacturado, totalUnidadesHist));
             sb.append(String.format("El número total de facturas emitidas históricamente es: %d\n", totalVentasCount));
-            sb.append(String.format("Ventas registradas hoy (%s): %d facturas emitidas por un valor total de $%,.2f COP\n",
-                    hoy.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), facturasHoy.size(), totalHoy));
+            sb.append(String.format("Ventas registradas hoy (%s): %d facturas emitidas por un valor total de $%,.2f COP (%d unidades de productos vendidas hoy)\n",
+                    hoy.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), facturasHoy.size(), totalHoy, unidadesHoy));
 
             List<Factura> sortedFacturas = facturas.stream()
                     .sorted((f1, f2) -> {

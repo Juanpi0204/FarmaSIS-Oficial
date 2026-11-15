@@ -21,9 +21,9 @@
             <!-- LABEL: Principal -->
             <li class="nav-label nav-text">Principal</li>
 
-            <!-- Dashboard — OWNER y ADMIN -->
-            <li class="nav-item" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">
-                <a th:href="${loggedUser != null && loggedUser.rol == 'ROLE_OWNER' ? '/owner/dashboard' : '/admin/dashboard'}" 
+            <!-- Dashboard — TODOS los roles (cada uno en su propio panel) -->
+            <li class="nav-item" th:if="${loggedUser != null}">
+                <a th:href="${loggedUser.rol == 'ROLE_OWNER' ? '/owner/dashboard' : (loggedUser.rol == 'ROLE_ADMIN' ? '/admin/dashboard' : '/empleado/dashboard')}" 
                    class="nav-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
                     <i class="bi bi-speedometer2"></i>
                     <span class="nav-text">Dashboard</span>
@@ -78,12 +78,12 @@
             <!-- LABEL: Ventas -->
             <li class="nav-label nav-text">Ventas</li>
 
-            <!-- Historial Ventas — OWNER y ADMIN -->
-            <li class="nav-item" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">
-                <a th:href="${loggedUser != null && loggedUser.rol == 'ROLE_ADMIN' ? '/admin/ventas' : '/ventas'}" 
+            <!-- Historial Ventas — TODOS los roles (Empleado ve solo las suyas) -->
+            <li class="nav-item" th:if="${loggedUser != null}">
+                <a th:href="${loggedUser.rol == 'ROLE_ADMIN' ? '/admin/ventas' : '/ventas'}" 
                    class="nav-link" th:classappend="${activePage == 'ventas' ? 'active' : ''}">
                     <i class="bi bi-receipt"></i>
-                    <span class="nav-text">Historial Ventas</span>
+                    <span class="nav-text" th:text="${loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas' : 'Historial Ventas'}">Historial Ventas</span>
                 </a>
             </li>
 

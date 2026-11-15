@@ -27,6 +27,7 @@ public class ChatbotController {
     public ResponseEntity<ChatResponseDto> askQuestion(@RequestBody ChatRequestDto request, Authentication authentication) {
         try {
             String userRole = "EMPLEADO"; // Fallback por defecto
+            String loggedUsername = authentication != null ? authentication.getName() : null;
             if (authentication != null && authentication.getAuthorities() != null) {
                 for (var authority : authentication.getAuthorities()) {
                     String authStr = authority.getAuthority();
@@ -39,7 +40,7 @@ public class ChatbotController {
                 }
             }
             
-            String aiResponse = chatbotService.chat(request.chatId(), request.message(), userRole);
+            String aiResponse = chatbotService.chat(request.chatId(), request.message(), userRole, loggedUsername);
             return ResponseEntity.ok(new ChatResponseDto(aiResponse));
         } catch (org.springframework.web.client.HttpClientErrorException e) {
             logger.log(Level.WARNING, "Error de API externa (Groq): " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);

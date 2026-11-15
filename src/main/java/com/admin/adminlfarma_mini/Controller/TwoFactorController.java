@@ -34,7 +34,7 @@ public class TwoFactorController {
         if (usuario.getRequiere2FA() == null || !usuario.getRequiere2FA()) {
             if ("ROLE_OWNER".equals(usuario.getRol())) return "redirect:/owner/dashboard";
             if ("ROLE_ADMIN".equals(usuario.getRol())) return "redirect:/admin/dashboard";
-            if ("ROLE_EMPLEADO".equals(usuario.getRol())) return "redirect:/empleado/pos";
+            if ("ROLE_EMPLEADO".equals(usuario.getRol())) return "redirect:/empleado/dashboard";
             return "redirect:/";
         }
 
@@ -69,7 +69,7 @@ public class TwoFactorController {
             } else if ("ROLE_ADMIN".equals(usuario.getRol())) {
                 return "redirect:/admin/dashboard";
             } else if ("ROLE_EMPLEADO".equals(usuario.getRol())) {
-                return "redirect:/empleado/pos";
+                return "redirect:/empleado/dashboard";
             }
             return "redirect:/login";
         }

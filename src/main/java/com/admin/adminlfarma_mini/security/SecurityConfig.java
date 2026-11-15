@@ -24,7 +24,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**",
                                                                 "/webjars/**", "/favicon.ico",
-                                                                "/api/v1/auth/**", "/api/v1/prediccion/**", "/api/v1/productos",
+                                                                "/api/v1/**", "/api/v1/auth/**", "/api/v1/prediccion/**", "/api/v1/productos",
                                                                 "/api/chat/**")
                                                 .permitAll()
                                                 // Rutas protegidas estrictamente

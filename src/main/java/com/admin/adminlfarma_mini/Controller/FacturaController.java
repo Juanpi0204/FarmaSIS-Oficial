@@ -73,7 +73,8 @@ public class FacturaController {
                                          (u.getUsername() != null && u.getUsername().toLowerCase().contains(vendedor.toLowerCase().trim())))
                             .toList();
                         for (com.admin.adminlfarma_mini.entity.Usuario u : matchedUsers) {
-                            allowedVendedores.add(u.getUsername());
+                            if (u.getUsername() != null) allowedVendedores.add(u.getUsername());
+                            if (u.getEmail() != null) allowedVendedores.add(u.getEmail());
                         }
                         if (allowedVendedores.isEmpty()) {
                             allowedVendedores.add("dummy_no_match");
@@ -83,11 +84,15 @@ public class FacturaController {
                     List<com.admin.adminlfarma_mini.entity.Usuario> allUsers = usuarioService.listarTodosIncluyendoInactivos();
                     for (com.admin.adminlfarma_mini.entity.Usuario u : allUsers) {
                         if (!"ROLE_OWNER".equals(u.getRol())) {
-                            allowedVendedores.add(u.getUsername());
+                            if (u.getUsername() != null) allowedVendedores.add(u.getUsername());
+                            if (u.getEmail() != null) allowedVendedores.add(u.getEmail());
                         }
                     }
                 } else {
                     allowedVendedores.add(loggedUserEmail);
+                    if (loggedUser.getEmail() != null && !loggedUser.getEmail().isBlank()) {
+                        allowedVendedores.add(loggedUser.getEmail());
+                    }
                 }
             }
         }
@@ -98,13 +103,19 @@ public class FacturaController {
 
         Page<Factura> ventasPage = facturaService.buscarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores, pageable);
 
+        List<Factura> facturasHoyScope = facturaService.getFacturasDelDiaPorVendedores(isOwner && allowedVendedores.isEmpty() ? null : allowedVendedores);
+        double ventasDelDiaScope = facturasHoyScope.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
+        long cantidadVentasDelDiaScope = facturasHoyScope.size();
+        int unidadesVendidasHoyScope = facturaService.calcularUnidadesVendidas(facturasHoyScope);
+
         model.addAttribute("ventas", ventasPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", ventasPage.getTotalPages());
         model.addAttribute("totalItems", ventasPage.getTotalElements());
         model.addAttribute("pageSize", size);
-        model.addAttribute("ventasDelDia", facturaService.getVentasDelDia());
-        model.addAttribute("cantidadVentasDelDia", facturaService.getCantidadVentasDelDia());
+        model.addAttribute("ventasDelDia", ventasDelDiaScope);
+        model.addAttribute("cantidadVentasDelDia", cantidadVentasDelDiaScope);
+        model.addAttribute("unidadesVendidasHoy", unidadesVendidasHoyScope);
         model.addAttribute("fechaDesde", fechaDesde);
         model.addAttribute("fechaHasta", fechaHasta);
         model.addAttribute("metodoPago", metodoPago);
@@ -271,7 +282,8 @@ public class FacturaController {
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) String search,
             Model model,
-            HttpServletRequest request) {
+            HttpServletRequest request,
+            java.security.Principal principal) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("nombre").ascending());
         Page<Producto> productosPage;
@@ -306,6 +318,45 @@ public class FacturaController {
         if ("XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"))) {
             return "crear-venta :: #productosContainer";
         }
+
+        // Cargar facturas del día e historial reciente para la sección inferior del POS
+        List<String> vendedoresScope = new java.util.ArrayList<>();
+        boolean isOwnerPos = false;
+        if (principal != null) {
+            String userPrincipal = principal.getName();
+            com.admin.adminlfarma_mini.entity.Usuario logged = usuarioService.buscarPorUsername(userPrincipal).orElse(null);
+            if (logged != null) {
+                if ("ROLE_OWNER".equals(logged.getRol())) {
+                    isOwnerPos = true;
+                } else if ("ROLE_ADMIN".equals(logged.getRol())) {
+                    for (com.admin.adminlfarma_mini.entity.Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
+                        if (!"ROLE_OWNER".equals(u.getRol())) {
+                            if (u.getUsername() != null) vendedoresScope.add(u.getUsername());
+                            if (u.getEmail() != null) vendedoresScope.add(u.getEmail());
+                        }
+                    }
+                } else {
+                    vendedoresScope.add(userPrincipal);
+                    if (logged.getEmail() != null && !logged.getEmail().isBlank()) {
+                        vendedoresScope.add(logged.getEmail());
+                    }
+                }
+            }
+        }
+
+        List<Factura> facturasHoyPos = facturaService.getFacturasDelDiaPorVendedores(isOwnerPos ? null : vendedoresScope);
+        double totalVendidoHoyPos = facturasHoyPos.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
+        int unidadesVendidasHoyPos = facturaService.calcularUnidadesVendidas(facturasHoyPos);
+
+        Pageable topRecent = PageRequest.of(0, 15, Sort.by("fecha").descending());
+        List<Factura> ventasRecientesPos = facturaService.buscarFacturas(
+                null, null, null, null, isOwnerPos ? null : vendedoresScope, topRecent).getContent();
+
+        model.addAttribute("facturasHoyPos", facturasHoyPos);
+        model.addAttribute("ventasRecientesPos", ventasRecientesPos);
+        model.addAttribute("totalVendidoHoyPos", totalVendidoHoyPos);
+        model.addAttribute("cantidadFacturasHoyPos", facturasHoyPos.size());
+        model.addAttribute("unidadesVendidasHoyPos", unidadesVendidasHoyPos);
 
         return "crear-venta";
     }
