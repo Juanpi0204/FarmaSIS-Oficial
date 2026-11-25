@@ -1,0 +1,12 @@
+.git
+.gitignore
+target/
+farmasis_app/
+docs/
+mock-server/
+*.apk
+*.docx
+*.pdf
+*.md
+.idea/
+.vscode/
