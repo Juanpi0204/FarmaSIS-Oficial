@@ -1,29 +1,40 @@
-/* EL CANDADO PARA QUE NO BRINQUE NADA */
+/* EL CANDADO PARA QUE NO BRINQUE NADA + ESCALA EJECUTIVA 80% Y NITIDEZ HD */
+@media (min-width: 769px) {
+    html {
+        font-size: 13.2px !important; /* Proporción exacta equivalente al 80% de zoom en pantallas de PC */
+    }
+}
+
 html, body {
     overflow-y: scroll !important; /* Fuerza la barra de scroll siempre para evitar saltos */
-    background-color: #f4f7f6 !important;
+    background-color: #f3f7f5 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
 }
 
 * {
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- Brand Color Palette --- */
+/* --- Brand Color Palette (Verde Esmeralda de Lujo) --- */
 :root {
-    --primary-color: #1B4332;       /* Verde Bosque Oscuro */
-    --primary-light: #2D6A4F;       /* Verde Bosque Medio */
-    --secondary-color: #52B788;     /* Verde Menta / Hoja */
-    --accent-color: #74C69D;        /* Verde Menta Claro */
-    --accent-light: #B7E4C7;        /* Verde Pastel */
-    --dark-bg: #081C15;             /* Fondo oscuro sidebar */
-    --dark-bg-alt: #0D2818;         /* Fondo oscuro alternativo */
-    --success-green: #40916C;       /* Para badges de éxito */
+    --primary-color: #133A29;       /* Verde Esmeralda Profundo de Lujo */
+    --primary-light: #1E6043;       /* Verde Esmeralda Imperial */
+    --secondary-color: #10B981;     /* Esmeralda Vibrante */
+    --accent-color: #34D399;        /* Esmeralda Luminoso */
+    --accent-light: #A7F3D0;        /* Esmeralda Cristal */
+    --dark-bg: #06150F;             /* Obsidiana Esmeralda para Sidebar */
+    --dark-bg-alt: #0C261B;         /* Fondo oscuro alternativo */
+    --success-green: #059669;       /* Para badges de éxito */
     --danger-color: #E63946;        /* Para acciones destructivas */
     --warning-color: #F4A261;       /* Para alertas */
-    --text-primary: #212529;
-    --text-muted: #6c757d;
-    --card-shadow: 0 4px 20px rgba(27, 67, 50, 0.08);
-    --card-hover-shadow: 0 8px 30px rgba(27, 67, 50, 0.15);
+    --text-primary: #0f172a;
+    --text-muted: #64748b;
+    --card-shadow: 0 6px 22px -4px rgba(19, 58, 41, 0.08), 0 2px 6px -1px rgba(19, 58, 41, 0.04);
+    --card-hover-shadow: 0 12px 32px -4px rgba(16, 185, 129, 0.16), 0 4px 12px -2px rgba(19, 58, 41, 0.08);
 }
 
 /* --- Anti-flicker: Preload state --- */
@@ -58,14 +69,15 @@ html.sidebar-preload-collapsed .sidebar span { display: none !important; opacity
     top: 0;
     left: 0;
     height: 100vh;
-    width: 260px;
-    min-width: 260px;
+    width: 225px;
+    min-width: 225px;
     flex-shrink: 0;
-    background: linear-gradient(180deg, var(--dark-bg) 0%, var(--primary-color) 100%);
+    background: linear-gradient(180deg, #06150F 0%, #0F2E20 55%, #164430 100%);
     color: white;
     transition: width 0.3s ease, min-width 0.3s ease;
     z-index: 1000;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 4px 0 24px rgba(5, 19, 13, 0.22);
+    border-right: 1px solid rgba(52, 211, 153, 0.14);
     overflow-x: hidden;
     overflow-y: auto;
     display: flex;
@@ -530,9 +542,9 @@ html.sidebar-preload-collapsed .sidebar span { display: none !important; opacity
    LAYOUT BASE ROBUSTO
    ========================================== */
 .main-content {
-    margin-left: 260px;
+    margin-left: 225px;
     transition: margin-left 0.3s ease;
-    background-color: #f4f7f6; /* Fondo suave para resaltar contenedores blancos */
+    background-color: #f3f7f5; /* Fondo suave para resaltar contenedores blancos */
     min-height: 100vh;
 }
 
