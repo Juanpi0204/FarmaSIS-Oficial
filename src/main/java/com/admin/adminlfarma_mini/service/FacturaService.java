@@ -15,6 +15,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,73 +34,62 @@ public class FacturaService {
         return facturaRepository.findAllByOrderByFechaDesc(pageable);
     }
 
-    public Page<Factura> buscarFacturas(String fechaDesde, String fechaHasta,
-                                         String metodoPago, String numFactura, List<String> vendedores, Pageable pageable) {
-        Query query = new Query().with(pageable).with(Sort.by(Sort.Direction.DESC, "fecha"));
+    /** Tope de seguridad para listados en memoria (exportar a Excel): protege la RAM del servidor. */
+    private static final int LIMITE_EXPORTACION = 20000;
+
+    /**
+     * Construye el filtro Mongo común (fechas, método de pago, nº de factura y vendedores).
+     * Lo usan el listado, la exportación y la contabilidad, para que los tres den siempre los mismos resultados.
+     * Devuelve null cuando no hay ningún filtro activo.
+     */
+    public Criteria construirFiltro(String fechaDesde, String fechaHasta,
+                                    String metodoPago, String numFactura, List<String> vendedores) {
         List<Criteria> criterios = new ArrayList<>();
 
-        if (fechaDesde != null && !fechaDesde.isEmpty()) {
-            LocalDateTime desde = LocalDate.parse(fechaDesde).atStartOfDay();
-            criterios.add(Criteria.where("fecha").gte(desde));
+        if (hayTexto(fechaDesde)) {
+            criterios.add(Criteria.where("fecha").gte(LocalDate.parse(fechaDesde.trim()).atStartOfDay()));
         }
-        if (fechaHasta != null && !fechaHasta.isEmpty()) {
-            LocalDateTime hasta = LocalDate.parse(fechaHasta).atTime(23, 59, 59);
-            criterios.add(Criteria.where("fecha").lte(hasta));
+        if (hayTexto(fechaHasta)) {
+            criterios.add(Criteria.where("fecha").lte(LocalDate.parse(fechaHasta.trim()).atTime(LocalTime.MAX)));
         }
-        if (metodoPago != null && !metodoPago.isEmpty()) {
-            criterios.add(Criteria.where("metodoPago").is(metodoPago));
+        if (hayTexto(metodoPago)) {
+            criterios.add(Criteria.where("metodoPago").is(metodoPago.trim()));
         }
-        if (numFactura != null && !numFactura.isEmpty()) {
-            criterios.add(Criteria.where("numeroFactura").regex(numFactura, "i"));
+        if (hayTexto(numFactura)) {
+            criterios.add(Criteria.where("numeroFactura").regex(java.util.regex.Pattern.quote(numFactura.trim()), "i"));
         }
         if (vendedores != null && !vendedores.isEmpty()) {
             criterios.add(Criteria.where("vendedorEmail").in(vendedores));
         }
+        return criterios.isEmpty() ? null : new Criteria().andOperator(criterios.toArray(new Criteria[0]));
+    }
 
-        if (!criterios.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criterios.toArray(new Criteria[0])));
+    private static boolean hayTexto(String valor) {
+        return valor != null && !valor.trim().isEmpty();
+    }
+
+    public Page<Factura> buscarFacturas(String fechaDesde, String fechaHasta,
+                                         String metodoPago, String numFactura, List<String> vendedores, Pageable pageable) {
+        Query query = new Query().with(pageable).with(Sort.by(Sort.Direction.DESC, "fecha"));
+        Criteria filtro = construirFiltro(fechaDesde, fechaHasta, metodoPago, numFactura, vendedores);
+        if (filtro != null) {
+            query.addCriteria(filtro);
         }
 
         List<Factura> facturas = mongoTemplate.find(query, Factura.class);
         Query countQuery = Query.of(query).limit(-1).skip(-1);
-        long total = mongoTemplate.count(countQuery, Factura.class);
 
-        return PageableExecutionUtils.getPage(facturas, pageable, () -> total);
+        return PageableExecutionUtils.getPage(facturas, pageable, () -> mongoTemplate.count(countQuery, Factura.class));
     }
 
     public List<Factura> exportarFacturas(String fechaDesde, String fechaHasta,
                                            String metodoPago, String numFactura, List<String> vendedores) {
-        Query query = new Query().with(Sort.by(Sort.Direction.DESC, "fecha")).limit(1500);
-        List<Criteria> criterios = new ArrayList<>();
-
-        if (fechaDesde != null && !fechaDesde.isEmpty()) {
-            criterios.add(Criteria.where("fecha").gte(LocalDate.parse(fechaDesde).atStartOfDay()));
+        Query query = new Query().with(Sort.by(Sort.Direction.DESC, "fecha")).limit(LIMITE_EXPORTACION);
+        Criteria filtro = construirFiltro(fechaDesde, fechaHasta, metodoPago, numFactura, vendedores);
+        if (filtro != null) {
+            query.addCriteria(filtro);
         }
-        if (fechaHasta != null && !fechaHasta.isEmpty()) {
-            criterios.add(Criteria.where("fecha").lte(LocalDate.parse(fechaHasta).atTime(23, 59, 59)));
-        }
-        if (metodoPago != null && !metodoPago.isEmpty()) {
-            criterios.add(Criteria.where("metodoPago").is(metodoPago));
-        }
-        if (numFactura != null && !numFactura.isEmpty()) {
-            criterios.add(Criteria.where("numeroFactura").regex(numFactura, "i"));
-        }
-        if (vendedores != null && !vendedores.isEmpty()) {
-            criterios.add(Criteria.where("vendedorEmail").in(vendedores));
-        }
-        if (!criterios.isEmpty()) {
-            query.addCriteria(new Criteria().andOperator(criterios.toArray(new Criteria[0])));
-        }
-        List<Factura> facturas = mongoTemplate.find(query, Factura.class);
-        if (facturas != null) {
-            facturas.sort((f1, f2) -> {
-                if (f1.getFecha() == null && f2.getFecha() == null) return 0;
-                if (f1.getFecha() == null) return 1;
-                if (f2.getFecha() == null) return -1;
-                return f2.getFecha().compareTo(f1.getFecha());
-            });
-        }
-        return facturas;
+        return mongoTemplate.find(query, Factura.class);
     }
     
     public Double getVentasDelDia() {

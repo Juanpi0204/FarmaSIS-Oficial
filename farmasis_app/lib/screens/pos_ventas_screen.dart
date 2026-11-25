@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/user_model.dart';
@@ -47,6 +48,12 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
   String _filtroMetodo = 'TODOS';
   String _searchFactura = '';
   bool _loadingVentas = true;
+  int _currentPage = 0;
+  int _totalPages = 1;
+  int _totalItems = 0;
+  int _pageSize = 30;
+  String? _errorVentas;
+  Timer? _searchDebounce;
 
   bool get _isOwner =>
       widget.user.rol.toUpperCase().contains('OWNER') ||
@@ -61,6 +68,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _clienteCcCtrl.dispose();
     _obsCtrl.dispose();
     super.dispose();
@@ -114,6 +122,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
         _periodoSeleccionado = 'TODO';
         _fechaDesde = null;
         _fechaHasta = null;
+        _currentPage = 0;
       });
       _cargarHistorialVentas();
       return;
@@ -124,6 +133,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
         _periodoSeleccionado = 'HOY';
         _fechaDesde = hoyStr;
         _fechaHasta = hoyStr;
+        _currentPage = 0;
       });
       _cargarHistorialVentas();
       return;
@@ -133,6 +143,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
         _periodoSeleccionado = 'SEMANA';
         _fechaDesde = _formatDateIso(now.subtract(const Duration(days: 7)));
         _fechaHasta = _formatDateIso(now);
+        _currentPage = 0;
       });
       _cargarHistorialVentas();
       return;
@@ -142,6 +153,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
         _periodoSeleccionado = 'MES';
         _fechaDesde = _formatDateIso(DateTime(now.year, now.month, 1));
         _fechaHasta = _formatDateIso(now);
+        _currentPage = 0;
       });
       _cargarHistorialVentas();
       return;
@@ -159,17 +171,26 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
           _periodoSeleccionado = 'RANGO';
           _fechaDesde = _formatDateIso(picked.start);
           _fechaHasta = _formatDateIso(picked.end);
+          _currentPage = 0;
         });
         _cargarHistorialVentas();
       }
     }
   }
 
-  Future<void> _cargarHistorialVentas() async {
-    setState(() => _loadingVentas = true);
+  Future<void> _cargarHistorialVentas({int? goToPage}) async {
+    if (goToPage != null) {
+      final maxPage = _totalPages > 0 ? _totalPages - 1 : 0;
+      _currentPage = goToPage.clamp(0, maxPage);
+    }
+    setState(() {
+      _loadingVentas = true;
+      _errorVentas = null;
+    });
     try {
       final data = await ApiService.getVentas(
-        size: 60,
+        page: _currentPage,
+        size: _pageSize,
         fechaDesde: _fechaDesde,
         fechaHasta: _fechaHasta,
         metodoPago: _filtroMetodo,
@@ -180,6 +201,9 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
       if (!mounted) return;
       setState(() {
         _ventas = (data['ventas'] as List<dynamic>? ?? []);
+        _currentPage = ((data['currentPage'] ?? _currentPage) as num).toInt();
+        _totalPages = ((data['totalPages'] ?? 1) as num).toInt();
+        _totalItems = ((data['totalItems'] ?? _ventas.length) as num).toInt();
         _ventasDelDia = ((data['ventasDelDia'] ?? 0) as num).toDouble();
         _cantidadVentasDelDia =
             ((data['cantidadVentasDelDia'] ?? 0) as num).toInt();
@@ -199,8 +223,196 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
       });
     } catch (e) {
       if (!mounted) return;
-      setState(() => _loadingVentas = false);
+      setState(() {
+        _errorVentas = 'No se pudo cargar el historial. Toca para reintentar.';
+        _loadingVentas = false;
+      });
     }
+  }
+
+  Future<void> _mostrarDialogoIrAPagina() async {
+    if (_totalPages <= 1) return;
+    final ctrl = TextEditingController(text: '${_currentPage + 1}');
+    final destino = await showDialog<int>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text(
+          'Ir a la página',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            color: FarmasisPalette.textSilverBright,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Ingresa un número entre 1 y ${_formatCurrency(_totalPages)}:',
+              style: const TextStyle(
+                fontSize: 12,
+                color: FarmasisPalette.textSteel,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: ctrl,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: InputDecoration(
+                isDense: true,
+                filled: true,
+                fillColor: FarmasisPalette.inputSurface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final parsed = int.tryParse(ctrl.text.trim());
+              if (parsed == null) return;
+              final clamped = parsed.clamp(1, _totalPages);
+              Navigator.pop(ctx, clamped - 1);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF133A29),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Ir'),
+          ),
+        ],
+      ),
+    );
+    if (destino != null && destino != _currentPage) {
+      _cargarHistorialVentas(goToPage: destino);
+    }
+  }
+
+  Widget _buildPaginationBar() {
+    if (_loadingVentas || _totalItems <= 0) return const SizedBox.shrink();
+    final startItem = _ventas.isEmpty ? 0 : (_currentPage * _pageSize + 1);
+    final endItem = _ventas.isEmpty ? 0 : (_currentPage * _pageSize + _ventas.length);
+    final canPrev = _currentPage > 0;
+    final canNext = _currentPage + 1 < _totalPages;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: MetallicGlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Mostrando ${_formatCurrency(startItem)}–${_formatCurrency(endItem)} de ${_formatCurrency(_totalItems)} facturas',
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: FarmasisPalette.textSteel,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: canPrev ? () => _cargarHistorialVentas(goToPage: 0) : null,
+                      icon: const Icon(Icons.first_page_rounded, size: 20),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Primera página',
+                    ),
+                    IconButton(
+                      onPressed: canPrev
+                          ? () => _cargarHistorialVentas(goToPage: _currentPage - 1)
+                          : null,
+                      icon: const Icon(Icons.chevron_left_rounded, size: 22),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Página anterior',
+                    ),
+                    InkWell(
+                      onTap: _totalPages > 1 ? _mostrarDialogoIrAPagina : null,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF133A29),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'Pág. ${_formatCurrency(_currentPage + 1)} / ${_formatCurrency(_totalPages > 0 ? _totalPages : 1)}',
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: canNext
+                          ? () => _cargarHistorialVentas(goToPage: _currentPage + 1)
+                          : null,
+                      icon: const Icon(Icons.chevron_right_rounded, size: 22),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Página siguiente',
+                    ),
+                    IconButton(
+                      onPressed: canNext
+                          ? () => _cargarHistorialVentas(goToPage: _totalPages - 1)
+                          : null,
+                      icon: const Icon(Icons.last_page_rounded, size: 20),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: 'Última página',
+                    ),
+                  ],
+                ),
+                DropdownButton<int>(
+                  value: _pageSize,
+                  dropdownColor: Colors.white,
+                  underline: const SizedBox(),
+                  isDense: true,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: FarmasisPalette.textSilverBright,
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 20, child: Text('20 / pág')),
+                    DropdownMenuItem(value: 30, child: Text('30 / pág')),
+                    DropdownMenuItem(value: 50, child: Text('50 / pág')),
+                    DropdownMenuItem(value: 100, child: Text('100 / pág')),
+                  ],
+                  onChanged: (v) {
+                    if (v != null && v != _pageSize) {
+                      setState(() {
+                        _pageSize = v;
+                        _currentPage = 0;
+                      });
+                      _cargarHistorialVentas();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   List<dynamic> get _productosFiltrados {
@@ -1556,7 +1768,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
           ? 'Unidades / Facturas'
           : 'Total Facturado (Período)',
       value: _isOwner
-          ? '$udsVendidas uds (${_ventas.length})'
+          ? '${_formatCurrency(udsVendidas)} uds (${_formatCurrency(_totalItems)})'
           : '\$${_formatCurrency(_ventasPeriodoTotal)}',
       bgColor: const Color(0xFF0284C7),
     );
@@ -1689,7 +1901,13 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                       child: TextField(
                         onChanged: (v) {
                           _searchFactura = v;
-                          _cargarHistorialVentas();
+                          _searchDebounce?.cancel();
+                          _searchDebounce =
+                              Timer(const Duration(milliseconds: 350), () {
+                            if (!mounted) return;
+                            _currentPage = 0;
+                            _cargarHistorialVentas();
+                          });
                         },
                         style: const TextStyle(
                           fontSize: 12.5,
@@ -1745,7 +1963,10 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                     ],
                     onChanged: (v) {
                       if (v != null) {
-                        setState(() => _filtroMetodo = v);
+                        setState(() {
+                          _filtroMetodo = v;
+                          _currentPage = 0;
+                        });
                         _cargarHistorialVentas();
                       }
                     },
@@ -1767,14 +1988,41 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                       backgroundColor: Colors.white,
                       onRefresh: _cargarHistorialVentas,
                       child: _ventas.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'No se encontraron facturas en este período',
-                                style: TextStyle(
-                                  color: FarmasisPalette.textSteel,
-                                  fontSize: 12.5,
-                                ),
-                              ),
+                          ? Center(
+                              child: _errorVentas != null
+                                  ? Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          _errorVentas!,
+                                          style: const TextStyle(
+                                            color: FarmasisPalette.dangerCoral,
+                                            fontSize: 12.5,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ElevatedButton.icon(
+                                          onPressed: _cargarHistorialVentas,
+                                          icon: const Icon(Icons.refresh,
+                                              size: 16),
+                                          label: const Text('Reintentar'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF133A29),
+                                            foregroundColor: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : const Text(
+                                      'No se encontraron facturas en este período',
+                                      style: TextStyle(
+                                        color: FarmasisPalette.textSteel,
+                                        fontSize: 12.5,
+                                      ),
+                                    ),
                             )
                           : ListView.separated(
                               itemCount: _ventas.length,
@@ -1907,6 +2155,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                             ),
                     ),
             ),
+            _buildPaginationBar(),
           ],
         );
       },

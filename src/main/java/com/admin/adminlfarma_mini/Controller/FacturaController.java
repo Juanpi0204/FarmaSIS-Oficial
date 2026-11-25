@@ -5,6 +5,7 @@ import com.admin.adminlfarma_mini.entity.Factura;
 import com.admin.adminlfarma_mini.entity.Producto;
 import com.admin.adminlfarma_mini.service.ClienteService;
 import com.admin.adminlfarma_mini.service.ConfiguracionService;
+import com.admin.adminlfarma_mini.service.ContabilidadService;
 import com.admin.adminlfarma_mini.service.FacturaService;
 import com.admin.adminlfarma_mini.service.ProductoService;
 import com.admin.adminlfarma_mini.service.UsuarioService;
@@ -43,6 +44,7 @@ public class FacturaController {
     private final ClienteService clienteService;
     private final ConfiguracionService configuracionService;
     private final UsuarioService usuarioService;
+    private final ContabilidadService contabilidadService;
 
     @GetMapping
     public String listarVentas(
@@ -56,171 +58,51 @@ public class FacturaController {
             Model model,
             java.security.Principal principal) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("fecha").descending());
+        String username = principal != null ? principal.getName() : null;
+        com.admin.adminlfarma_mini.entity.Usuario logueado =
+                username != null ? usuarioService.buscarPorUsername(username).orElse(null) : null;
+        String rol = logueado != null ? logueado.getRol() : null;
 
-        List<String> allowedVendedores = new java.util.ArrayList<>();
-        boolean isOwner = false;
-        if (principal != null) {
-            String loggedUserEmail = principal.getName();
-            com.admin.adminlfarma_mini.entity.Usuario loggedUser = usuarioService.buscarPorUsername(loggedUserEmail).orElse(null);
-            if (loggedUser != null) {
-                String userRol = loggedUser.getRol() != null ? loggedUser.getRol().toUpperCase() : "";
-                if (userRol.contains("OWNER") || userRol.contains("ADMIN")) {
-                    isOwner = true; // Tanto OWNER como ADMIN acceden a Contabilidad y ven todas las ventas de la farmacia
-                    if (vendedor != null && !vendedor.trim().isEmpty()) {
-                        List<com.admin.adminlfarma_mini.entity.Usuario> matchedUsers = usuarioService.listarTodosIncluyendoInactivos().stream()
-                            .filter(u -> (u.getNombre() != null && u.getNombre().toLowerCase().contains(vendedor.toLowerCase().trim())) ||
-                                         (u.getApellido() != null && u.getApellido().toLowerCase().contains(vendedor.toLowerCase().trim())) ||
-                                         (u.getUsername() != null && u.getUsername().toLowerCase().contains(vendedor.toLowerCase().trim())))
-                            .toList();
-                        for (com.admin.adminlfarma_mini.entity.Usuario u : matchedUsers) {
-                            if (u.getUsername() != null) allowedVendedores.add(u.getUsername());
-                            if (u.getEmail() != null) allowedVendedores.add(u.getEmail());
-                        }
-                        if (allowedVendedores.isEmpty()) {
-                            allowedVendedores.add("dummy_no_match");
-                        }
-                    }
-                } else {
-                    allowedVendedores.add(loggedUserEmail);
-                    if (loggedUser.getEmail() != null && !loggedUser.getEmail().isBlank()) {
-                        allowedVendedores.add(loggedUser.getEmail());
-                    }
-                }
-            }
+        // Dueño y administrador ven todo + contabilidad; el empleado solo sus ventas y sin ganancias
+        boolean accesoContable = ContabilidadService.tieneAccesoContable(rol);
+        List<String> vendedores = contabilidadService.resolverVendedoresPermitidos(rol, username, vendedor);
+
+        int tamano = Math.min(Math.max(size, 5), 100);
+        int pagina = Math.max(page, 0);
+        Page<Factura> ventasPage = facturaService.buscarFacturas(
+                fechaDesde, fechaHasta, metodoPago, factura, vendedores,
+                PageRequest.of(pagina, tamano, Sort.by("fecha").descending()));
+
+        // Si piden una página que ya no existe (p. ej. cambió el filtro), se muestra la última
+        if (ventasPage.getTotalPages() > 0 && pagina >= ventasPage.getTotalPages()) {
+            pagina = ventasPage.getTotalPages() - 1;
+            ventasPage = facturaService.buscarFacturas(
+                    fechaDesde, fechaHasta, metodoPago, factura, vendedores,
+                    PageRequest.of(pagina, tamano, Sort.by("fecha").descending()));
         }
+        contabilidadService.enriquecer(ventasPage.getContent(), accesoContable);
 
-        if (!isOwner && allowedVendedores.isEmpty()) {
-            allowedVendedores.add("dummy_no_match");
-        }
+        // Totales calculados en la base de datos: "Todo" siempre suma todo el historial
+        ContabilidadService.ResumenContable periodo =
+                contabilidadService.calcularResumen(fechaDesde, fechaHasta, metodoPago, factura, vendedores);
+        ContabilidadService.ResumenContable hoy = contabilidadService.calcularResumenHoy(vendedores);
 
-        Page<Factura> ventasPage = facturaService.buscarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores, pageable);
-
-        List<Factura> facturasHoyScope = facturaService.getFacturasDelDiaPorVendedores(isOwner && allowedVendedores.isEmpty() ? null : allowedVendedores);
-
-        // Si el usuario filtró por fechas (Hoy, Semanal, Mensual, Desde-Hasta), calculamos sobre ese rango;
-        // si no hay filtro de fecha activo, el resumen contable superior muestra el consolidado de HOY (evitando cargar 65,000 facturas históricas en RAM)
-        boolean tieneFiltroFecha = (fechaDesde != null && !fechaDesde.trim().isEmpty()) || (fechaHasta != null && !fechaHasta.trim().isEmpty());
-        List<Factura> facturasPeriodo = tieneFiltroFecha
-                ? facturaService.exportarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores)
-                : facturasHoyScope;
-        if (facturasPeriodo.size() > 1500) {
-            facturasPeriodo = facturasPeriodo.subList(0, 1500);
-        }
-
-        // Recolectar únicamente los IDs de productos presentes en las facturas a mostrar (ultra rápido y sin consumo de RAM)
-        java.util.Set<String> prodIds = new java.util.HashSet<>();
-        for (Factura f : ventasPage.getContent()) {
-            if (f.getDetalles() != null) {
-                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
-                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
-                }
-            }
-        }
-        for (Factura f : facturasHoyScope) {
-            if (f.getDetalles() != null) {
-                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
-                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
-                }
-            }
-        }
-        for (Factura f : facturasPeriodo) {
-            if (f.getDetalles() != null) {
-                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
-                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
-                }
-            }
-        }
-
-        Map<String, com.admin.adminlfarma_mini.entity.Usuario> mapaUsuarios = new HashMap<>();
-        for (com.admin.adminlfarma_mini.entity.Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
-            if (u.getUsername() != null) mapaUsuarios.put(u.getUsername().toLowerCase(), u);
-            if (u.getEmail() != null) mapaUsuarios.put(u.getEmail().toLowerCase(), u);
-        }
-        Map<String, Double> mapaCostos = new HashMap<>();
-        for (String pid : prodIds) {
-            productoService.obtenerPorId(pid).ifPresent(p -> {
-                if (p.getCostoCompra() != null && p.getCostoCompra() > 0) {
-                    mapaCostos.put(pid, p.getCostoCompra());
-                }
-            });
-        }
-
-        // Enriquecer cada factura de la página actual con Vendedor, Costo y Ganancia Neta
-        for (Factura f : ventasPage.getContent()) {
-            enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
-        }
-
-        for (Factura f : facturasHoyScope) {
-            enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
-        }
-        double ventasDelDiaScope = facturasHoyScope.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
-        double gananciaDelDiaScope = facturasHoyScope.stream().mapToDouble(f -> f.getGananciaNeta() != null ? f.getGananciaNeta() : 0.0).sum();
-        long cantidadVentasDelDiaScope = facturasHoyScope.size();
-        int unidadesVendidasHoyScope = facturaService.calcularUnidadesVendidas(facturasHoyScope);
-
-        // Contabilidad del período seleccionado
-        double ventasPeriodoTotal = 0.0;
-        double costoPeriodoTotal = 0.0;
-        double gananciaPeriodoTotal = 0.0;
-        int unidadesPeriodoTotal = 0;
-        Map<String, Map<String, Object>> desgloseProductosMap = new java.util.LinkedHashMap<>();
-
-        for (Factura f : facturasPeriodo) {
-            enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
-            ventasPeriodoTotal += (f.getTotal() != null ? f.getTotal() : 0.0);
-            costoPeriodoTotal += (f.getCostoTotal() != null ? f.getCostoTotal() : 0.0);
-            gananciaPeriodoTotal += (f.getGananciaNeta() != null ? f.getGananciaNeta() : 0.0);
-
-            if (f.getDetalles() != null) {
-                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
-                    int cant = d.getCantidad() != null ? d.getCantidad() : 0;
-                    unidadesPeriodoTotal += cant;
-                    String key = d.getProductoId() != null ? d.getProductoId() : (d.getProductoNombre() != null ? d.getProductoNombre() : "ITEM");
-                    Map<String, Object> prodStat = desgloseProductosMap.computeIfAbsent(key, k -> {
-                        Map<String, Object> m = new HashMap<>();
-                        m.put("codigo", d.getProductoCodigo() != null ? d.getProductoCodigo() : "—");
-                        m.put("nombre", d.getProductoNombre() != null ? d.getProductoNombre() : "Producto");
-                        m.put("unidades", 0);
-                        m.put("precioUnitario", d.getPrecioUnitario() != null ? d.getPrecioUnitario() : 0.0);
-                        m.put("costoUnitario", d.getCostoUnitario() != null ? d.getCostoUnitario() : 0.0);
-                        m.put("ventaTotal", 0.0);
-                        m.put("costoTotal", 0.0);
-                        m.put("gananciaTotal", 0.0);
-                        return m;
-                    });
-                    prodStat.put("unidades", ((Integer) prodStat.get("unidades")) + cant);
-                    double subVenta = d.getSubtotal() != null ? d.getSubtotal() : 0.0;
-                    double subCosto = (d.getCostoUnitario() != null ? d.getCostoUnitario() : 0.0) * cant;
-                    double subGan = d.getGananciaItem() != null ? d.getGananciaItem() : (subVenta - subCosto);
-                    prodStat.put("ventaTotal", ((Double) prodStat.get("ventaTotal")) + subVenta);
-                    prodStat.put("costoTotal", ((Double) prodStat.get("costoTotal")) + subCosto);
-                    prodStat.put("gananciaTotal", ((Double) prodStat.get("gananciaTotal")) + subGan);
-                }
-            }
-        }
-
-        List<Map<String, Object>> resumenProductosContable = new java.util.ArrayList<>(desgloseProductosMap.values());
-        resumenProductosContable.sort((a, b) -> Double.compare((Double) b.get("gananciaTotal"), (Double) a.get("gananciaTotal")));
-
-        double margenPeriodoPorcentaje = ventasPeriodoTotal > 0 ? Math.round((gananciaPeriodoTotal / ventasPeriodoTotal) * 1000.0) / 10.0 : 0.0;
-
-        model.addAttribute("isOwner", isOwner);
+        model.addAttribute("accesoContable", accesoContable);
         model.addAttribute("ventas", ventasPage.getContent());
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", pagina);
         model.addAttribute("totalPages", ventasPage.getTotalPages());
         model.addAttribute("totalItems", ventasPage.getTotalElements());
-        model.addAttribute("pageSize", size);
-        model.addAttribute("ventasDelDia", ventasDelDiaScope);
-        model.addAttribute("gananciaDelDia", gananciaDelDiaScope);
-        model.addAttribute("cantidadVentasDelDia", cantidadVentasDelDiaScope);
-        model.addAttribute("unidadesVendidasHoy", unidadesVendidasHoyScope);
-        model.addAttribute("ventasPeriodoTotal", ventasPeriodoTotal);
-        model.addAttribute("costoPeriodoTotal", costoPeriodoTotal);
-        model.addAttribute("gananciaPeriodoTotal", gananciaPeriodoTotal);
-        model.addAttribute("unidadesPeriodoTotal", unidadesPeriodoTotal);
-        model.addAttribute("margenPeriodoPorcentaje", margenPeriodoPorcentaje);
-        model.addAttribute("resumenProductosContable", resumenProductosContable);
+        model.addAttribute("pageSize", tamano);
+        model.addAttribute("ventasDelDia", hoy.getVentas());
+        model.addAttribute("gananciaDelDia", hoy.getGanancia());
+        model.addAttribute("cantidadVentasDelDia", hoy.getFacturas());
+        model.addAttribute("unidadesVendidasHoy", hoy.getUnidades());
+        model.addAttribute("ventasPeriodoTotal", periodo.getVentas());
+        model.addAttribute("costoPeriodoTotal", periodo.getCosto());
+        model.addAttribute("gananciaPeriodoTotal", periodo.getGanancia());
+        model.addAttribute("unidadesPeriodoTotal", periodo.getUnidades());
+        model.addAttribute("margenPeriodoPorcentaje", periodo.getMargenPorcentaje());
+        model.addAttribute("resumenProductosContable", periodo.getProductos());
         model.addAttribute("fechaDesde", fechaDesde);
         model.addAttribute("fechaHasta", fechaHasta);
         model.addAttribute("metodoPago", metodoPago);
@@ -228,48 +110,6 @@ public class FacturaController {
         model.addAttribute("vendedor", vendedor);
 
         return "ventas";
-    }
-
-    private void enriquecerFacturaContable(
-            Factura f,
-            Map<String, com.admin.adminlfarma_mini.entity.Usuario> mapaUsuarios,
-            Map<String, Double> mapaCostos) {
-        if ((f.getVendedorNombre() == null || f.getVendedorNombre().isBlank()) && f.getVendedorEmail() != null) {
-            com.admin.adminlfarma_mini.entity.Usuario u = mapaUsuarios.get(f.getVendedorEmail().toLowerCase().trim());
-            if (u != null) {
-                String full = ((u.getNombre() != null ? u.getNombre() : "") + " " + (u.getApellido() != null ? u.getApellido() : "")).trim();
-                f.setVendedorNombre(full.isEmpty() ? u.getUsername() : full);
-                if (f.getVendedorRol() == null || f.getVendedorRol().isBlank()) {
-                    f.setVendedorRol(u.getRol() != null ? u.getRol().replace("ROLE_", "") : "EMPLEADO");
-                }
-            } else {
-                f.setVendedorNombre(f.getVendedorEmail());
-            }
-        }
-        double costoFactura = 0.0;
-        double gananciaFactura = 0.0;
-        if (f.getDetalles() != null) {
-            for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
-                int cant = d.getCantidad() != null ? d.getCantidad() : 0;
-                double precioU = d.getPrecioUnitario() != null ? d.getPrecioUnitario() : 0.0;
-                double sub = d.getSubtotal() != null ? d.getSubtotal() : (precioU * cant);
-                Double costoReal = d.getProductoId() != null ? mapaCostos.get(d.getProductoId()) : null;
-                double costoU = (costoReal != null && costoReal > 0 && costoReal < precioU)
-                        ? costoReal
-                        : Math.round(precioU * 0.65 * 100.0) / 100.0;
-                double ganItem = Math.round((sub - (costoU * cant)) * 100.0) / 100.0;
-                d.setCostoUnitario(costoU);
-                d.setGananciaItem(ganItem);
-                costoFactura += (costoU * cant);
-                gananciaFactura += ganItem;
-            }
-        } else {
-            double totalF = f.getTotal() != null ? f.getTotal() : 0.0;
-            costoFactura = Math.round(totalF * 0.65 * 100.0) / 100.0;
-            gananciaFactura = Math.round((totalF - costoFactura) * 100.0) / 100.0;
-        }
-        f.setCostoTotal(Math.round(costoFactura * 100.0) / 100.0);
-        f.setGananciaNeta(Math.round(gananciaFactura * 100.0) / 100.0);
     }
 
     @GetMapping("/exportar")
@@ -327,44 +167,12 @@ public class FacturaController {
             return "redirect:/ventas";
         }
 
-        List<String> allowedVendedores = new java.util.ArrayList<>();
-        boolean isOwner = false;
-        if (principal != null) {
-            String loggedUserEmail = principal.getName();
-            com.admin.adminlfarma_mini.entity.Usuario loggedUser = usuarioService.buscarPorUsername(loggedUserEmail).orElse(null);
-            if (loggedUser != null) {
-                if ("ROLE_OWNER".equals(loggedUser.getRol())) {
-                    isOwner = true;
-                    if (vendedor != null && !vendedor.trim().isEmpty()) {
-                        List<com.admin.adminlfarma_mini.entity.Usuario> matchedUsers = usuarioService.listarTodosIncluyendoInactivos().stream()
-                            .filter(u -> (u.getNombre() != null && u.getNombre().toLowerCase().contains(vendedor.toLowerCase().trim())) ||
-                                         (u.getApellido() != null && u.getApellido().toLowerCase().contains(vendedor.toLowerCase().trim())) ||
-                                         (u.getUsername() != null && u.getUsername().toLowerCase().contains(vendedor.toLowerCase().trim())))
-                            .toList();
-                        for (com.admin.adminlfarma_mini.entity.Usuario u : matchedUsers) {
-                            allowedVendedores.add(u.getUsername());
-                        }
-                        if (allowedVendedores.isEmpty()) {
-                            allowedVendedores.add("dummy_no_match");
-                        }
-                    }
-                } else if ("ROLE_ADMIN".equals(loggedUser.getRol())) {
-                    List<com.admin.adminlfarma_mini.entity.Usuario> allUsers = usuarioService.listarTodosIncluyendoInactivos();
-                    for (com.admin.adminlfarma_mini.entity.Usuario u : allUsers) {
-                        if (!"ROLE_OWNER".equals(u.getRol())) {
-                            allowedVendedores.add(u.getUsername());
-                        }
-                    }
-                } else {
-                    allowedVendedores.add(loggedUserEmail);
-                }
-            }
-        }
-
-        if (!isOwner && allowedVendedores.isEmpty()) {
-            allowedVendedores.add("dummy_no_match");
-        }
-
+        com.admin.adminlfarma_mini.entity.Usuario logueado = principal != null
+                ? usuarioService.buscarPorUsername(principal.getName()).orElse(null) : null;
+        List<String> allowedVendedores = contabilidadService.resolverVendedoresPermitidos(
+                logueado != null ? logueado.getRol() : null,
+                principal != null ? principal.getName() : null,
+                vendedor);
         List<Factura> facturas = facturaService.exportarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores);
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -467,37 +275,20 @@ public class FacturaController {
         }
 
         // Cargar facturas del día e historial reciente para la sección inferior del POS
-        List<String> vendedoresScope = new java.util.ArrayList<>();
-        boolean isOwnerPos = false;
-        if (principal != null) {
-            String userPrincipal = principal.getName();
-            com.admin.adminlfarma_mini.entity.Usuario logged = usuarioService.buscarPorUsername(userPrincipal).orElse(null);
-            if (logged != null) {
-                if ("ROLE_OWNER".equals(logged.getRol())) {
-                    isOwnerPos = true;
-                } else if ("ROLE_ADMIN".equals(logged.getRol())) {
-                    for (com.admin.adminlfarma_mini.entity.Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
-                        if (!"ROLE_OWNER".equals(u.getRol())) {
-                            if (u.getUsername() != null) vendedoresScope.add(u.getUsername());
-                            if (u.getEmail() != null) vendedoresScope.add(u.getEmail());
-                        }
-                    }
-                } else {
-                    vendedoresScope.add(userPrincipal);
-                    if (logged.getEmail() != null && !logged.getEmail().isBlank()) {
-                        vendedoresScope.add(logged.getEmail());
-                    }
-                }
-            }
-        }
+        com.admin.adminlfarma_mini.entity.Usuario logueadoPos = principal != null
+                ? usuarioService.buscarPorUsername(principal.getName()).orElse(null) : null;
+        List<String> vendedoresScope = contabilidadService.resolverVendedoresPermitidos(
+                logueadoPos != null ? logueadoPos.getRol() : null,
+                principal != null ? principal.getName() : null,
+                null);
 
-        List<Factura> facturasHoyPos = facturaService.getFacturasDelDiaPorVendedores(isOwnerPos ? null : vendedoresScope);
+        List<Factura> facturasHoyPos = facturaService.getFacturasDelDiaPorVendedores(vendedoresScope);
         double totalVendidoHoyPos = facturasHoyPos.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
         int unidadesVendidasHoyPos = facturaService.calcularUnidadesVendidas(facturasHoyPos);
 
         Pageable topRecent = PageRequest.of(0, 15, Sort.by("fecha").descending());
         List<Factura> ventasRecientesPos = facturaService.buscarFacturas(
-                null, null, null, null, isOwnerPos ? null : vendedoresScope, topRecent).getContent();
+                null, null, null, null, vendedoresScope, topRecent).getContent();
 
         model.addAttribute("facturasHoyPos", facturasHoyPos);
         model.addAttribute("ventasRecientesPos", ventasRecientesPos);

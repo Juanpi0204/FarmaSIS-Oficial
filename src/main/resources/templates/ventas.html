@@ -109,12 +109,12 @@
                 <div>
                     <h1 class="mb-0 fw-bold" style="color: #133A29;">
                         <i class="bi bi-receipt-cutoff me-1" style="color: #10B981;"></i>
-                        <span th:text="${isOwner ? 'Historial de Ventas y Contabilidad' : (loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas' : 'Historial de Ventas')}">Ventas</span>
+                        <span th:text="${accesoContable ? 'Historial de Ventas y Contabilidad' : (loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas' : 'Historial de Ventas')}">Ventas</span>
                     </h1>
-                    <p class="text-muted small mb-0" th:text="${isOwner ? 'Control contable de facturación, costos de mercancía y ganancia neta por producto y período.' : 'Registro detallado de transacciones y arqueo de caja por período.'}"></p>
+                    <p class="text-muted small mb-0" th:text="${accesoContable ? 'Control contable de facturación, costos de mercancía y ganancia neta por producto y período.' : 'Registro detallado de transacciones y arqueo de caja por período.'}"></p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button th:if="${isOwner}" type="button" class="btn btn-outline-success fw-semibold" data-bs-toggle="modal" data-bs-target="#contabilidadProductosModal" style="border-radius: 10px;">
+                    <button th:if="${accesoContable}" type="button" class="btn btn-outline-success fw-semibold" data-bs-toggle="modal" data-bs-target="#contabilidadProductosModal" style="border-radius: 10px;">
                         <i class="bi bi-calculator-fill me-1"></i> Ganancia por Producto
                     </button>
                     <a href="/ventas/nueva" class="btn btn-primary fw-semibold" style="border-radius: 10px;">
@@ -134,7 +134,7 @@
             </div>
 
             <!-- TARJETAS CONTABLES (OWNER VE GANANCIA NETA Y COSTOS; ADMIN/EMPLEADO VEN ARQUEO DE VENTAS) -->
-            <div class="row g-3 mb-3" th:if="${isOwner}">
+            <div class="row g-3 mb-3" th:if="${accesoContable}">
                 <div class="col-xl-3 col-sm-6">
                     <div class="card kpi-card kpi-emerald h-100">
                         <div class="card-body py-3">
@@ -186,7 +186,7 @@
             </div>
 
             <!-- TARJETAS PARA ADMIN Y EMPLEADO (SIN REVELAR GANANCIA NETA DEL OWNER) -->
-            <div class="row g-3 mb-3" th:unless="${isOwner}">
+            <div class="row g-3 mb-3" th:unless="${accesoContable}">
                 <div class="col-md-3 col-sm-6">
                     <div class="card kpi-card kpi-emerald h-100">
                         <div class="card-body py-3">
@@ -290,8 +290,8 @@
                                 <th>Cliente</th>
                                 <th>Productos</th>
                                 <th class="text-end">Total Venta</th>
-                                <th th:if="${isOwner}" class="text-end">Costo</th>
-                                <th th:if="${isOwner}" class="text-end">Ganancia Neta</th>
+                                <th th:if="${accesoContable}" class="text-end">Costo</th>
+                                <th th:if="${accesoContable}" class="text-end">Ganancia Neta</th>
                                 <th class="text-center">Método</th>
                                 <th>Vendedor</th>
                                 <th class="text-center">Ticket</th>
@@ -315,10 +315,10 @@
                                 <td class="text-nowrap text-end">
                                     <strong style="color: #0f172a;" th:text="'$ ' + ${#numbers.formatDecimal(v.total, 1, 'POINT', 0, 'COMMA')}">$ 0</strong>
                                 </td>
-                                <td th:if="${isOwner}" class="text-muted small text-nowrap text-end">
+                                <td th:if="${accesoContable}" class="text-muted small text-nowrap text-end">
                                     <span th:text="'$ ' + ${#numbers.formatDecimal(v.costoTotal != null ? v.costoTotal : 0, 1, 'POINT', 0, 'COMMA')}">$ 0</span>
                                 </td>
-                                <td th:if="${isOwner}" class="text-nowrap text-end">
+                                <td th:if="${accesoContable}" class="text-nowrap text-end">
                                     <span class="badge-profit" th:text="'+ $ ' + ${#numbers.formatDecimal(v.gananciaNeta != null ? v.gananciaNeta : 0, 1, 'POINT', 0, 'COMMA')}">+ $ 0</span>
                                 </td>
                                 <td class="text-nowrap text-center"><span class="badge bg-info text-dark" th:text="${v.metodoPago}">-</span></td>
@@ -337,7 +337,7 @@
                                 </td>
                             </tr>
                             <tr th:if="${ventas.empty}">
-                                <td th:colspan="${isOwner ? 10 : 8}" class="text-center py-5 text-muted">
+                                <td th:colspan="${accesoContable ? 10 : 8}" class="text-center py-5 text-muted">
                                     No hay ventas registradas en este período. <a href="/ventas/nueva" class="fw-bold text-success">Crear nueva venta</a>
                                 </td>
                             </tr>
@@ -347,7 +347,16 @@
 
                 <!-- Paginación -->
                 <div th:if="${totalPages > 1}" class="d-flex justify-content-between align-items-center mt-3">
-                    <span class="small text-muted" th:text="'Página ' + (${currentPage + 1}) + ' de ' + ${totalPages}">Página 1 de 1</span>
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="small text-muted"
+                              th:text="'Mostrando ' + ${#numbers.formatInteger(currentPage * pageSize + 1, 1, 'POINT')} + '–' + ${#numbers.formatInteger(currentPage * pageSize + #lists.size(ventas), 1, 'POINT')} + ' de ' + ${#numbers.formatInteger(totalItems, 1, 'POINT')} + ' facturas · Página ' + ${currentPage + 1} + ' de ' + ${#numbers.formatInteger(totalPages, 1, 'POINT')}">Mostrando 1–15</span>
+                        <form class="d-flex align-items-center gap-1 mb-0" onsubmit="return irAPagina(event)">
+                            <label class="small text-muted mb-0" for="irPaginaInput">Ir a la página</label>
+                            <input type="number" id="irPaginaInput" class="form-control form-control-sm" style="width: 95px; border-radius: 8px;"
+                                   min="1" th:max="${totalPages}" th:placeholder="${currentPage + 1}">
+                            <button type="submit" class="btn btn-sm btn-outline-success" style="border-radius: 8px;">Ir</button>
+                        </form>
+                    </div>
                     <nav>
                         <ul class="pagination mb-0">
                             <li class="page-item" th:classappend="${currentPage == 0 or totalPages == 0} ? 'disabled' : ''">
@@ -389,7 +398,7 @@
     </div>
 
     <!-- MODAL EXCLUSIVO OWNER: DESGLOSE CONTABLE DE GANANCIA POR PRODUCTO -->
-    <div th:if="${isOwner}" class="modal fade" id="contabilidadProductosModal" tabindex="-1">
+    <div th:if="${accesoContable}" class="modal fade" id="contabilidadProductosModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content" style="border-radius: 16px; border: none;">
                 <div class="modal-header text-white" style="background: linear-gradient(135deg, #06150F 0%, #133A29 60%, #1E6043 100%);">
@@ -497,6 +506,19 @@
                 inputDesde.value = formatearFechaISO(inicioMes);
             }
             form.submit();
+        }
+
+        function irAPagina(event) {
+            event.preventDefault();
+            const input = document.getElementById('irPaginaInput');
+            const ultima = parseInt(input.max, 10) || 1;
+            let destino = parseInt(input.value, 10);
+            if (isNaN(destino)) return false;
+            destino = Math.min(Math.max(destino, 1), ultima);
+            const params = new URLSearchParams(window.location.search);
+            params.set('page', String(destino - 1));
+            window.location.href = '/ventas?' + params.toString();
+            return false;
         }
 
         function changePageSize(select) {
