@@ -69,7 +69,7 @@ public class FacturaService {
 
     public List<Factura> exportarFacturas(String fechaDesde, String fechaHasta,
                                            String metodoPago, String numFactura, List<String> vendedores) {
-        Query query = new Query().with(Sort.by(Sort.Direction.DESC, "fecha"));
+        Query query = new Query().with(Sort.by(Sort.Direction.DESC, "fecha")).limit(1500);
         List<Criteria> criterios = new ArrayList<>();
 
         if (fechaDesde != null && !fechaDesde.isEmpty()) {

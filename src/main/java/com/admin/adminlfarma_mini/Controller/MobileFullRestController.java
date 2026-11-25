@@ -361,13 +361,38 @@ public class MobileFullRestController {
 
         boolean isOwner = cleanRol.contains("OWNER");
 
+        boolean tieneFiltroFecha = (fechaDesde != null && !fechaDesde.trim().isEmpty())
+                || (fechaHasta != null && !fechaHasta.trim().isEmpty());
+        List<Factura> facturasPeriodo = tieneFiltroFecha
+                ? facturaService.exportarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores)
+                : facturaService.getFacturasDelDiaPorVendedores(isOwner && allowedVendedores.isEmpty() ? null : allowedVendedores);
+        if (facturasPeriodo.size() > 1500) {
+            facturasPeriodo = facturasPeriodo.subList(0, 1500);
+        }
+
+        Set<String> prodIds = new HashSet<>();
+        for (Factura f : ventasPage.getContent()) {
+            if (f.getDetalles() != null) {
+                for (DetalleFactura d : f.getDetalles()) {
+                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
+                }
+            }
+        }
+        for (Factura f : facturasPeriodo) {
+            if (f.getDetalles() != null) {
+                for (DetalleFactura d : f.getDetalles()) {
+                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
+                }
+            }
+        }
+
         Map<String, Usuario> mapaUsuarios = new HashMap<>();
         for (Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
             if (u.getUsername() != null) mapaUsuarios.put(u.getUsername().toLowerCase(), u);
             if (u.getEmail() != null) mapaUsuarios.put(u.getEmail().toLowerCase(), u);
         }
         Map<String, Double> mapaCostos = new HashMap<>();
-        for (Producto p : productoService.listarTodos()) {
+        for (Producto p : productoRepository.findAllById(prodIds)) {
             if (p.getId() != null && p.getCostoCompra() != null && p.getCostoCompra() > 0) {
                 mapaCostos.put(p.getId(), p.getCostoCompra());
             }
@@ -377,9 +402,7 @@ public class MobileFullRestController {
             enriquecerFacturaContableMobile(f, mapaUsuarios, mapaCostos, isOwner);
         }
 
-        // Calcular métricas contables de todo el período filtrado
-        List<Factura> facturasPeriodo = facturaService.exportarFacturas(
-                fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores);
+        // Calcular métricas contables del período seleccionado (o de Hoy por defecto)
         double ventasPeriodoTotal = 0.0;
         double costoPeriodoTotal = 0.0;
         double gananciaPeriodoTotal = 0.0;

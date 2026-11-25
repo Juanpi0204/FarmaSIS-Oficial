@@ -103,17 +103,54 @@ public class FacturaController {
 
         Page<Factura> ventasPage = facturaService.buscarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores, pageable);
 
-        // Mapas de consulta rápida para enriquecer nombre de vendedor y costos reales de productos
+        List<Factura> facturasHoyScope = facturaService.getFacturasDelDiaPorVendedores(isOwner && allowedVendedores.isEmpty() ? null : allowedVendedores);
+
+        // Si el usuario filtró por fechas (Hoy, Semanal, Mensual, Desde-Hasta), calculamos sobre ese rango;
+        // si no hay filtro de fecha activo, el resumen contable superior muestra el consolidado de HOY (evitando cargar 65,000 facturas históricas en RAM)
+        boolean tieneFiltroFecha = (fechaDesde != null && !fechaDesde.trim().isEmpty()) || (fechaHasta != null && !fechaHasta.trim().isEmpty());
+        List<Factura> facturasPeriodo = tieneFiltroFecha
+                ? facturaService.exportarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores)
+                : facturasHoyScope;
+        if (facturasPeriodo.size() > 1500) {
+            facturasPeriodo = facturasPeriodo.subList(0, 1500);
+        }
+
+        // Recolectar únicamente los IDs de productos presentes en las facturas a mostrar (ultra rápido y sin consumo de RAM)
+        java.util.Set<String> prodIds = new java.util.HashSet<>();
+        for (Factura f : ventasPage.getContent()) {
+            if (f.getDetalles() != null) {
+                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
+                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
+                }
+            }
+        }
+        for (Factura f : facturasHoyScope) {
+            if (f.getDetalles() != null) {
+                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
+                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
+                }
+            }
+        }
+        for (Factura f : facturasPeriodo) {
+            if (f.getDetalles() != null) {
+                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
+                    if (d.getProductoId() != null) prodIds.add(d.getProductoId());
+                }
+            }
+        }
+
         Map<String, com.admin.adminlfarma_mini.entity.Usuario> mapaUsuarios = new HashMap<>();
         for (com.admin.adminlfarma_mini.entity.Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
             if (u.getUsername() != null) mapaUsuarios.put(u.getUsername().toLowerCase(), u);
             if (u.getEmail() != null) mapaUsuarios.put(u.getEmail().toLowerCase(), u);
         }
         Map<String, Double> mapaCostos = new HashMap<>();
-        for (Producto p : productoService.listarTodos()) {
-            if (p.getId() != null && p.getCostoCompra() != null && p.getCostoCompra() > 0) {
-                mapaCostos.put(p.getId(), p.getCostoCompra());
-            }
+        for (String pid : prodIds) {
+            productoService.obtenerPorId(pid).ifPresent(p -> {
+                if (p.getCostoCompra() != null && p.getCostoCompra() > 0) {
+                    mapaCostos.put(pid, p.getCostoCompra());
+                }
+            });
         }
 
         // Enriquecer cada factura de la página actual con Vendedor, Costo y Ganancia Neta
@@ -121,7 +158,6 @@ public class FacturaController {
             enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
         }
 
-        List<Factura> facturasHoyScope = facturaService.getFacturasDelDiaPorVendedores(isOwner && allowedVendedores.isEmpty() ? null : allowedVendedores);
         for (Factura f : facturasHoyScope) {
             enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
         }
@@ -130,8 +166,7 @@ public class FacturaController {
         long cantidadVentasDelDiaScope = facturasHoyScope.size();
         int unidadesVendidasHoyScope = facturaService.calcularUnidadesVendidas(facturasHoyScope);
 
-        // Contabilidad del período filtrado completo (Hoy / Semanal / Mensual / Rango Desde-Hasta)
-        List<Factura> facturasPeriodo = facturaService.exportarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores);
+        // Contabilidad del período seleccionado
         double ventasPeriodoTotal = 0.0;
         double costoPeriodoTotal = 0.0;
         double gananciaPeriodoTotal = 0.0;
