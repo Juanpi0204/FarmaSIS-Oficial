@@ -64,8 +64,9 @@ public class FacturaController {
             String loggedUserEmail = principal.getName();
             com.admin.adminlfarma_mini.entity.Usuario loggedUser = usuarioService.buscarPorUsername(loggedUserEmail).orElse(null);
             if (loggedUser != null) {
-                if ("ROLE_OWNER".equals(loggedUser.getRol())) {
-                    isOwner = true;
+                String userRol = loggedUser.getRol() != null ? loggedUser.getRol().toUpperCase() : "";
+                if (userRol.contains("OWNER") || userRol.contains("ADMIN")) {
+                    isOwner = true; // Tanto OWNER como ADMIN acceden a Contabilidad y ven todas las ventas de la farmacia
                     if (vendedor != null && !vendedor.trim().isEmpty()) {
                         List<com.admin.adminlfarma_mini.entity.Usuario> matchedUsers = usuarioService.listarTodosIncluyendoInactivos().stream()
                             .filter(u -> (u.getNombre() != null && u.getNombre().toLowerCase().contains(vendedor.toLowerCase().trim())) ||
@@ -78,14 +79,6 @@ public class FacturaController {
                         }
                         if (allowedVendedores.isEmpty()) {
                             allowedVendedores.add("dummy_no_match");
-                        }
-                    }
-                } else if ("ROLE_ADMIN".equals(loggedUser.getRol())) {
-                    List<com.admin.adminlfarma_mini.entity.Usuario> allUsers = usuarioService.listarTodosIncluyendoInactivos();
-                    for (com.admin.adminlfarma_mini.entity.Usuario u : allUsers) {
-                        if (!"ROLE_OWNER".equals(u.getRol())) {
-                            if (u.getUsername() != null) allowedVendedores.add(u.getUsername());
-                            if (u.getEmail() != null) allowedVendedores.add(u.getEmail());
                         }
                     }
                 } else {

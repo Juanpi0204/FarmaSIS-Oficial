@@ -333,13 +333,6 @@ public class MobileFullRestController {
                     allowedVendedores.add(u.getEmail().trim());
                 }
             });
-        } else if (cleanRol.contains("ADMIN")) {
-            for (Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
-                if (!"ROLE_OWNER".equals(u.getRol())) {
-                    if (u.getUsername() != null) allowedVendedores.add(u.getUsername());
-                    if (u.getEmail() != null) allowedVendedores.add(u.getEmail());
-                }
-            }
         } else if (vendedor != null && !vendedor.trim().isEmpty()) {
             String vLower = vendedor.toLowerCase().trim();
             for (Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
@@ -359,7 +352,8 @@ public class MobileFullRestController {
         Page<Factura> ventasPage = facturaService.buscarFacturas(
                 fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores, pageable);
 
-        boolean isOwner = cleanRol.contains("OWNER");
+        // Tanto OWNER como ADMIN pueden ver todas las ventas y la contabilidad (Ganancia Neta)
+        boolean isOwner = cleanRol.contains("OWNER") || cleanRol.contains("ADMIN");
 
         boolean tieneFiltroFecha = (fechaDesde != null && !fechaDesde.trim().isEmpty())
                 || (fechaHasta != null && !fechaHasta.trim().isEmpty());

@@ -48,7 +48,9 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
   String _searchFactura = '';
   bool _loadingVentas = true;
 
-  bool get _isOwner => widget.user.rol.toUpperCase().contains('OWNER');
+  bool get _isOwner =>
+      widget.user.rol.toUpperCase().contains('OWNER') ||
+      widget.user.rol.toUpperCase().contains('ADMIN');
 
   @override
   void initState() {

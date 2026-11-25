@@ -190,6 +190,10 @@ class _GestionUsuariosScreenState extends State<GestionUsuariosScreen> {
                                 const DropdownMenuItem(
                                     value: 'ROLE_ADMIN',
                                     child: Text('Administrador')),
+                              if (_isOwner)
+                                const DropdownMenuItem(
+                                    value: 'ROLE_OWNER',
+                                    child: Text('Owner (Dueño)')),
                             ],
                             onChanged: (v) {
                               if (v != null) setModalState(() => rolSel = v);
