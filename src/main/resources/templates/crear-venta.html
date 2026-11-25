@@ -660,12 +660,32 @@
                             renderCart();
                             
                             Swal.fire({
-                                title: '¡Venta Registrada!',
-                                text: 'Venta ' + data.numeroFactura + ' registrada con éxito por un total de $' + Number(data.total).toLocaleString() + '.',
+                                title: '¡Venta Registrada con Éxito!',
+                                html: `
+                                    <div class="py-2">
+                                        <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 mb-3">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Factura: <strong>${data.numeroFactura}</strong>
+                                        </div>
+                                        <p class="fs-3 fw-bold text-dark mb-1">$ ${Number(data.total).toLocaleString()}</p>
+                                        <p class="text-muted small mb-0">Cliente: <strong>${data.cliente || 'Consumidor Final'}</strong></p>
+                                    </div>
+                                `,
                                 icon: 'success',
-                                confirmButtonColor: '#1B4332'
-                            }).then(() => {
-                                window.location.href = '/ventas/' + data.facturaId + '/factura';
+                                showCancelButton: true,
+                                confirmButtonText: '<i class="bi bi-cart-plus me-1"></i> Seguir Vendiendo',
+                                confirmButtonColor: '#059669',
+                                cancelButtonText: '<i class="bi bi-printer me-1"></i> Ver / Imprimir Ticket',
+                                cancelButtonColor: '#0f172a',
+                                reverseButtons: true,
+                                allowOutsideClick: false
+                            }).then((choice) => {
+                                if (choice.isConfirmed) {
+                                    // Seguir vendiendo de inmediato en el POS: recarga para actualizar contadores y facturas de hoy
+                                    window.location.href = window.location.pathname;
+                                } else if (choice.dismiss === Swal.DismissReason.cancel) {
+                                    // Ver el comprobante e imprimir
+                                    window.location.href = '/ventas/' + data.facturaId + '/factura';
+                                }
                             });
                         } else {
                             Swal.fire({

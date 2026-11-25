@@ -13,12 +13,20 @@
     <link rel="stylesheet" href="/css/sidebar.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>/* Anti-flicker */
-    (function(){try{if(localStorage.getItem('sidebarState')==='closed'){document.documentElement.classList.add('sidebar-preload-collapsed');}}catch(e){}}());
+        (function () { try { if (localStorage.getItem('sidebarState') === 'closed') { document.documentElement.classList.add('sidebar-preload-collapsed'); } } catch (e) { } }());
     </script>
     <style>
-        body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; color: #1e293b; }
-        .main-content { background-color: #f4f7f6; min-height: 100vh; }
-        
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+
+        .main-content {
+            background-color: #f4f7f6;
+            min-height: 100vh;
+        }
+
         /* Banner IA */
         .ia-hero-banner {
             background: linear-gradient(135deg, #093824 0%, #115e41 50%, #1e7e5e 100%);
@@ -29,6 +37,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .ia-hero-banner::after {
             content: '';
             position: absolute;
@@ -36,7 +45,7 @@
             right: -50px;
             width: 260px;
             height: 260px;
-            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
             border-radius: 50%;
         }
 
@@ -51,6 +60,7 @@
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
+
         .btn-ia-action:hover {
             background-color: #059669;
             color: white;
@@ -64,16 +74,18 @@
             border-radius: 14px;
             border: 1px solid #e2e8f0;
             padding: 1.4rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
             transition: all 0.25s ease;
             position: relative;
             overflow: hidden;
         }
+
         .kpi-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
             border-color: #cbd5e1;
         }
+
         .kpi-icon-box {
             width: 44px;
             height: 44px;
@@ -96,10 +108,12 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .horizonte-btn:hover {
             background: #f1f5f9;
             color: #0f172a;
         }
+
         .horizonte-btn.active {
             background: #10B981;
             color: white;
@@ -117,12 +131,14 @@
             padding: 0.85rem 1rem;
             border-bottom: 2px solid #e2e8f0;
         }
+
         .table-prediction tbody td {
             padding: 0.85rem 1rem;
             vertical-align: middle;
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.875rem;
         }
+
         .table-prediction tbody tr.row-futura {
             background-color: #f0fdf4;
             font-weight: 500;
@@ -140,6 +156,7 @@
             align-items: center;
             gap: 0.35rem;
         }
+
         .badge-riesgo-medio {
             background-color: #fef3c7;
             color: #b45309;
@@ -151,6 +168,7 @@
             align-items: center;
             gap: 0.35rem;
         }
+
         .badge-riesgo-bajo {
             background-color: #d1fae5;
             color: #047857;
@@ -169,7 +187,7 @@
             border-radius: 16px;
             border: 1px solid #e2e8f0;
             padding: 1.5rem;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
         }
 
         /* Loader */
@@ -199,19 +217,21 @@
 
     <div class="main-content no-transition" id="mainContent">
         <div class="container-fluid px-3 px-md-4 py-4">
-            
+
             <!-- 1. HERO BANNER PRINCIPAL -->
             <div class="ia-hero-banner mb-4">
                 <div class="row align-items-center">
                     <div class="col-lg-8">
                         <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                            <span class="badge bg-white text-emerald-800 fw-bold px-2 py-1" style="color: #065f46 !important; font-size: 0.72rem;">
+                            <span class="badge bg-white text-emerald-800 fw-bold px-2 py-1"
+                                style="color: #065f46 !important; font-size: 0.72rem;">
                                 <i class="bi bi-cpu-fill me-1"></i> IA & SERIES TEMPORALES
                             </span>
                             <span class="badge bg-black/30 text-white px-2 py-1" style="font-size: 0.72rem;">
                                 <i class="bi bi-database-check me-1"></i> DATOS REALES DE MONGODB
                             </span>
-                            <span class="badge bg-emerald-400 text-emerald-950 fw-bold px-2 py-1" style="font-size: 0.72rem;">
+                            <span class="badge bg-emerald-400 text-emerald-950 fw-bold px-2 py-1"
+                                style="font-size: 0.72rem;">
                                 MODELO DAMPED HOLT (1985)
                             </span>
                         </div>
@@ -219,11 +239,15 @@
                             Predicción de Demanda e Inteligencia de Inventario
                         </h1>
                         <p class="mb-0 text-white-50" style="font-size: 0.95rem; max-width: 820px;">
-                            Pronóstico estocástico de ventas futuras y simulación de rotación de stock. Calcula el riesgo inminente de quiebre, el día crítico de desabastecimiento y sugiere órdenes de reposición basadas en facturación real de FarmaSIS.
+                            Pronóstico estocástico de ventas futuras y simulación de rotación de stock. Calcula el
+                            riesgo inminente de quiebre, el día crítico de desabastecimiento y sugiere órdenes de
+                            reposición basadas en facturación real de FarmaSIS.
                         </p>
                     </div>
                     <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                        <button type="button" class="btn btn-outline-light btn-sm fw-semibold rounded-pill px-3 py-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalExplicacion">
+                        <button type="button"
+                            class="btn btn-outline-light btn-sm fw-semibold rounded-pill px-3 py-2 shadow-sm"
+                            data-bs-toggle="modal" data-bs-target="#modalExplicacion">
                             <i class="bi bi-journal-text me-1"></i> Sustentación del Modelo
                         </button>
                     </div>
@@ -237,13 +261,15 @@
                         <!-- Selector de Producto -->
                         <div class="col-lg-6 col-md-7">
                             <label for="selectProducto" class="form-label fw-bold small text-muted mb-1">
-                                <i class="bi bi-search me-1 text-emerald-600"></i> Seleccionar Medicamento / Producto de MongoDB:
+                                <i class="bi bi-search me-1 text-emerald-600"></i> Seleccionar Medicamento / Producto de
+                                MongoDB:
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0 text-muted">
                                     <i class="bi bi-capsule"></i>
                                 </span>
-                                <select id="selectProducto" class="form-select border-start-0 ps-0 fw-semibold" style="box-shadow: none;">
+                                <select id="selectProducto" class="form-select border-start-0 ps-0 fw-semibold"
+                                    style="box-shadow: none;">
                                     <option value="" disabled selected>Cargando catálogo activo...</option>
                                 </select>
                             </div>
@@ -255,13 +281,16 @@
                                 <i class="bi bi-calendar3 me-1 text-emerald-600"></i> Horizonte Temporal:
                             </label>
                             <div class="d-flex gap-2">
-                                <button type="button" class="horizonte-btn" data-temporalidad="DIARIO" onclick="cambiarTemporalidad('DIARIO')">
+                                <button type="button" class="horizonte-btn" data-temporalidad="DIARIO"
+                                    onclick="cambiarTemporalidad('DIARIO')">
                                     Diario (7d)
                                 </button>
-                                <button type="button" class="horizonte-btn active" data-temporalidad="SEMANAL" onclick="cambiarTemporalidad('SEMANAL')">
+                                <button type="button" class="horizonte-btn active" data-temporalidad="SEMANAL"
+                                    onclick="cambiarTemporalidad('SEMANAL')">
                                     Semanal (4s)
                                 </button>
-                                <button type="button" class="horizonte-btn" data-temporalidad="MENSUAL" onclick="cambiarTemporalidad('MENSUAL')">
+                                <button type="button" class="horizonte-btn" data-temporalidad="MENSUAL"
+                                    onclick="cambiarTemporalidad('MENSUAL')">
                                     Mensual (3m)
                                 </button>
                             </div>
@@ -270,29 +299,33 @@
                         <!-- Botón Recalcular -->
                         <div class="col-lg-2 text-lg-end">
                             <label class="form-label d-none d-lg-block mb-1">&nbsp;</label>
-                            <button id="btnRecalcular" class="btn btn-ia-action w-100" onclick="cargarPrediccionActual()">
+                            <button id="btnRecalcular" class="btn btn-ia-action w-100"
+                                onclick="cargarPrediccionActual()">
                                 <i class="bi bi-arrow-repeat me-1" id="iconRecalcular"></i> Actualizar
                             </button>
                         </div>
                     </div>
 
                     <!-- Fila con información rápida del producto seleccionado -->
-                    <div id="infoProductoStrip" class="d-flex flex-wrap align-items-center gap-3 pt-3 mt-3 border-top" style="display: none !important;">
+                    <div id="infoProductoStrip" class="d-flex flex-wrap align-items-center gap-3 pt-3 mt-3 border-top"
+                        style="display: none !important;">
                         <div class="small">
-                            <span class="text-muted">Código:</span> 
+                            <span class="text-muted">Código:</span>
                             <strong id="badgeCodigo" class="text-dark bg-light px-2 py-1 rounded">--</strong>
                         </div>
                         <div class="small">
-                            <span class="text-muted">Categoría:</span> 
+                            <span class="text-muted">Categoría:</span>
                             <strong id="badgeCategoria" class="text-dark">--</strong>
                         </div>
                         <div class="small">
-                            <span class="text-muted">Stock Actual en Bodega:</span> 
-                            <span id="badgeStockActual" class="badge bg-emerald-100 text-emerald-800 fw-bold px-2 py-1" style="background-color: #d1fae5; color: #065f46;">-- uds</span>
+                            <span class="text-muted">Stock Actual en Bodega:</span>
+                            <span id="badgeStockActual" class="badge bg-emerald-100 text-emerald-800 fw-bold px-2 py-1"
+                                style="background-color: #d1fae5; color: #065f46;">-- uds</span>
                         </div>
                         <div class="small">
-                            <span class="text-muted">Stock Mínimo de Seguridad:</span> 
-                            <span id="badgeStockMinimo" class="badge bg-secondary-subtle text-secondary fw-semibold px-2 py-1">-- uds</span>
+                            <span class="text-muted">Stock Mínimo de Seguridad:</span>
+                            <span id="badgeStockMinimo"
+                                class="badge bg-secondary-subtle text-secondary fw-semibold px-2 py-1">-- uds</span>
                         </div>
                         <div class="ms-auto small text-muted">
                             <i class="bi bi-clock-history me-1"></i> Predicción generada sobre facturación viva
@@ -311,19 +344,25 @@
             </div>
 
             <!-- 4. ESTADO VACÍO (SIN_DATOS) -->
-            <div id="sinDatosState" class="card border-0 shadow-sm rounded-4 p-5 text-center mb-4" style="display: none; background: #fffdf5; border: 1px dashed #f59e0b !important;">
-                <div class="mx-auto mb-3" style="width: 64px; height: 64px; border-radius: 50%; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #d97706;">
+            <div id="sinDatosState" class="card border-0 shadow-sm rounded-4 p-5 text-center mb-4"
+                style="display: none; background: #fffdf5; border: 1px dashed #f59e0b !important;">
+                <div class="mx-auto mb-3"
+                    style="width: 64px; height: 64px; border-radius: 50%; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #d97706;">
                     <i class="bi bi-database-exclamation"></i>
                 </div>
                 <h4 class="fw-bold text-dark mb-2">Historial de Ventas Insuficiente en MongoDB</h4>
                 <p id="sinDatosMensaje" class="text-muted mx-auto mb-4" style="max-width: 650px;">
-                    Este producto no cuenta con registros de facturación suficientes en la base de datos para el horizonte seleccionado. El sistema no inventa datos ficticios para preservar la integridad analítica.
+                    Este producto no cuenta con registros de facturación suficientes en la base de datos para el
+                    horizonte seleccionado. El sistema no inventa datos ficticios para preservar la integridad
+                    analítica.
                 </p>
                 <div class="d-flex justify-content-center gap-2 flex-wrap">
-                    <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="cambiarTemporalidad('DIARIO')">
+                    <button class="btn btn-outline-dark btn-sm rounded-pill px-3"
+                        onclick="cambiarTemporalidad('DIARIO')">
                         <i class="bi bi-calendar-event me-1"></i> Probar Horizonte Diario
                     </button>
-                    <button class="btn btn-outline-dark btn-sm rounded-pill px-3" onclick="seleccionarProductoSiguiente()">
+                    <button class="btn btn-outline-dark btn-sm rounded-pill px-3"
+                        onclick="seleccionarProductoSiguiente()">
                         <i class="bi bi-arrow-right-circle me-1"></i> Probar Siguiente Producto
                     </button>
                 </div>
@@ -331,15 +370,17 @@
 
             <!-- 5. CONTENIDO PRINCIPAL DE LA PREDICCIÓN (KPIS + GRÁFICO + TABLA) -->
             <div id="prediccionContent" style="display: none;">
-                
+
                 <!-- 4 TARJETAS DE KPIS -->
                 <div class="row g-3 mb-4">
                     <!-- KPI 1: Demanda Total Proyectada -->
                     <div class="col-xl-3 col-md-6">
                         <div class="kpi-card h-100">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Demanda Proyectada</span>
-                                <div class="kpi-icon-box bg-emerald-50 text-emerald-600" style="background: #ecfdf5; color: #059669;">
+                                <span class="text-uppercase fw-bold text-muted small"
+                                    style="font-size: 0.72rem; letter-spacing: 0.05em;">Demanda Proyectada</span>
+                                <div class="kpi-icon-box bg-emerald-50 text-emerald-600"
+                                    style="background: #ecfdf5; color: #059669;">
                                     <i class="bi bi-graph-up-arrow"></i>
                                 </div>
                             </div>
@@ -358,8 +399,10 @@
                     <div class="col-xl-3 col-md-6">
                         <div class="kpi-card h-100">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Riesgo de Quiebre</span>
-                                <div class="kpi-icon-box" id="kpiRiesgoIconBox" style="background: #f1f5f9; color: #475569;">
+                                <span class="text-uppercase fw-bold text-muted small"
+                                    style="font-size: 0.72rem; letter-spacing: 0.05em;">Riesgo de Quiebre</span>
+                                <div class="kpi-icon-box" id="kpiRiesgoIconBox"
+                                    style="background: #f1f5f9; color: #475569;">
                                     <i class="bi bi-shield-check" id="kpiRiesgoIcon"></i>
                                 </div>
                             </div>
@@ -378,12 +421,15 @@
                     <div class="col-xl-3 col-md-6">
                         <div class="kpi-card h-100">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Punto Crítico</span>
-                                <div class="kpi-icon-box bg-amber-50 text-amber-600" style="background: #fffbeb; color: #d97706;">
+                                <span class="text-uppercase fw-bold text-muted small"
+                                    style="font-size: 0.72rem; letter-spacing: 0.05em;">Punto Crítico</span>
+                                <div class="kpi-icon-box bg-amber-50 text-amber-600"
+                                    style="background: #fffbeb; color: #d97706;">
                                     <i class="bi bi-exclamation-diamond"></i>
                                 </div>
                             </div>
-                            <h3 id="kpiPeriodoCritico" class="fw-bold mb-0 text-dark" style="font-size: 1.45rem;">--</h3>
+                            <h3 id="kpiPeriodoCritico" class="fw-bold mb-0 text-dark" style="font-size: 1.45rem;">--
+                            </h3>
                             <div class="mt-2 text-muted small">
                                 Momento estimado de alerta o agotamiento
                             </div>
@@ -394,8 +440,10 @@
                     <div class="col-xl-3 col-md-6">
                         <div class="kpi-card h-100">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <span class="text-uppercase fw-bold text-muted small" style="font-size: 0.72rem; letter-spacing: 0.05em;">Sugerencia de Compra</span>
-                                <div class="kpi-icon-box bg-blue-50 text-blue-600" style="background: #eff6ff; color: #2563eb;">
+                                <span class="text-uppercase fw-bold text-muted small"
+                                    style="font-size: 0.72rem; letter-spacing: 0.05em;">Sugerencia de Compra</span>
+                                <div class="kpi-icon-box bg-blue-50 text-blue-600"
+                                    style="background: #eff6ff; color: #2563eb;">
                                     <i class="bi bi-cart-check"></i>
                                 </div>
                             </div>
@@ -412,16 +460,20 @@
 
                 <!-- GRÁFICO INTERACTIVO CHART.JS -->
                 <div class="chart-container-card mb-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                    <div
+                        class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
                         <div>
                             <h5 class="fw-bold mb-0 text-dark">
-                                <i class="bi bi-activity text-emerald-600 me-2"></i> Curva de Facturación Real vs Predicción IA
+                                <i class="bi bi-activity text-emerald-600 me-2"></i> Curva de Facturación Real vs
+                                Predicción IA
                             </h5>
-                            <small class="text-muted">Barras verdes: ventas históricas facturadas | Línea verde esmeralda: pronóstico con intervalo de confianza al 95%</small>
+                            <small class="text-muted">Barras verdes: ventas históricas facturadas | Línea verde
+                                esmeralda: pronóstico con intervalo de confianza al 95%</small>
                         </div>
                         <div class="d-flex align-items-center gap-3">
                             <span class="badge bg-light text-dark border small fw-normal py-2 px-3">
-                                <i class="bi bi-funnel me-1"></i> <span id="badgeFiltroGrafico">Horizonte: SEMANAL</span>
+                                <i class="bi bi-funnel me-1"></i> <span id="badgeFiltroGrafico">Horizonte:
+                                    SEMANAL</span>
                             </span>
                         </div>
                     </div>
@@ -437,11 +489,13 @@
                     <!-- Tabla de Desglose Período a Período -->
                     <div class="col-lg-8">
                         <div class="card border-0 shadow-sm rounded-4 h-100" style="border: 1px solid #e2e8f0;">
-                            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                            <div
+                                class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
                                 <h6 class="fw-bold mb-0 text-dark">
                                     <i class="bi bi-table me-2 text-emerald-600"></i> Desglose Temporal de Datos
                                 </h6>
-                                <span class="badge bg-secondary-subtle text-secondary small fw-normal" id="badgeTotalPeriodos">0 períodos</span>
+                                <span class="badge bg-secondary-subtle text-secondary small fw-normal"
+                                    id="badgeTotalPeriodos">0 períodos</span>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
@@ -466,7 +520,8 @@
 
                     <!-- Ficha Científica del Modelo (Para defensa académica) -->
                     <div class="col-lg-4">
-                        <div class="card border-0 shadow-sm rounded-4 h-100" style="border: 1px solid #e2e8f0; background: #ffffff;">
+                        <div class="card border-0 shadow-sm rounded-4 h-100"
+                            style="border: 1px solid #e2e8f0; background: #ffffff;">
                             <div class="card-header bg-white border-0 py-3 px-4">
                                 <h6 class="fw-bold mb-0 text-dark">
                                     <i class="bi bi-shield-check me-2 text-emerald-600"></i> Parámetros del Modelo
@@ -477,7 +532,8 @@
                                 <ul class="list-group list-group-flush small">
                                     <li class="list-group-item d-flex justify-content-between px-0 py-2">
                                         <span class="text-muted">Algoritmo:</span>
-                                        <span class="fw-bold text-dark text-end" id="metricaAlgoritmo">Damped Holt</span>
+                                        <span class="fw-bold text-dark text-end" id="metricaAlgoritmo">Damped
+                                            Holt</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between px-0 py-2">
                                         <span class="text-muted">Alfa (&alpha; - Nivel):</span>
@@ -505,7 +561,8 @@
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between px-0 py-2">
                                         <span class="text-muted">Nivel de Confianza:</span>
-                                        <span class="badge bg-success-subtle text-success fw-bold">95% (&plusmn;1.96&sigma;)</span>
+                                        <span class="badge bg-success-subtle text-success fw-bold">95%
+                                            (&plusmn;1.96&sigma;)</span>
                                     </li>
                                 </ul>
 
@@ -514,7 +571,9 @@
                                         <i class="bi bi-info-circle me-1 text-primary"></i> Fuente de Datos
                                     </div>
                                     <p class="mb-0 text-muted" style="font-size: 0.78rem;">
-                                        Registros reales de facturas emitidas en MongoDB Atlas (<code class="text-dark">colección FACTURA</code>). No se emplean estimaciones heurísticas arbitrarias.
+                                        Registros reales de facturas emitidas en MongoDB Atlas (<code
+                                            class="text-dark">colección FACTURA</code>). No se emplean estimaciones
+                                        heurísticas arbitrarias.
                                     </p>
                                 </div>
                             </div>
@@ -531,29 +590,40 @@
     <div class="modal fade" id="modalExplicacion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow rounded-4">
-                <div class="modal-header bg-emerald-900 text-white rounded-top-4" style="background: linear-gradient(135deg, #093824, #1B4332);">
+                <div class="modal-header bg-emerald-900 text-white rounded-top-4"
+                    style="background: linear-gradient(135deg, #093824, #1B4332);">
                     <h5 class="modal-title fw-bold text-white">
                         <i class="bi bi-mortarboard-fill me-2"></i> Fundamentación Matemática del Módulo de Predicción
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4" style="font-size: 0.9rem; line-height: 1.6;">
-                    
+
                     <h6 class="fw-bold text-emerald-800 mb-2">1. ¿Qué modelo se implementó y por qué?</h6>
                     <p class="text-muted mb-3">
-                        Se implementó el <strong>Modelo de Tendencia Lineal Amortiguada de Holt (Damped Holt)</strong> propuesto por <em>Gardner & McKenzie (1985)</em>, recomendado por la literatura científica de pronóstico (Makridakis Competitions M3/M4) por su alta precisión en series de demanda con ruido y ventas intermitentes. A diferencia de Holt estándar o regresiones lineales, evita la sobreproyección asintótica a mediano y largo plazo.
+                        Se implementó el <strong>Modelo de Tendencia Lineal Amortiguada de Holt (Damped Holt)</strong>
+                        propuesto por <em>Gardner & McKenzie (1985)</em>, recomendado por la literatura científica de
+                        pronóstico (Makridakis Competitions M3/M4) por su alta precisión en series de demanda con ruido
+                        y ventas intermitentes. A diferencia de Holt estándar o regresiones lineales, evita la
+                        sobreproyección asintótica a mediano y largo plazo.
                     </p>
 
                     <h6 class="fw-bold text-emerald-800 mb-2">2. Ecuaciones de Recurrencia</h6>
                     <div class="formula-box mb-3">
-                        Nivel (L_t):     L_t = &alpha; &middot; y_t + (1 - &alpha;) &middot; (L_{t-1} + &phi; &middot; b_{t-1})<br>
-                        Tendencia (b_t): b_t = &beta; &middot; (L_t - L_{t-1}) + (1 - &beta;) &middot; &phi; &middot; b_{t-1}<br>
+                        Nivel (L_t): L_t = &alpha; &middot; y_t + (1 - &alpha;) &middot; (L_{t-1} + &phi; &middot;
+                        b_{t-1})<br>
+                        Tendencia (b_t): b_t = &beta; &middot; (L_t - L_{t-1}) + (1 - &beta;) &middot; &phi; &middot;
+                        b_{t-1}<br>
                         Previsión k-pasos: &ycirc;_{t+k} = L_t + &sum;_{i=1}^k (&phi;^i &middot; b_t)
                     </div>
 
                     <h6 class="fw-bold text-emerald-800 mb-2">3. Optimización de Parámetros (&alpha;, &beta;)</h6>
                     <p class="text-muted mb-3">
-                        Los hiperparámetros &alpha; y &beta; no son fijos: se calculan en cada consulta mediante una búsqueda en rejilla (<em>Grid Search</em>) en el espacio [0.1, 0.9], seleccionando la combinación que minimiza la suma de errores cuadráticos de un paso adelante (<em>One-Step-Ahead SSE</em>). El coeficiente de amortiguamiento &phi; se fija en 0.90 (valor canónico en la industria).
+                        Los hiperparámetros &alpha; y &beta; no son fijos: se calculan en cada consulta mediante una
+                        búsqueda en rejilla (<em>Grid Search</em>) en el espacio [0.1, 0.9], seleccionando la
+                        combinación que minimiza la suma de errores cuadráticos de un paso adelante (<em>One-Step-Ahead
+                            SSE</em>). El coeficiente de amortiguamiento &phi; se fija en 0.90 (valor canónico en la
+                        industria).
                     </p>
 
                     <h6 class="fw-bold text-emerald-800 mb-2">4. Intervalos de Confianza al 95%</h6>
@@ -566,12 +636,15 @@
                     <h6 class="fw-bold text-emerald-800 mb-2">5. Detección de Quiebre y Sugerencia de Reorden</h6>
                     <p class="text-muted mb-0">
                         El sistema proyecta el saldo de inventario restando la demanda esperada período a período:
-                        <code>Stock_{t+k} = Stock_{t+k-1} - &ycirc;_{t+k}</code>. Si el stock cae por debajo del stock mínimo de seguridad, se emite alerta crítica indicando el momento exacto y la cantidad requerida para reponer el inventario.
+                        <code>Stock_{t+k} = Stock_{t+k-1} - &ycirc;_{t+k}</code>. Si el stock cae por debajo del stock
+                        mínimo de seguridad, se emite alerta crítica indicando el momento exacto y la cantidad requerida
+                        para reponer el inventario.
                     </p>
 
                 </div>
                 <div class="modal-footer bg-light border-0 rounded-bottom-4">
-                    <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Entendido</button>
+                    <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill"
+                        data-bs-dismiss="modal">Entendido</button>
                 </div>
             </div>
         </div>
@@ -591,7 +664,7 @@
         let chartInstance = null;
 
         // Inicialización al cargar el DOM
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             cargarCatalogoProductos();
         });
 
@@ -630,7 +703,7 @@
                     }
 
                     // Listener de cambio
-                    select.addEventListener('change', function() {
+                    select.addEventListener('change', function () {
                         productoSeleccionadoId = this.value;
                         cargarPrediccionActual();
                     });
@@ -705,7 +778,7 @@
                     // Verificar status devuelto
                     if (data.status === 'SIN_DATOS') {
                         sinDatosState.style.display = 'block';
-                        document.getElementById('sinDatosMensaje').innerText = data.mensaje || 
+                        document.getElementById('sinDatosMensaje').innerText = data.mensaje ||
                             'Este producto no cuenta con ventas registradas suficientes en la base de datos para este horizonte temporal.';
                         infoProductoStrip.style.display = 'none';
                         return;
@@ -718,9 +791,9 @@
                     loadingState.style.display = 'none';
                     if (iconRecalcular) iconRecalcular.classList.remove('bi-spin');
                     console.error('Error al obtener predicción:', err);
-                    
+
                     sinDatosState.style.display = 'block';
-                    document.getElementById('sinDatosMensaje').innerText = err.mensaje || 
+                    document.getElementById('sinDatosMensaje').innerText = err.mensaje ||
                         'No fue posible obtener la predicción para este producto.';
                     infoProductoStrip.style.display = 'none';
                 });
@@ -800,7 +873,7 @@
                 const esFuturo = item.ventas_reales === null || item.ventas_reales === undefined;
                 if (esFuturo) tr.classList.add('row-futura');
 
-                const tipoHtml = esFuturo 
+                const tipoHtml = esFuturo
                     ? '<span class="badge bg-emerald-100 text-emerald-800 fw-bold px-2 py-1" style="background:#d1fae5; color:#065f46;"><i class="bi bi-stars me-1"></i>Pronóstico</span>'
                     : '<span class="badge bg-light text-secondary border px-2 py-1">Histórico</span>';
 
@@ -921,7 +994,7 @@
                             padding: 10,
                             cornerRadius: 8,
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     const val = context.parsed.y;
                                     if (val === null || val === undefined) return null;
                                     return ` ${context.dataset.label}: ${val} uds`;
