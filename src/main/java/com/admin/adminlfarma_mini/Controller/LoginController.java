@@ -3,6 +3,7 @@ package com.admin.adminlfarma_mini.Controller;
 import com.admin.adminlfarma_mini.entity.Usuario;
 import com.admin.adminlfarma_mini.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,14 @@ public class LoginController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @GetMapping("/")
+    public String rootRedirect(Authentication auth) {
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return "redirect:/login";
+        }
+        return "redirect:/verificar-codigo";
+    }
 
     @GetMapping("/login")
     public String loginForm(

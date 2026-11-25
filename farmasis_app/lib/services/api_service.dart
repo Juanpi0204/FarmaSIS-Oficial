@@ -5,16 +5,15 @@ import '../models/user_model.dart';
 import '../models/prediction_model.dart';
 
 class ApiService {
-  /// Detección automática del host según plataforma (192.168.1.9 en red Wi-Fi local para Android físico)
+  /// Servidor oficial de producción en la nube (Render)
+  static const String cloudRenderUrl = 'https://farmasis-oficial.onrender.com';
+
+  /// Detección automática del host (Producción en Render por defecto)
   static String get defaultHost {
-    if (kIsWeb) return 'http://localhost';
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://192.168.1.9';
-    }
-    return 'http://localhost';
+    return cloudRenderUrl;
   }
 
-  static String springBootBaseUrl = '$defaultHost:8092';
+  static String springBootBaseUrl = cloudRenderUrl;
 
   static bool useProductionBackend = true;
 
@@ -22,8 +21,10 @@ class ApiService {
 
   static String get fallbackBaseUrl =>
       defaultTargetPlatform == TargetPlatform.android
-          ? 'http://10.0.2.2:8092'
-          : springBootBaseUrl;
+          ? 'http://192.168.1.9:8092'
+          : 'http://localhost:8092';
+
+  static const Duration _defaultTimeout = Duration(seconds: 45);
 
   /// Permite apuntar en caliente a AWS o IP local
   static void setCustomServerUrl(String url) {
@@ -46,10 +47,11 @@ class ApiService {
       try {
         final response = await http
             .get(url, headers: {'Accept': 'application/json'})
-            .timeout(const Duration(seconds: 15));
+            .timeout(_defaultTimeout);
         if (response.statusCode == 200) {
           if (candidateBase != baseUrl) {
-            useProductionBackend = (candidateBase == springBootBaseUrl);
+            springBootBaseUrl = candidateBase;
+            useProductionBackend = true;
           }
           final data = jsonDecode(utf8.decode(response.bodyBytes));
           final lista = (data['productos'] as List<dynamic>?) ?? [];
@@ -89,11 +91,12 @@ class ApiService {
                 'password': cleanPass,
               }),
             )
-            .timeout(const Duration(seconds: 15));
+            .timeout(_defaultTimeout);
 
         if (response.statusCode == 200) {
           if (candidateBase != baseUrl) {
-            useProductionBackend = (candidateBase == springBootBaseUrl);
+            springBootBaseUrl = candidateBase;
+            useProductionBackend = true;
           }
           final data = jsonDecode(utf8.decode(response.bodyBytes));
           if (data['status'] == 'success' && data['usuario'] != null) {
@@ -135,11 +138,12 @@ class ApiService {
       try {
         final response = await http
             .get(url, headers: {'Accept': 'application/json'})
-            .timeout(const Duration(seconds: 15));
+            .timeout(_defaultTimeout);
 
         if (response.statusCode == 200) {
           if (candidateBase != baseUrl) {
-            useProductionBackend = (candidateBase == springBootBaseUrl);
+            springBootBaseUrl = candidateBase;
+            useProductionBackend = true;
           }
           final data = jsonDecode(utf8.decode(response.bodyBytes));
           return ContratoPrediccionResponse.fromJson(data);
@@ -179,7 +183,7 @@ class ApiService {
     });
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -218,7 +222,7 @@ class ApiService {
         .replace(queryParameters: params);
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -234,7 +238,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode == 200 && data['success'] == true) {
       return data;
@@ -251,7 +255,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode == 200 && data['success'] == true) {
       return data;
@@ -261,7 +265,7 @@ class ApiService {
 
   static Future<void> archivarProducto(String id) async {
     final uri = Uri.parse('$springBootBaseUrl/api/v1/inventario/$id/archivar');
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al archivar producto');
@@ -270,7 +274,7 @@ class ApiService {
 
   static Future<void> restaurarProducto(String id) async {
     final uri = Uri.parse('$springBootBaseUrl/api/v1/inventario/$id/restaurar');
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al restaurar producto');
@@ -281,7 +285,7 @@ class ApiService {
       String id, double porcentaje) async {
     final uri = Uri.parse(
         '$springBootBaseUrl/api/v1/inventario/$id/descuento?porcentaje=$porcentaje');
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al aplicar descuento');
@@ -291,7 +295,7 @@ class ApiService {
   static Future<void> revertirDescuentoProducto(String id) async {
     final uri = Uri.parse(
         '$springBootBaseUrl/api/v1/inventario/$id/revertir-descuento');
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al revertir descuento');
@@ -334,7 +338,7 @@ class ApiService {
         .replace(queryParameters: params);
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -366,7 +370,7 @@ class ApiService {
             'detalles': detalles,
           }),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode == 200 && data['success'] == true) {
       return data;
@@ -398,7 +402,7 @@ class ApiService {
         .replace(queryParameters: params);
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -415,7 +419,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al crear proveedor');
@@ -431,7 +435,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al actualizar proveedor');
@@ -441,7 +445,7 @@ class ApiService {
   static Future<void> cambiarEstadoProveedor(String id, bool activar) async {
     final action = activar ? 'reactivar' : 'desactivar';
     final uri = Uri.parse('$springBootBaseUrl/api/v1/proveedores/$id/$action');
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al cambiar estado del proveedor');
@@ -459,7 +463,7 @@ class ApiService {
     );
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -474,7 +478,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al crear usuario');
@@ -484,7 +488,7 @@ class ApiService {
   static Future<void> cambiarRolUsuario(String id, String nuevoRol) async {
     final uri = Uri.parse('$springBootBaseUrl/api/v1/usuarios/$id/rol')
         .replace(queryParameters: {'nuevoRol': nuevoRol});
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al cambiar rol');
@@ -494,7 +498,7 @@ class ApiService {
   static Future<void> cambiarEstadoUsuario(String id, bool activar) async {
     final action = activar ? 'activar' : 'desactivar';
     final uri = Uri.parse('$springBootBaseUrl/api/v1/usuarios/$id/$action');
-    final res = await http.post(uri).timeout(const Duration(seconds: 15));
+    final res = await http.post(uri).timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al cambiar estado del usuario');
@@ -508,7 +512,7 @@ class ApiService {
     final uri = Uri.parse('$springBootBaseUrl/api/v1/optimizacion/ultimo');
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -538,7 +542,7 @@ class ApiService {
     );
     final res = await http
         .get(uri, headers: {'Accept': 'application/json'})
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     if (res.statusCode == 200) {
       return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     }
@@ -554,7 +558,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al guardar configuración');
@@ -569,7 +573,7 @@ class ApiService {
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(body),
         )
-        .timeout(const Duration(seconds: 15));
+        .timeout(_defaultTimeout);
     final data = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     if (res.statusCode != 200 || data['success'] != true) {
       throw Exception(data['message'] ?? 'Error al actualizar perfil');

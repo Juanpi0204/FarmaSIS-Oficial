@@ -32,10 +32,11 @@ public class TwoFactorController {
                 
         // REGLA: Si el usuario NO requiere 2FA, saltar directo al dashboard
         if (usuario.getRequiere2FA() == null || !usuario.getRequiere2FA()) {
-            if ("ROLE_OWNER".equals(usuario.getRol())) return "redirect:/owner/dashboard";
-            if ("ROLE_ADMIN".equals(usuario.getRol())) return "redirect:/admin/dashboard";
-            if ("ROLE_EMPLEADO".equals(usuario.getRol())) return "redirect:/empleado/dashboard";
-            return "redirect:/";
+            String rol = usuario.getRol() != null ? usuario.getRol().toUpperCase() : "";
+            if (rol.contains("OWNER")) return "redirect:/owner/dashboard";
+            if (rol.contains("ADMIN")) return "redirect:/admin/dashboard";
+            if (rol.contains("EMPLEADO")) return "redirect:/empleado/dashboard";
+            return "redirect:/login";
         }
 
         if (usuario.getEmail() == null || usuario.getEmail().isEmpty()) {

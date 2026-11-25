@@ -831,7 +831,7 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
-          'Configurar IP del Servidor (PC)',
+          'Configurar Servidor FarmaSIS',
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -843,7 +843,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Ingresa la IP de tu PC en la misma red Wi-Fi (ej. http://192.168.1.9:8092):',
+              'URL del servidor en la nube (Render) o IP local:',
               style: TextStyle(
                 fontSize: 12,
                 color: FarmasisPalette.textSteel,
@@ -857,7 +857,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 color: FarmasisPalette.textSilverBright,
               ),
               decoration: InputDecoration(
-                hintText: 'http://192.168.1.9:8092',
+                hintText: 'https://farmasis-oficial.onrender.com',
                 filled: true,
                 fillColor: FarmasisPalette.inputSurface,
                 isDense: true,
