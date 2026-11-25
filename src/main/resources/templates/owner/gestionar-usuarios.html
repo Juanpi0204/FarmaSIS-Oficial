@@ -172,19 +172,20 @@
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <!-- Botón Ver Detalles (Info) -->
-                                            <button class="btn btn-info editar-usuario-btn" data-bs-toggle="modal"
+                                            <button th:if="${loggedUser == null || loggedUser.rol == 'ROLE_OWNER' || user.rol == 'ROLE_EMPLEADO'}"
+                                                class="btn btn-info editar-usuario-btn" data-bs-toggle="modal"
                                                 data-bs-target="#editarUsuarioModal" title="Ver Detalles">
                                                 <i class="bi bi-info-circle"></i>
                                             </button>
 
-                                            <!-- Botón Desactivar (Solo si está ACTIVO) -->
-                                            <button th:if="${user.activo == true && user.rol != 'ROLE_OWNER'}"
+                                            <!-- Botón Desactivar (Solo si está ACTIVO; Admin solo sobre Empleados) -->
+                                            <button th:if="${user.activo == true && user.rol != 'ROLE_OWNER' && (loggedUser == null || loggedUser.rol == 'ROLE_OWNER' || user.rol == 'ROLE_EMPLEADO')}"
                                                 class="btn btn-danger desactivar-usuario-btn" title="Desactivar">
                                                 <i class="bi bi-person-x"></i>
                                             </button>
 
-                                            <!-- Botón Reactivar (Solo si está INACTIVO) -->
-                                            <button th:unless="${user.activo == true}"
+                                            <!-- Botón Reactivar (Solo si está INACTIVO; Admin solo sobre Empleados) -->
+                                            <button th:if="${user.activo != true && (loggedUser == null || loggedUser.rol == 'ROLE_OWNER' || user.rol == 'ROLE_EMPLEADO')}"
                                                 class="btn btn-success activar-usuario-btn" title="Reactivar Cuenta">
                                                 <i class="bi bi-person-check"></i>
                                             </button>
@@ -246,8 +247,8 @@
                         <div class="mb-3">
                             <label class="form-label">Rol *</label>
                             <select class="form-select" id="rol" name="rol" required>
-                                <option value="ADMIN">ADMIN</option>
-                                <option value="EMPLEADO">EMPLEADO</option>
+                                <option th:if="${loggedUser != null && loggedUser.rol == 'ROLE_OWNER'}" value="ADMIN">ADMIN</option>
+                                <option value="EMPLEADO" selected>EMPLEADO</option>
                             </select>
                         </div>
                     </form>

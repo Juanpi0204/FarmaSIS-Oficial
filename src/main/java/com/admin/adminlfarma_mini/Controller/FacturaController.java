@@ -103,19 +103,96 @@ public class FacturaController {
 
         Page<Factura> ventasPage = facturaService.buscarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores, pageable);
 
+        // Mapas de consulta rápida para enriquecer nombre de vendedor y costos reales de productos
+        Map<String, com.admin.adminlfarma_mini.entity.Usuario> mapaUsuarios = new HashMap<>();
+        for (com.admin.adminlfarma_mini.entity.Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
+            if (u.getUsername() != null) mapaUsuarios.put(u.getUsername().toLowerCase(), u);
+            if (u.getEmail() != null) mapaUsuarios.put(u.getEmail().toLowerCase(), u);
+        }
+        Map<String, Double> mapaCostos = new HashMap<>();
+        for (Producto p : productoService.listarTodos()) {
+            if (p.getId() != null && p.getCostoCompra() != null && p.getCostoCompra() > 0) {
+                mapaCostos.put(p.getId(), p.getCostoCompra());
+            }
+        }
+
+        // Enriquecer cada factura de la página actual con Vendedor, Costo y Ganancia Neta
+        for (Factura f : ventasPage.getContent()) {
+            enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
+        }
+
         List<Factura> facturasHoyScope = facturaService.getFacturasDelDiaPorVendedores(isOwner && allowedVendedores.isEmpty() ? null : allowedVendedores);
+        for (Factura f : facturasHoyScope) {
+            enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
+        }
         double ventasDelDiaScope = facturasHoyScope.stream().mapToDouble(f -> f.getTotal() != null ? f.getTotal() : 0.0).sum();
+        double gananciaDelDiaScope = facturasHoyScope.stream().mapToDouble(f -> f.getGananciaNeta() != null ? f.getGananciaNeta() : 0.0).sum();
         long cantidadVentasDelDiaScope = facturasHoyScope.size();
         int unidadesVendidasHoyScope = facturaService.calcularUnidadesVendidas(facturasHoyScope);
 
+        // Contabilidad del período filtrado completo (Hoy / Semanal / Mensual / Rango Desde-Hasta)
+        List<Factura> facturasPeriodo = facturaService.exportarFacturas(fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores);
+        double ventasPeriodoTotal = 0.0;
+        double costoPeriodoTotal = 0.0;
+        double gananciaPeriodoTotal = 0.0;
+        int unidadesPeriodoTotal = 0;
+        Map<String, Map<String, Object>> desgloseProductosMap = new java.util.LinkedHashMap<>();
+
+        for (Factura f : facturasPeriodo) {
+            enriquecerFacturaContable(f, mapaUsuarios, mapaCostos);
+            ventasPeriodoTotal += (f.getTotal() != null ? f.getTotal() : 0.0);
+            costoPeriodoTotal += (f.getCostoTotal() != null ? f.getCostoTotal() : 0.0);
+            gananciaPeriodoTotal += (f.getGananciaNeta() != null ? f.getGananciaNeta() : 0.0);
+
+            if (f.getDetalles() != null) {
+                for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
+                    int cant = d.getCantidad() != null ? d.getCantidad() : 0;
+                    unidadesPeriodoTotal += cant;
+                    String key = d.getProductoId() != null ? d.getProductoId() : (d.getProductoNombre() != null ? d.getProductoNombre() : "ITEM");
+                    Map<String, Object> prodStat = desgloseProductosMap.computeIfAbsent(key, k -> {
+                        Map<String, Object> m = new HashMap<>();
+                        m.put("codigo", d.getProductoCodigo() != null ? d.getProductoCodigo() : "—");
+                        m.put("nombre", d.getProductoNombre() != null ? d.getProductoNombre() : "Producto");
+                        m.put("unidades", 0);
+                        m.put("precioUnitario", d.getPrecioUnitario() != null ? d.getPrecioUnitario() : 0.0);
+                        m.put("costoUnitario", d.getCostoUnitario() != null ? d.getCostoUnitario() : 0.0);
+                        m.put("ventaTotal", 0.0);
+                        m.put("costoTotal", 0.0);
+                        m.put("gananciaTotal", 0.0);
+                        return m;
+                    });
+                    prodStat.put("unidades", ((Integer) prodStat.get("unidades")) + cant);
+                    double subVenta = d.getSubtotal() != null ? d.getSubtotal() : 0.0;
+                    double subCosto = (d.getCostoUnitario() != null ? d.getCostoUnitario() : 0.0) * cant;
+                    double subGan = d.getGananciaItem() != null ? d.getGananciaItem() : (subVenta - subCosto);
+                    prodStat.put("ventaTotal", ((Double) prodStat.get("ventaTotal")) + subVenta);
+                    prodStat.put("costoTotal", ((Double) prodStat.get("costoTotal")) + subCosto);
+                    prodStat.put("gananciaTotal", ((Double) prodStat.get("gananciaTotal")) + subGan);
+                }
+            }
+        }
+
+        List<Map<String, Object>> resumenProductosContable = new java.util.ArrayList<>(desgloseProductosMap.values());
+        resumenProductosContable.sort((a, b) -> Double.compare((Double) b.get("gananciaTotal"), (Double) a.get("gananciaTotal")));
+
+        double margenPeriodoPorcentaje = ventasPeriodoTotal > 0 ? Math.round((gananciaPeriodoTotal / ventasPeriodoTotal) * 1000.0) / 10.0 : 0.0;
+
+        model.addAttribute("isOwner", isOwner);
         model.addAttribute("ventas", ventasPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", ventasPage.getTotalPages());
         model.addAttribute("totalItems", ventasPage.getTotalElements());
         model.addAttribute("pageSize", size);
         model.addAttribute("ventasDelDia", ventasDelDiaScope);
+        model.addAttribute("gananciaDelDia", gananciaDelDiaScope);
         model.addAttribute("cantidadVentasDelDia", cantidadVentasDelDiaScope);
         model.addAttribute("unidadesVendidasHoy", unidadesVendidasHoyScope);
+        model.addAttribute("ventasPeriodoTotal", ventasPeriodoTotal);
+        model.addAttribute("costoPeriodoTotal", costoPeriodoTotal);
+        model.addAttribute("gananciaPeriodoTotal", gananciaPeriodoTotal);
+        model.addAttribute("unidadesPeriodoTotal", unidadesPeriodoTotal);
+        model.addAttribute("margenPeriodoPorcentaje", margenPeriodoPorcentaje);
+        model.addAttribute("resumenProductosContable", resumenProductosContable);
         model.addAttribute("fechaDesde", fechaDesde);
         model.addAttribute("fechaHasta", fechaHasta);
         model.addAttribute("metodoPago", metodoPago);
@@ -123,6 +200,48 @@ public class FacturaController {
         model.addAttribute("vendedor", vendedor);
 
         return "ventas";
+    }
+
+    private void enriquecerFacturaContable(
+            Factura f,
+            Map<String, com.admin.adminlfarma_mini.entity.Usuario> mapaUsuarios,
+            Map<String, Double> mapaCostos) {
+        if ((f.getVendedorNombre() == null || f.getVendedorNombre().isBlank()) && f.getVendedorEmail() != null) {
+            com.admin.adminlfarma_mini.entity.Usuario u = mapaUsuarios.get(f.getVendedorEmail().toLowerCase().trim());
+            if (u != null) {
+                String full = ((u.getNombre() != null ? u.getNombre() : "") + " " + (u.getApellido() != null ? u.getApellido() : "")).trim();
+                f.setVendedorNombre(full.isEmpty() ? u.getUsername() : full);
+                if (f.getVendedorRol() == null || f.getVendedorRol().isBlank()) {
+                    f.setVendedorRol(u.getRol() != null ? u.getRol().replace("ROLE_", "") : "EMPLEADO");
+                }
+            } else {
+                f.setVendedorNombre(f.getVendedorEmail());
+            }
+        }
+        double costoFactura = 0.0;
+        double gananciaFactura = 0.0;
+        if (f.getDetalles() != null) {
+            for (com.admin.adminlfarma_mini.entity.DetalleFactura d : f.getDetalles()) {
+                int cant = d.getCantidad() != null ? d.getCantidad() : 0;
+                double precioU = d.getPrecioUnitario() != null ? d.getPrecioUnitario() : 0.0;
+                double sub = d.getSubtotal() != null ? d.getSubtotal() : (precioU * cant);
+                Double costoReal = d.getProductoId() != null ? mapaCostos.get(d.getProductoId()) : null;
+                double costoU = (costoReal != null && costoReal > 0 && costoReal < precioU)
+                        ? costoReal
+                        : Math.round(precioU * 0.65 * 100.0) / 100.0;
+                double ganItem = Math.round((sub - (costoU * cant)) * 100.0) / 100.0;
+                d.setCostoUnitario(costoU);
+                d.setGananciaItem(ganItem);
+                costoFactura += (costoU * cant);
+                gananciaFactura += ganItem;
+            }
+        } else {
+            double totalF = f.getTotal() != null ? f.getTotal() : 0.0;
+            costoFactura = Math.round(totalF * 0.65 * 100.0) / 100.0;
+            gananciaFactura = Math.round((totalF - costoFactura) * 100.0) / 100.0;
+        }
+        f.setCostoTotal(Math.round(costoFactura * 100.0) / 100.0);
+        f.setGananciaNeta(Math.round(gananciaFactura * 100.0) / 100.0);
     }
 
     @GetMapping("/exportar")

@@ -27,7 +27,7 @@ import java.util.Locale;
 
 @Controller
 @RequestMapping("/owner")
-@PreAuthorize("hasRole('OWNER')")
+@PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
 public class OwnerController {
 
     @Autowired
@@ -43,6 +43,7 @@ public class OwnerController {
     private ProductoRepository productoRepository;
 
     @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('OWNER')")
     public String dashboard(Model model) {
         model.addAttribute("titulo", "Panel de Owner - Control Total");
         
@@ -111,6 +112,7 @@ public class OwnerController {
     }
 
     @GetMapping({"/optimizacion-ia", "/prediccion-ia", "/prediccion"})
+    @PreAuthorize("hasRole('OWNER')")
     public String mostrarOptimizacionIA(Model model) {
         model.addAttribute("titulo", "Predicción de Demanda e IA");
         return "owner/optimizacion-ia";
@@ -165,7 +167,8 @@ public class OwnerController {
     @PostMapping("/crear-usuario")
     @ResponseBody
     public Map<String, Object> crearUsuario(@jakarta.validation.Valid @ModelAttribute com.admin.adminlfarma_mini.DTO.UsuarioRegistroDTO dto,
-                                            org.springframework.validation.BindingResult result) {
+                                            org.springframework.validation.BindingResult result,
+                                            org.springframework.security.core.Authentication auth) {
         Map<String, Object> response = new HashMap<>();
         
         if (result.hasErrors()) {
@@ -181,11 +184,15 @@ public class OwnerController {
                 return response;
             }
 
+            boolean isCallerOwner = auth != null && auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().contains("OWNER"));
+            String rolAsignado = isCallerOwner ? dto.getRol() : "EMPLEADO";
+
             Usuario nuevoUsuario = new Usuario();
             nuevoUsuario.setUsername(dto.getUsername());
             nuevoUsuario.setPassword(dto.getPassword());
             nuevoUsuario.setEmail(dto.getEmail());
-            nuevoUsuario.setRol(dto.getRol());
+            nuevoUsuario.setRol(rolAsignado);
             nuevoUsuario.setNombre(dto.getNombre());
             nuevoUsuario.setApellido(dto.getApellido());
             nuevoUsuario.setTelefono(dto.getTelefono());
@@ -193,7 +200,7 @@ public class OwnerController {
             usuarioService.registrar(nuevoUsuario);
             
             // Send email asynchronously
-            emailService.enviarCorreoBienvenida(dto.getEmail(), dto.getNombre() + " " + dto.getApellido(), dto.getUsername(), dto.getPassword(), dto.getRol());
+            emailService.enviarCorreoBienvenida(dto.getEmail(), dto.getNombre() + " " + dto.getApellido(), dto.getUsername(), dto.getPassword(), rolAsignado);
             
             response.put("success", true);
             response.put("message", "Usuario creado exitosamente y correo de bienvenida enviado");

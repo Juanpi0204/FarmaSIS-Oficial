@@ -359,6 +359,70 @@ public class MobileFullRestController {
         Page<Factura> ventasPage = facturaService.buscarFacturas(
                 fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores, pageable);
 
+        boolean isOwner = cleanRol.contains("OWNER");
+
+        Map<String, Usuario> mapaUsuarios = new HashMap<>();
+        for (Usuario u : usuarioService.listarTodosIncluyendoInactivos()) {
+            if (u.getUsername() != null) mapaUsuarios.put(u.getUsername().toLowerCase(), u);
+            if (u.getEmail() != null) mapaUsuarios.put(u.getEmail().toLowerCase(), u);
+        }
+        Map<String, Double> mapaCostos = new HashMap<>();
+        for (Producto p : productoService.listarTodos()) {
+            if (p.getId() != null && p.getCostoCompra() != null && p.getCostoCompra() > 0) {
+                mapaCostos.put(p.getId(), p.getCostoCompra());
+            }
+        }
+
+        for (Factura f : ventasPage.getContent()) {
+            enriquecerFacturaContableMobile(f, mapaUsuarios, mapaCostos, isOwner);
+        }
+
+        // Calcular métricas contables de todo el período filtrado
+        List<Factura> facturasPeriodo = facturaService.exportarFacturas(
+                fechaDesde, fechaHasta, metodoPago, factura, allowedVendedores);
+        double ventasPeriodoTotal = 0.0;
+        double costoPeriodoTotal = 0.0;
+        double gananciaPeriodoTotal = 0.0;
+        int unidadesPeriodoTotal = 0;
+        Map<String, Map<String, Object>> desgloseProductosMap = new LinkedHashMap<>();
+
+        for (Factura f : facturasPeriodo) {
+            enriquecerFacturaContableMobile(f, mapaUsuarios, mapaCostos, true);
+            ventasPeriodoTotal += (f.getTotal() != null ? f.getTotal() : 0.0);
+            costoPeriodoTotal += (f.getCostoTotal() != null ? f.getCostoTotal() : 0.0);
+            gananciaPeriodoTotal += (f.getGananciaNeta() != null ? f.getGananciaNeta() : 0.0);
+            if (f.getDetalles() != null) {
+                for (DetalleFactura d : f.getDetalles()) {
+                    int cant = d.getCantidad() != null ? d.getCantidad() : 0;
+                    unidadesPeriodoTotal += cant;
+                    String key = d.getProductoId() != null ? d.getProductoId() : (d.getProductoNombre() != null ? d.getProductoNombre() : "ITEM");
+                    Map<String, Object> prodStat = desgloseProductosMap.computeIfAbsent(key, k -> {
+                        Map<String, Object> m = new LinkedHashMap<>();
+                        m.put("codigo", d.getProductoCodigo() != null ? d.getProductoCodigo() : "—");
+                        m.put("nombre", d.getProductoNombre() != null ? d.getProductoNombre() : "Producto");
+                        m.put("unidades", 0);
+                        m.put("precioUnitario", d.getPrecioUnitario() != null ? d.getPrecioUnitario() : 0.0);
+                        m.put("costoUnitario", d.getCostoUnitario() != null ? d.getCostoUnitario() : 0.0);
+                        m.put("ventaTotal", 0.0);
+                        m.put("costoTotal", 0.0);
+                        m.put("gananciaTotal", 0.0);
+                        return m;
+                    });
+                    prodStat.put("unidades", ((Integer) prodStat.get("unidades")) + cant);
+                    double subVenta = d.getSubtotal() != null ? d.getSubtotal() : 0.0;
+                    double subCosto = (d.getCostoUnitario() != null ? d.getCostoUnitario() : 0.0) * cant;
+                    double subGan = d.getGananciaItem() != null ? d.getGananciaItem() : (subVenta - subCosto);
+                    prodStat.put("ventaTotal", Math.round((((Double) prodStat.get("ventaTotal")) + subVenta) * 100.0) / 100.0);
+                    prodStat.put("costoTotal", Math.round((((Double) prodStat.get("costoTotal")) + subCosto) * 100.0) / 100.0);
+                    prodStat.put("gananciaTotal", Math.round((((Double) prodStat.get("gananciaTotal")) + subGan) * 100.0) / 100.0);
+                }
+            }
+        }
+
+        List<Map<String, Object>> resumenProductosContable = new ArrayList<>(desgloseProductosMap.values());
+        resumenProductosContable.sort((a, b) -> Double.compare(((Number) b.get("gananciaTotal")).doubleValue(), ((Number) a.get("gananciaTotal")).doubleValue()));
+        double margenPeriodoPorcentaje = ventasPeriodoTotal > 0 ? Math.round((gananciaPeriodoTotal / ventasPeriodoTotal) * 1000.0) / 10.0 : 0.0;
+
         Map<String, Object> res = new LinkedHashMap<>();
         res.put("status", "OK");
         res.put("ventas", ventasPage.getContent());
@@ -367,8 +431,63 @@ public class MobileFullRestController {
         res.put("totalItems", ventasPage.getTotalElements());
         res.put("ventasDelDia", facturaService.getVentasDelDia());
         res.put("cantidadVentasDelDia", facturaService.getCantidadVentasDelDia());
+        res.put("ventasPeriodoTotal", Math.round(ventasPeriodoTotal * 100.0) / 100.0);
+        res.put("unidadesPeriodoTotal", unidadesPeriodoTotal);
+        if (isOwner) {
+            res.put("costoPeriodoTotal", Math.round(costoPeriodoTotal * 100.0) / 100.0);
+            res.put("gananciaPeriodoTotal", Math.round(gananciaPeriodoTotal * 100.0) / 100.0);
+            res.put("margenPeriodoPorcentaje", margenPeriodoPorcentaje);
+            res.put("resumenProductosContable", resumenProductosContable);
+        }
         res.put("configuracion", configuracionService.getConfiguracion());
         return ResponseEntity.ok(res);
+    }
+
+    private void enriquecerFacturaContableMobile(
+            Factura f,
+            Map<String, Usuario> mapaUsuarios,
+            Map<String, Double> mapaCostos,
+            boolean incluirGanancia) {
+        if ((f.getVendedorNombre() == null || f.getVendedorNombre().isBlank()) && f.getVendedorEmail() != null) {
+            Usuario u = mapaUsuarios.get(f.getVendedorEmail().toLowerCase().trim());
+            if (u != null) {
+                String full = ((u.getNombre() != null ? u.getNombre() : "") + " " + (u.getApellido() != null ? u.getApellido() : "")).trim();
+                f.setVendedorNombre(full.isEmpty() ? u.getUsername() : full);
+                if (f.getVendedorRol() == null || f.getVendedorRol().isBlank()) {
+                    f.setVendedorRol(u.getRol() != null ? u.getRol().replace("ROLE_", "") : "EMPLEADO");
+                }
+            } else {
+                f.setVendedorNombre(f.getVendedorEmail());
+            }
+        }
+        double costoFactura = 0.0;
+        double gananciaFactura = 0.0;
+        if (f.getDetalles() != null) {
+            for (DetalleFactura d : f.getDetalles()) {
+                int cant = d.getCantidad() != null ? d.getCantidad() : 0;
+                double precioU = d.getPrecioUnitario() != null ? d.getPrecioUnitario() : 0.0;
+                double sub = d.getSubtotal() != null ? d.getSubtotal() : (precioU * cant);
+                Double costoReal = d.getProductoId() != null ? mapaCostos.get(d.getProductoId()) : null;
+                double costoU = (costoReal != null && costoReal > 0 && costoReal < precioU)
+                        ? costoReal
+                        : Math.round(precioU * 0.65 * 100.0) / 100.0;
+                double ganItem = Math.round((sub - (costoU * cant)) * 100.0) / 100.0;
+                if (incluirGanancia) {
+                    d.setCostoUnitario(costoU);
+                    d.setGananciaItem(ganItem);
+                }
+                costoFactura += (costoU * cant);
+                gananciaFactura += ganItem;
+            }
+        } else {
+            double totalF = f.getTotal() != null ? f.getTotal() : 0.0;
+            costoFactura = Math.round(totalF * 0.65 * 100.0) / 100.0;
+            gananciaFactura = Math.round((totalF - costoFactura) * 100.0) / 100.0;
+        }
+        if (incluirGanancia) {
+            f.setCostoTotal(Math.round(costoFactura * 100.0) / 100.0);
+            f.setGananciaNeta(Math.round(gananciaFactura * 100.0) / 100.0);
+        }
     }
 
     @PostMapping("/ventas")

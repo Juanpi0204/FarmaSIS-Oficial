@@ -19,6 +19,8 @@ class _GestionUsuariosScreenState extends State<GestionUsuariosScreen> {
   int _inactivos = 0;
   bool _loading = true;
 
+  bool get _isOwner => widget.user.rol.toUpperCase().contains('OWNER');
+
   @override
   void initState() {
     super.initState();
@@ -180,13 +182,14 @@ class _GestionUsuariosScreenState extends State<GestionUsuariosScreen> {
                                     color: FarmasisPalette.borderChromeSubtle),
                               ),
                             ),
-                            items: const [
-                              DropdownMenuItem(
+                            items: [
+                              const DropdownMenuItem(
                                   value: 'ROLE_EMPLEADO',
                                   child: Text('Empleado')),
-                              DropdownMenuItem(
-                                  value: 'ROLE_ADMIN',
-                                  child: Text('Administrador')),
+                              if (_isOwner)
+                                const DropdownMenuItem(
+                                    value: 'ROLE_ADMIN',
+                                    child: Text('Administrador')),
                             ],
                             onChanged: (v) {
                               if (v != null) setModalState(() => rolSel = v);
@@ -485,13 +488,13 @@ class _GestionUsuariosScreenState extends State<GestionUsuariosScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    if (activo)
+                                    if (activo && _isOwner)
                                       InkWell(
                                         onTap: () async {
                                           try {
                                             final nuevoRol = isAdmin
                                                 ? 'ROLE_EMPLEADO'
-                                            : 'ROLE_ADMIN';
+                                                : 'ROLE_ADMIN';
                                             await ApiService.cambiarRolUsuario(
                                                 '${u['id']}', nuevoRol);
                                             _cargarUsuarios();
@@ -535,7 +538,8 @@ class _GestionUsuariosScreenState extends State<GestionUsuariosScreen> {
                                         ),
                                       ),
                                     const SizedBox(width: 10),
-                                    InkWell(
+                                    if (_isOwner || !isAdmin)
+                                      InkWell(
                                       onTap: () async {
                                         try {
                                           await ApiService.cambiarEstadoUsuario(

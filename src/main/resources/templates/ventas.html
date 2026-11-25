@@ -1,24 +1,94 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ventas - L-Farma</title>
+    <title>Ventas y Contabilidad - L-Farma</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/sidebar.css">
     <script>(function(){try{if(localStorage.getItem('sidebarState')==='closed'){document.documentElement.classList.add('sidebar-preload-collapsed');}}catch(e){}}());</script>
     <style>
-
-
         body {
-            background-color: #ffffff;
+            background-color: #f3f7f5;
         }
-
-        .table-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 80px; }
-        .filter-bar { background: white; border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+        .table-container {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(19, 58, 41, 0.06);
+            margin-bottom: 30px;
+            border: 1px solid rgba(16, 185, 129, 0.12);
+        }
+        .filter-bar {
+            background: white;
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 14px rgba(19, 58, 41, 0.06);
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(16, 185, 129, 0.12);
+        }
+        .kpi-card {
+            border-radius: 14px;
+            border: none;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+            transition: transform 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+        .kpi-emerald {
+            background: linear-gradient(135deg, #133A29 0%, #1E6043 60%, #10B981 100%);
+            color: white;
+        }
+        .kpi-profit {
+            background: linear-gradient(135deg, #065F46 0%, #059669 50%, #34D399 100%);
+            color: white;
+        }
+        .kpi-cost {
+            background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+            color: white;
+        }
+        .kpi-info {
+            background: linear-gradient(135deg, #0F4C81 0%, #0284C7 100%);
+            color: white;
+        }
+        .period-pill {
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 5px 14px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .period-pill:hover, .period-pill.active {
+            background: #133A29;
+            color: #ffffff;
+            border-color: #133A29;
+        }
+        .badge-profit {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+        .badge-seller {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 7px;
+            font-size: 0.78rem;
+        }
     </style>
 </head>
 
@@ -28,149 +98,249 @@
     <div th:replace="~{fragments/sidebar :: logoutModal}"></div>
 
     <div class="main-content no-transition" id="mainContent">
-
         <div class="container-fluid px-4 py-4">
-            <!-- Cabecera Pegajosa Global -->
-            <div class="global-sticky-header mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="mb-0"><i class="bi bi-receipt"></i> Ventas</h1>
-                    <a href="/ventas/nueva" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nueva Venta</a>
+            <!-- Cabecera -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <div>
+                    <h1 class="mb-0 fw-bold" style="color: #133A29;">
+                        <i class="bi bi-receipt-cutoff me-1" style="color: #10B981;"></i>
+                        <span th:text="${isOwner ? 'Historial de Ventas y Contabilidad' : (loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas' : 'Historial de Ventas')}">Ventas</span>
+                    </h1>
+                    <p class="text-muted small mb-0" th:text="${isOwner ? 'Control contable de facturación, costos de mercancía y ganancia neta por producto y período.' : 'Registro detallado de transacciones y arqueo de caja por período.'}"></p>
                 </div>
-
-                <!-- Alertas -->
-                <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-4" style="border-radius: 10px;">
-                    <span th:text="${success}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-4" style="border-radius: 10px;">
-                    <span th:text="${error}"></span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-
-                <!-- Estadísticas -->
-                <div class="row mb-4">
-                    <div class="col-md-3 col-sm-6 mb-3">
-                        <div class="card bg-success text-white shadow-sm border-0">
-                            <div class="card-body">
-                                <h6 th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas Hoy' : 'Ventas Hoy'}">Ventas Hoy</h6>
-                                <h3><span th:text="'$ ' + ${#numbers.formatDecimal(ventasDelDia, 1, 'POINT', 0, 'COMMA')}">0</span></h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 mb-3">
-                        <div class="card bg-info text-white shadow-sm border-0">
-                            <div class="card-body">
-                                <h6 th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Facturas Hoy' : 'Transacciones Hoy'}">Transacciones Hoy</h6>
-                                <h3 th:text="${cantidadVentasDelDia}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 mb-3">
-                        <div class="card bg-secondary text-white shadow-sm border-0">
-                            <div class="card-body">
-                                <h6>Productos Vendidos Hoy</h6>
-                                <h3 th:text="${(unidadesVendidasHoy != null ? unidadesVendidasHoy : 0) + ' uds'}">0 uds</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 mb-3">
-                        <div class="card bg-primary text-white shadow-sm border-0">
-                            <div class="card-body">
-                                <h6 th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Total Mis Ventas' : 'Total Ventas'}">Total Ventas</h6>
-                                <h3 th:text="${totalItems}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filtros Avanzados -->
-                <div class="filter-bar mb-0">
-                    <form method="get" class="row g-2 align-items-end">
-                        <div class="col-md-2">
-                            <label class="form-label small fw-bold text-muted">Desde</label>
-                            <input type="date" class="form-control" name="fechaDesde" th:value="${fechaDesde}" style="border-radius:10px;">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-bold text-muted">Hasta</label>
-                            <input type="date" class="form-control" name="fechaHasta" th:value="${fechaHasta}" style="border-radius:10px;">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-bold text-muted">Método Pago</label>
-                            <select class="form-select" name="metodoPago" style="border-radius:10px;">
-                                <option value="">Todos</option>
-                                <option value="EFECTIVO" th:selected="${metodoPago == 'EFECTIVO'}">Efectivo</option>
-                                <option value="TARJETA" th:selected="${metodoPago == 'TARJETA'}">Tarjeta</option>
-                                <option value="TRANSFERENCIA" th:selected="${metodoPago == 'TRANSFERENCIA'}">Transferencia</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label small fw-bold text-muted"># Factura</label>
-                            <input type="search" class="form-control" name="factura" placeholder="Buscar FAC-..." th:value="${factura}" style="border-radius:10px;">
-                        </div>
-                        <th:block sec:authorize="hasAnyAuthority('OWNER', 'ROLE_OWNER')">
-                            <div class="col-md-2">
-                                <label class="form-label small fw-bold text-muted">Nombre de usuario</label>
-                                <input type="search" class="form-control" name="vendedor" placeholder="Nombre o usuario..." th:value="${vendedor}" style="border-radius:10px;">
-                            </div>
-                        </th:block>
-                        <div class="col-md-2">
-                            <div class="d-flex gap-1">
-                                <button type="submit" class="btn btn-primary w-100" style="border-radius:10px; padding:9px;" title="Filtrar">
-                                    <i class="bi bi-funnel"></i> Filtrar
-                                </button>
-                                <a href="/ventas" class="btn btn-outline-secondary" style="border-radius:10px; padding:9px;" title="Limpiar Filtros">
-                                    <i class="bi bi-x-lg"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <a id="exportBtn" class="btn btn-success w-100" style="border-radius:10px; padding:9px;" title="Exportar Excel">
-                                <i class="bi bi-file-earmark-excel me-1"></i> Excel
-                            </a>
-                        </div>
-                    </form>
+                <div class="d-flex gap-2">
+                    <button th:if="${isOwner}" type="button" class="btn btn-outline-success fw-semibold" data-bs-toggle="modal" data-bs-target="#contabilidadProductosModal" style="border-radius: 10px;">
+                        <i class="bi bi-calculator-fill me-1"></i> Ganancia por Producto
+                    </button>
+                    <a href="/ventas/nueva" class="btn btn-primary fw-semibold" style="border-radius: 10px;">
+                        <i class="bi bi-plus-circle me-1"></i> Nueva Venta
+                    </a>
                 </div>
             </div>
 
-            <div class="table-container pb-5">
+            <!-- Alertas -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show mb-3" style="border-radius: 10px;">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show mb-3" style="border-radius: 10px;">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- TARJETAS CONTABLES (OWNER VE GANANCIA NETA Y COSTOS; ADMIN/EMPLEADO VEN ARQUEO DE VENTAS) -->
+            <div class="row g-3 mb-3" th:if="${isOwner}">
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card kpi-card kpi-emerald h-100">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small fw-semibold text-white-50 text-uppercase">Venta Total (Período)</span>
+                                <i class="bi bi-cash-stack fs-4 text-white-50"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1 mt-1" th:text="'$ ' + ${#numbers.formatDecimal(ventasPeriodoTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                            <small class="text-white-50" th:text="${totalItems + ' facturas · ' + unidadesPeriodoTotal + ' uds vendidas'}">0 facturas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card kpi-card kpi-profit h-100">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small fw-semibold text-white-50 text-uppercase">Ganancia Neta (Período)</span>
+                                <i class="bi bi-graph-up-arrow fs-4 text-white-50"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1 mt-1" th:text="'+ $ ' + ${#numbers.formatDecimal(gananciaPeriodoTotal, 1, 'POINT', 0, 'COMMA')}">+ $ 0</h3>
+                            <small class="text-white" th:text="'Margen de utilidad: ' + ${margenPeriodoPorcentaje} + '%'">Margen: 35%</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card kpi-card kpi-cost h-100">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small fw-semibold text-white-50 text-uppercase">Costo Mercancía (Período)</span>
+                                <i class="bi bi-box-seam fs-4 text-white-50"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1 mt-1" th:text="'$ ' + ${#numbers.formatDecimal(costoPeriodoTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                            <small class="text-white-50">Costo base de productos vendidos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card kpi-card kpi-info h-100">
+                        <div class="card-body py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="small fw-semibold text-white-50 text-uppercase">Caja y Ganancia de Hoy</span>
+                                <i class="bi bi-calendar-check fs-4 text-white-50"></i>
+                            </div>
+                            <h3 class="fw-bold mb-1 mt-1" th:text="'$ ' + ${#numbers.formatDecimal(ventasDelDia, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                            <small class="text-white" th:text="'Ganancia hoy: + $ ' + ${#numbers.formatDecimal(gananciaDelDia, 1, 'POINT', 0, 'COMMA')} + ' (' + ${cantidadVentasDelDia} + ' ventas)'">Ganancia hoy</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETAS PARA ADMIN Y EMPLEADO (SIN REVELAR GANANCIA NETA DEL OWNER) -->
+            <div class="row g-3 mb-3" th:unless="${isOwner}">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card kpi-card kpi-emerald h-100">
+                        <div class="card-body py-3">
+                            <h6 class="small text-white-50 text-uppercase mb-1" th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas Hoy' : 'Ventas Hoy'}">Ventas Hoy</h6>
+                            <h3 class="fw-bold mb-0"><span th:text="'$ ' + ${#numbers.formatDecimal(ventasDelDia, 1, 'POINT', 0, 'COMMA')}">0</span></h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card kpi-card kpi-info h-100">
+                        <div class="card-body py-3">
+                            <h6 class="small text-white-50 text-uppercase mb-1" th:text="${loggedUser != null && loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Facturas Hoy' : 'Transacciones Hoy'}">Transacciones Hoy</h6>
+                            <h3 class="fw-bold mb-0" th:text="${cantidadVentasDelDia}">0</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card kpi-card kpi-cost h-100">
+                        <div class="card-body py-3">
+                            <h6 class="small text-white-50 text-uppercase mb-1">Productos Vendidos (Período)</h6>
+                            <h3 class="fw-bold mb-0" th:text="${(unidadesPeriodoTotal != null ? unidadesPeriodoTotal : 0) + ' uds'}">0 uds</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card kpi-card kpi-profit h-100">
+                        <div class="card-body py-3">
+                            <h6 class="small text-white-50 text-uppercase mb-1">Total Facturado (Período)</h6>
+                            <h3 class="fw-bold mb-0" th:text="'$ ' + ${#numbers.formatDecimal(ventasPeriodoTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS RÁPIDOS DE PERÍODO + RANGO DE FECHAS -->
+            <div class="filter-bar">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 pb-2 border-bottom">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <span class="small fw-bold text-muted me-1"><i class="bi bi-calendar3 me-1 text-success"></i>Período Rápido:</span>
+                        <button type="button" class="period-pill" onclick="aplicarPeriodoRapido('HOY')">Hoy</button>
+                        <button type="button" class="period-pill" onclick="aplicarPeriodoRapido('SEMANA')">Últimos 7 Días (Semanal)</button>
+                        <button type="button" class="period-pill" onclick="aplicarPeriodoRapido('MES')">Este Mes (Mensual)</button>
+                        <button type="button" class="period-pill" onclick="aplicarPeriodoRapido('TODO')">Todo el Historial</button>
+                    </div>
+                    <span class="badge bg-light text-dark border" th:if="${fechaDesde != null and !fechaDesde.isEmpty()}"
+                          th:text="'Filtro activo: ' + ${fechaDesde} + ' al ' + ${fechaHasta}"></span>
+                </div>
+
+                <form id="filtroVentasForm" method="get" class="row g-2 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Desde</label>
+                        <input type="date" class="form-control" id="fechaDesdeInput" name="fechaDesde" th:value="${fechaDesde}" style="border-radius:10px;">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Hasta</label>
+                        <input type="date" class="form-control" id="fechaHastaInput" name="fechaHasta" th:value="${fechaHasta}" style="border-radius:10px;">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1">Método Pago</label>
+                        <select class="form-select" name="metodoPago" style="border-radius:10px;">
+                            <option value="">Todos</option>
+                            <option value="EFECTIVO" th:selected="${metodoPago == 'EFECTIVO'}">Efectivo</option>
+                            <option value="TARJETA" th:selected="${metodoPago == 'TARJETA'}">Tarjeta</option>
+                            <option value="TRANSFERENCIA" th:selected="${metodoPago == 'TRANSFERENCIA'}">Transferencia</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-muted mb-1"># Factura</label>
+                        <input type="search" class="form-control" name="factura" placeholder="Buscar FAC-..." th:value="${factura}" style="border-radius:10px;">
+                    </div>
+                    <th:block sec:authorize="hasAnyAuthority('OWNER', 'ROLE_OWNER', 'ADMIN', 'ROLE_ADMIN')">
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold text-muted mb-1">Vendedor</label>
+                            <input type="search" class="form-control" name="vendedor" placeholder="Nombre o correo..." th:value="${vendedor}" style="border-radius:10px;">
+                        </div>
+                    </th:block>
+                    <div class="col-md-2">
+                        <div class="d-flex gap-1">
+                            <button type="submit" class="btn btn-primary w-100" style="border-radius:10px; padding:8px;" title="Filtrar">
+                                <i class="bi bi-funnel"></i> Filtrar
+                            </button>
+                            <a href="/ventas" class="btn btn-outline-secondary" style="border-radius:10px; padding:8px;" title="Limpiar Filtros">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                            <a id="exportBtn" class="btn btn-success" style="border-radius:10px; padding:8px;" title="Exportar Excel">
+                                <i class="bi bi-file-earmark-excel"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TABLA PRINCIPAL DE FACTURAS -->
+            <div class="table-container">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle mb-0">
                         <thead class="table-dark">
                             <tr>
                                 <th># Factura</th>
-                                <th>Fecha</th>
+                                <th>Fecha y Hora</th>
                                 <th>Cliente</th>
-                                <th>Subtotal</th>
-                                <th>Total</th>
+                                <th>Productos</th>
+                                <th>Total Venta</th>
+                                <th th:if="${isOwner}">Costo</th>
+                                <th th:if="${isOwner}">Ganancia Neta</th>
                                 <th>Método</th>
                                 <th>Vendedor</th>
-                                <th class="text-center">Acciones</th>
+                                <th class="text-center">Ticket</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="v : ${ventas}" th:classappend="${v.vendedorEmail == loggedUser.email ? 'table-primary' : ''}">
+                            <tr th:each="v : ${ventas}">
                                 <td><span class="badge bg-secondary" th:text="${v.numeroFactura}">-</span></td>
-                                <td th:text="${#temporals.format(v.fecha, 'dd/MM/yyyy HH:mm')}">-</td>
-                                <td th:text="${v.clienteNombre}">-</td>
-                                <td><span th:text="'$ ' + ${#numbers.formatDecimal(v.subtotal, 1, 'POINT', 0, 'COMMA')}">0</span></td>
-                                <td><strong><span th:text="'$ ' + ${#numbers.formatDecimal(v.total, 1, 'POINT', 0, 'COMMA')}">0</span></strong>
-                                </td>
-                                <td><span class="badge bg-info" th:text="${v.metodoPago}">-</span></td>
-                                <td th:text="${v.vendedorEmail == loggedUser.email ? 'Tú' : v.vendedorEmail}"></td>
+                                <td class="small fw-medium" th:text="${#temporals.format(v.fecha, 'dd/MM/yyyy HH:mm')}">-</td>
+                                <td class="fw-medium" th:text="${v.clienteNombre}">-</td>
                                 <td>
-                                    <a th:href="@{/ventas/{id}/factura(id=${v.id})}" class="btn btn-sm btn-outline-primary" title="Ver Factura">
+                                    <span class="small text-muted" th:if="${v.detalles != null and !v.detalles.empty}">
+                                        <span th:each="d, iter : ${v.detalles}" th:if="${iter.index < 2}">
+                                            <strong th:text="${d.cantidad + 'x'}">1x</strong>
+                                            <span th:text="${d.productoNombre}">Prod</span><span th:if="${!iter.last and iter.index < 1}">, </span>
+                                        </span>
+                                        <span th:if="${v.detalles.size() > 2}" class="badge bg-light text-dark border ms-1" th:text="'+' + (${v.detalles.size() - 2}) + ' más'"></span>
+                                    </span>
+                                    <span class="small text-muted" th:if="${v.detalles == null or v.detalles.empty}">—</span>
+                                </td>
+                                <td>
+                                    <strong style="color: #0f172a;" th:text="'$ ' + ${#numbers.formatDecimal(v.total, 1, 'POINT', 0, 'COMMA')}">$ 0</strong>
+                                </td>
+                                <td th:if="${isOwner}" class="text-muted small">
+                                    <span th:text="'$ ' + ${#numbers.formatDecimal(v.costoTotal != null ? v.costoTotal : 0, 1, 'POINT', 0, 'COMMA')}">$ 0</span>
+                                </td>
+                                <td th:if="${isOwner}">
+                                    <span class="badge-profit" th:text="'+ $ ' + ${#numbers.formatDecimal(v.gananciaNeta != null ? v.gananciaNeta : 0, 1, 'POINT', 0, 'COMMA')}">+ $ 0</span>
+                                </td>
+                                <td><span class="badge bg-info text-dark" th:text="${v.metodoPago}">-</span></td>
+                                <td>
+                                    <span class="badge-seller">
+                                        <i class="bi bi-person-badge me-1 text-success"></i>
+                                        <span th:text="${v.vendedorNombre != null and !v.vendedorNombre.isEmpty() ? v.vendedorNombre : (v.vendedorEmail != null ? v.vendedorEmail : 'Sistema')}">Vendedor</span>
+                                    </span>
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.7rem;"
+                                           th:text="${(v.vendedorRol != null ? v.vendedorRol.replace('ROLE_','') : '') + (v.origenVenta != null ? ' · ' + v.origenVenta : '')}"></small>
+                                </td>
+                                <td class="text-center">
+                                    <a th:href="@{/ventas/{id}/factura(id=${v.id})}" class="btn btn-sm btn-outline-primary" title="Ver Ticket / Factura">
                                         <i class="bi bi-printer"></i>
                                     </a>
                                 </td>
                             </tr>
                             <tr th:if="${ventas.empty}">
-                                <td colspan="8" class="text-center py-5">No hay ventas registradas. <a
-                                        href="/ventas/nueva">Crear primera venta</a></td>
+                                <td th:colspan="${isOwner ? 10 : 8}" class="text-center py-5 text-muted">
+                                    No hay ventas registradas en este período. <a href="/ventas/nueva" class="fw-bold text-success">Crear nueva venta</a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
+                <!-- Paginación -->
                 <div th:if="${totalPages > 1}" class="d-flex justify-content-between align-items-center mt-3">
                     <span class="small text-muted" th:text="'Página ' + (${currentPage + 1}) + ' de ' + ${totalPages}">Página 1 de 1</span>
                     <nav>
@@ -213,25 +383,133 @@
         </div>
     </div>
 
-    <div th:replace="~{fragments/sidebar :: logoutModal}"></div>
+    <!-- MODAL EXCLUSIVO OWNER: DESGLOSE CONTABLE DE GANANCIA POR PRODUCTO -->
+    <div th:if="${isOwner}" class="modal fade" id="contabilidadProductosModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content" style="border-radius: 16px; border: none;">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #06150F 0%, #133A29 60%, #1E6043 100%);">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-calculator-fill me-2 text-success"></i>Contabilidad Detallada: Venta y Ganancia Neta por Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <small class="text-muted fw-bold text-uppercase d-block">Total Vendido en Período</small>
+                                <h4 class="fw-bold mb-0 text-dark" th:text="'$ ' + ${#numbers.formatDecimal(ventasPeriodoTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <small class="text-muted fw-bold text-uppercase d-block">Costo Total de Mercancía</small>
+                                <h4 class="fw-bold mb-0 text-secondary" th:text="'$ ' + ${#numbers.formatDecimal(costoPeriodoTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</h4>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 border" style="background-color: #f0fdf4; border-color: #86efac !important;">
+                                <small class="text-success fw-bold text-uppercase d-block">Ganancia Neta Total (Utilidad)</small>
+                                <h4 class="fw-bold mb-0 text-success" th:text="'+ $ ' + ${#numbers.formatDecimal(gananciaPeriodoTotal, 1, 'POINT', 0, 'COMMA')} + ' (' + ${margenPeriodoPorcentaje} + '%)'">+ $ 0</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Medicamento / Producto</th>
+                                    <th class="text-center">Unidades Vendidas</th>
+                                    <th class="text-end">Costo Unit.</th>
+                                    <th class="text-end">Precio Venta</th>
+                                    <th class="text-end">Venta Total</th>
+                                    <th class="text-end">Costo Total</th>
+                                    <th class="text-end">Ganancia Neta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="p : ${resumenProductosContable}">
+                                    <td><span class="badge bg-secondary" th:text="${p.codigo}">0001</span></td>
+                                    <td class="fw-semibold" th:text="${p.nombre}">Producto</td>
+                                    <td class="text-center"><span class="badge bg-primary" th:text="${p.unidades + ' uds'}">0 uds</span></td>
+                                    <td class="text-end text-muted" th:text="'$ ' + ${#numbers.formatDecimal(p.costoUnitario, 1, 'POINT', 0, 'COMMA')}">$ 0</td>
+                                    <td class="text-end" th:text="'$ ' + ${#numbers.formatDecimal(p.precioUnitario, 1, 'POINT', 0, 'COMMA')}">$ 0</td>
+                                    <td class="text-end fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(p.ventaTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</td>
+                                    <td class="text-end text-muted" th:text="'$ ' + ${#numbers.formatDecimal(p.costoTotal, 1, 'POINT', 0, 'COMMA')}">$ 0</td>
+                                    <td class="text-end">
+                                        <span class="badge-profit" th:text="'+ $ ' + ${#numbers.formatDecimal(p.gananciaTotal, 1, 'POINT', 0, 'COMMA')}">+ $ 0</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${resumenProductosContable == null or resumenProductosContable.empty}">
+                                    <td colspan="8" class="text-center py-4 text-muted">No hay productos vendidos en el período seleccionado.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/sidebar.js"></script>
     <script>
+        function formatearFechaISO(date) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function aplicarPeriodoRapido(periodo) {
+            const hoy = new Date();
+            const inputDesde = document.getElementById('fechaDesdeInput');
+            const inputHasta = document.getElementById('fechaHastaInput');
+            const form = document.getElementById('filtroVentasForm');
+
+            if (periodo === 'TODO') {
+                inputDesde.value = '';
+                inputHasta.value = '';
+                form.submit();
+                return;
+            }
+
+            inputHasta.value = formatearFechaISO(hoy);
+
+            if (periodo === 'HOY') {
+                inputDesde.value = formatearFechaISO(hoy);
+            } else if (periodo === 'SEMANA') {
+                const hace7 = new Date();
+                hace7.setDate(hoy.getDate() - 7);
+                inputDesde.value = formatearFechaISO(hace7);
+            } else if (periodo === 'MES') {
+                const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                inputDesde.value = formatearFechaISO(inicioMes);
+            }
+            form.submit();
+        }
+
         function changePageSize(select) {
             const params = new URLSearchParams(window.location.search);
             params.set('size', select.value);
             params.set('page', '0');
             window.location.href = '/ventas?' + params.toString();
         }
-        // Build export URL with current filters
+
         (function() {
             const params = new URLSearchParams(window.location.search);
             params.delete('page'); params.delete('size');
-            document.getElementById('exportBtn').href = '/ventas/exportar?' + params.toString();
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                exportBtn.href = '/ventas/exportar?' + params.toString();
+            }
         })();
 
-        // Limpieza automática en botón 'X' nativo de buscadores
         document.addEventListener("DOMContentLoaded", function() {
             document.querySelectorAll('input[type="search"]').forEach(input => {
                 input.addEventListener('search', function() {

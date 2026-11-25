@@ -35,6 +35,8 @@ public class Factura {
     private String vendedorNombre;
     private String vendedorRol;
     private String origenVenta = "WEB"; // "WEB" o "APP MÓVIL"
+    private Double costoTotal;
+    private Double gananciaNeta;
 
     private List<DetalleFactura> detalles = new ArrayList<>();
 }

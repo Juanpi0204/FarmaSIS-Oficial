@@ -14,4 +14,6 @@ public class DetalleFactura {
     private Integer cantidad;
     private Double precioUnitario;
     private Double subtotal;
+    private Double costoUnitario;
+    private Double gananciaItem;
 }

@@ -121,6 +121,13 @@ class _HomeShellScreenState extends State<HomeShellScreen> {
           builder: () => ProveedoresScreen(user: widget.user),
         ),
         _NavModule(
+          id: 'usuarios',
+          title: 'Gestión de Personal',
+          shortLabel: 'Personal',
+          icon: Icons.group_outlined,
+          builder: () => GestionUsuariosScreen(user: widget.user),
+        ),
+        _NavModule(
           id: 'chatbot',
           title: 'Chatbot Farmacéutico IA',
           shortLabel: 'Chatbot',

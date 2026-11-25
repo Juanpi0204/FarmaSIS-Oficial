@@ -31,13 +31,24 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
   String _metodoPago = 'EFECTIVO';
   bool _procesandoVenta = false;
 
-  // Estado del Historial de Facturas
+  // Estado del Historial de Facturas y Contabilidad
   List<dynamic> _ventas = [];
   double _ventasDelDia = 0;
   int _cantidadVentasDelDia = 0;
+  double _ventasPeriodoTotal = 0;
+  double _costoPeriodoTotal = 0;
+  double _gananciaPeriodoTotal = 0;
+  double _margenPeriodoPorcentaje = 0;
+  int _unidadesPeriodoTotal = 0;
+  List<dynamic> _resumenProductosContable = [];
+  String _periodoSeleccionado = 'TODO'; // TODO, HOY, SEMANA, MES, RANGO
+  String? _fechaDesde;
+  String? _fechaHasta;
   String _filtroMetodo = 'TODOS';
   String _searchFactura = '';
   bool _loadingVentas = true;
+
+  bool get _isOwner => widget.user.rol.toUpperCase().contains('OWNER');
 
   @override
   void initState() {
@@ -87,10 +98,78 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
     }
   }
 
+  String _formatDateIso(DateTime d) {
+    final yyyy = d.year.toString().padLeft(4, '0');
+    final mm = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    return '$yyyy-$mm-$dd';
+  }
+
+  void _aplicarPeriodoRapido(String periodo) async {
+    final now = DateTime.now();
+    if (periodo == 'TODO') {
+      setState(() {
+        _periodoSeleccionado = 'TODO';
+        _fechaDesde = null;
+        _fechaHasta = null;
+      });
+      _cargarHistorialVentas();
+      return;
+    }
+    if (periodo == 'HOY') {
+      final hoyStr = _formatDateIso(now);
+      setState(() {
+        _periodoSeleccionado = 'HOY';
+        _fechaDesde = hoyStr;
+        _fechaHasta = hoyStr;
+      });
+      _cargarHistorialVentas();
+      return;
+    }
+    if (periodo == 'SEMANA') {
+      setState(() {
+        _periodoSeleccionado = 'SEMANA';
+        _fechaDesde = _formatDateIso(now.subtract(const Duration(days: 7)));
+        _fechaHasta = _formatDateIso(now);
+      });
+      _cargarHistorialVentas();
+      return;
+    }
+    if (periodo == 'MES') {
+      setState(() {
+        _periodoSeleccionado = 'MES';
+        _fechaDesde = _formatDateIso(DateTime(now.year, now.month, 1));
+        _fechaHasta = _formatDateIso(now);
+      });
+      _cargarHistorialVentas();
+      return;
+    }
+    if (periodo == 'RANGO') {
+      final picked = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime(2024, 1, 1),
+        lastDate: DateTime(now.year + 1, 12, 31),
+        helpText: 'Selecciona el rango de fechas contable',
+        saveText: 'Aplicar',
+      );
+      if (picked != null) {
+        setState(() {
+          _periodoSeleccionado = 'RANGO';
+          _fechaDesde = _formatDateIso(picked.start);
+          _fechaHasta = _formatDateIso(picked.end);
+        });
+        _cargarHistorialVentas();
+      }
+    }
+  }
+
   Future<void> _cargarHistorialVentas() async {
     setState(() => _loadingVentas = true);
     try {
       final data = await ApiService.getVentas(
+        size: 60,
+        fechaDesde: _fechaDesde,
+        fechaHasta: _fechaHasta,
         metodoPago: _filtroMetodo,
         factura: _searchFactura.trim(),
         username: widget.user.username,
@@ -102,6 +181,18 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
         _ventasDelDia = ((data['ventasDelDia'] ?? 0) as num).toDouble();
         _cantidadVentasDelDia =
             ((data['cantidadVentasDelDia'] ?? 0) as num).toInt();
+        _ventasPeriodoTotal =
+            ((data['ventasPeriodoTotal'] ?? _ventasDelDia) as num).toDouble();
+        _unidadesPeriodoTotal =
+            ((data['unidadesPeriodoTotal'] ?? 0) as num).toInt();
+        _costoPeriodoTotal =
+            ((data['costoPeriodoTotal'] ?? 0) as num).toDouble();
+        _gananciaPeriodoTotal =
+            ((data['gananciaPeriodoTotal'] ?? 0) as num).toDouble();
+        _margenPeriodoPorcentaje =
+            ((data['margenPeriodoPorcentaje'] ?? 0) as num).toDouble();
+        _resumenProductosContable =
+            (data['resumenProductosContable'] as List<dynamic>? ?? []);
         _loadingVentas = false;
       });
     } catch (e) {
@@ -357,17 +448,32 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                   separatorBuilder: (_, _) => const SizedBox(height: 6),
                   itemBuilder: (_, idx) {
                     final d = detalles[idx] as Map<String, dynamic>;
+                    final ganItem = ((d['gananciaItem'] ?? 0) as num).toDouble();
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            '${d['cantidad']}x ${d['productoNombre'] ?? ''}',
-                            style: const TextStyle(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              color: FarmasisPalette.textSilverBright,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${d['cantidad']}x ${d['productoNombre'] ?? ''}',
+                                style: const TextStyle(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: FarmasisPalette.textSilverBright,
+                                ),
+                              ),
+                              if (_isOwner && ganItem > 0)
+                                Text(
+                                  'Costo u.: \$${_formatCurrency((d['costoUnitario'] ?? 0) as num)} · Ganancia: +\$${_formatCurrency(ganItem)}',
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF15803D),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         Text(
@@ -388,6 +494,52 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                 color:
                     FarmasisPalette.borderChromeSubtle.withValues(alpha: 0.6),
               ),
+              if (_isOwner && factura['gananciaNeta'] != null) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'COSTO MERCANCÍA',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: FarmasisPalette.textSteel,
+                      ),
+                    ),
+                    Text(
+                      '\$${_formatCurrency((factura['costoTotal'] ?? 0) as num)}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: FarmasisPalette.textSteel,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'GANANCIA NETA FACTURA',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF15803D),
+                      ),
+                    ),
+                    Text(
+                      '+\$${_formatCurrency((factura['gananciaNeta'] ?? 0) as num)}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF15803D),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+              ],
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1197,35 +1349,214 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
     );
   }
 
+  void _mostrarModalContabilidadProductos() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        height: MediaQuery.of(ctx).size.height * 0.78,
+        padding: const EdgeInsets.all(18),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Contabilidad: Ganancia por Producto',
+                          style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w800,
+                            color: FarmasisPalette.textSilverBright,
+                          ),
+                        ),
+                        Text(
+                          'Desglose de venta, costo y utilidad neta en el período seleccionado',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: FarmasisPalette.textSteel,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildWebColorSummaryCard(
+                      label: 'Venta Total',
+                      value: '\$${_formatCurrency(_ventasPeriodoTotal)}',
+                      bgColor: const Color(0xFF133A29),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildWebColorSummaryCard(
+                      label: 'Ganancia Neta ($_margenPeriodoPorcentaje%)',
+                      value: '+\$${_formatCurrency(_gananciaPeriodoTotal)}',
+                      bgColor: const Color(0xFF059669),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: _resumenProductosContable.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No hay productos vendidos en este período.',
+                          style: TextStyle(
+                            color: FarmasisPalette.textSteel,
+                            fontSize: 12.5,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        itemCount: _resumenProductosContable.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 7),
+                        itemBuilder: (_, idx) {
+                          final p = _resumenProductosContable[idx]
+                              as Map<String, dynamic>;
+                          final uds = ((p['unidades'] ?? 0) as num).toInt();
+                          final ventaT =
+                              ((p['ventaTotal'] ?? 0) as num).toDouble();
+                          final costoT =
+                              ((p['costoTotal'] ?? 0) as num).toDouble();
+                          final ganT =
+                              ((p['gananciaTotal'] ?? 0) as num).toDouble();
+                          return MetallicGlassCard(
+                            padding: const EdgeInsets.all(11),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF133A29),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${uds}x',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 11.5,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${p['nombre'] ?? 'Producto'}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12.5,
+                                          color:
+                                              FarmasisPalette.textSilverBright,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Venta: \$${_formatCurrency(ventaT)} · Costo: \$${_formatCurrency(costoT)}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: FarmasisPalette.textSteel,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 9, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFDCFCE7),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: const Color(0xFF86EFAC)),
+                                  ),
+                                  child: Text(
+                                    '+\$${_formatCurrency(ganT)}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 12,
+                                      color: Color(0xFF166534),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHistorialTab() {
-    int udsVendidas = 0;
-    for (final v in _ventas) {
-      final map = v as Map<String, dynamic>;
-      final dets = (map['detalles'] as List<dynamic>? ?? []);
-      for (final d in dets) {
-        udsVendidas += (((d as Map<String, dynamic>)['cantidad'] ?? 0) as num).toInt();
-      }
-    }
+    final udsVendidas = _unidadesPeriodoTotal;
 
     final c1 = _buildWebColorSummaryCard(
-      label: 'Mis Ventas Hoy',
-      value: '\$${_formatCurrency(_ventasDelDia)}',
-      bgColor: const Color(0xFF198754),
+      label: _isOwner ? 'Venta Total (Período)' : 'Ventas Hoy',
+      value:
+          '\$${_formatCurrency(_isOwner ? _ventasPeriodoTotal : _ventasDelDia)}',
+      bgColor: const Color(0xFF133A29),
     );
-    final c2 = _buildWebColorSummaryCard(
-      label: 'Mis Facturas Hoy',
-      value: '$_cantidadVentasDelDia',
-      bgColor: const Color(0xFF06B6D4),
-    );
-    final c3 = _buildWebColorSummaryCard(
-      label: 'Productos Vendidos',
-      value: '$udsVendidas uds',
-      bgColor: const Color(0xFF64748B),
-    );
+    final c2 = _isOwner
+        ? _buildWebColorSummaryCard(
+            label: 'Ganancia Neta ($_margenPeriodoPorcentaje%)',
+            value: '+\$${_formatCurrency(_gananciaPeriodoTotal)}',
+            bgColor: const Color(0xFF059669),
+          )
+        : _buildWebColorSummaryCard(
+            label: 'Facturas Hoy',
+            value: '$_cantidadVentasDelDia',
+            bgColor: const Color(0xFF0284C7),
+          );
+    final c3 = _isOwner
+        ? _buildWebColorSummaryCard(
+            label: 'Costo Mercancía',
+            value: '\$${_formatCurrency(_costoPeriodoTotal)}',
+            bgColor: const Color(0xFF334155),
+          )
+        : _buildWebColorSummaryCard(
+            label: 'Productos Vendidos',
+            value: '$udsVendidas uds',
+            bgColor: const Color(0xFF475569),
+          );
     final c4 = _buildWebColorSummaryCard(
-      label: 'Total Mis Ventas',
-      value: '${_ventas.length}',
-      bgColor: const Color(0xFF2563EB),
+      label: _isOwner
+          ? 'Unidades / Facturas'
+          : 'Total Facturado (Período)',
+      value: _isOwner
+          ? '$udsVendidas uds (${_ventas.length})'
+          : '\$${_formatCurrency(_ventasPeriodoTotal)}',
+      bgColor: const Color(0xFF0284C7),
     );
 
     return LayoutBuilder(
@@ -1262,7 +1593,90 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                 ],
               ),
             ],
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
+            // BARRA DE PERÍODOS CONTABLES RÁPIDOS (HOY, SEMANA, MES, RANGO) + BOTÓN CONTABILIDAD PRODUCTOS (OWNER)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final p in [
+                    {'id': 'TODO', 'label': 'Todo'},
+                    {'id': 'HOY', 'label': 'Hoy'},
+                    {'id': 'SEMANA', 'label': 'Semanal (7d)'},
+                    {'id': 'MES', 'label': 'Mensual'},
+                    {
+                      'id': 'RANGO',
+                      'label': _periodoSeleccionado == 'RANGO' &&
+                              _fechaDesde != null
+                          ? '📅 $_fechaDesde a $_fechaHasta'
+                          : '📅 Desde - Hasta'
+                    },
+                  ])
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: InkWell(
+                        onTap: () => _aplicarPeriodoRapido(p['id']!),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 11, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: _periodoSeleccionado == p['id']
+                                ? const Color(0xFF133A29)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: _periodoSeleccionado == p['id']
+                                  ? const Color(0xFF10B981)
+                                  : FarmasisPalette.borderChromeSubtle,
+                            ),
+                          ),
+                          child: Text(
+                            p['label']!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: _periodoSeleccionado == p['id']
+                                  ? Colors.white
+                                  : FarmasisPalette.textSilver,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (_isOwner)
+                    InkWell(
+                      onTap: _mostrarModalContabilidadProductos,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 11, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: const Color(0xFF10B981)),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.calculate_outlined,
+                                size: 14, color: Color(0xFF166534)),
+                            SizedBox(width: 4),
+                            Text(
+                              'Ganancia por Producto',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF166534),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
             MetallicGlassCard(
               padding: const EdgeInsets.all(10),
               child: Row(
@@ -1353,7 +1767,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                       child: _ventas.isEmpty
                           ? const Center(
                               child: Text(
-                                'No se encontraron facturas registradas',
+                                'No se encontraron facturas en este período',
                                 style: TextStyle(
                                   color: FarmasisPalette.textSteel,
                                   fontSize: 12.5,
@@ -1368,10 +1782,24 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                                 final f = _ventas[idx] as Map<String, dynamic>;
                                 final total =
                                     ((f['total'] ?? 0) as num).toDouble();
+                                final ganancia =
+                                    ((f['gananciaNeta'] ?? 0) as num)
+                                        .toDouble();
                                 final detalles =
                                     (f['detalles'] as List<dynamic>? ?? []);
                                 final metodo =
                                     '${f['metodoPago'] ?? 'EFECTIVO'}';
+                                final vendedorNom =
+                                    '${f['vendedorNombre'] ?? f['vendedorEmail'] ?? 'Sistema'}';
+                                final vendedorRol =
+                                    '${f['vendedorRol'] ?? ''}'
+                                        .replaceAll('ROLE_', '');
+                                final fechaRaw = '${f['fecha'] ?? ''}';
+                                final fechaCorta = fechaRaw.length >= 16
+                                    ? fechaRaw
+                                        .substring(0, 16)
+                                        .replaceAll('T', ' ')
+                                    : fechaRaw;
                                 return MetallicGlassCard(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 10),
@@ -1382,7 +1810,7 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF64748B),
+                                          color: const Color(0xFF133A29),
                                           borderRadius:
                                               BorderRadius.circular(6),
                                         ),
@@ -1402,10 +1830,10 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              '${f['clienteNombre'] ?? 'Consumidor Final'}',
+                                              '${f['clienteNombre'] ?? 'Consumidor Final'} · $fechaCorta',
                                               style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 12.2,
                                                 color: FarmasisPalette
                                                     .textSilverBright,
                                               ),
@@ -1414,12 +1842,15 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              '${detalles.length} ítems · Vendedor: ${f['vendedorNombre'] ?? 'Tú'}',
+                                              '👤 Vendedor: $vendedorNom${vendedorRol.isNotEmpty ? ' ($vendedorRol)' : ''} · ${detalles.length} ítems',
                                               style: const TextStyle(
-                                                fontSize: 11.5,
+                                                fontSize: 11.2,
+                                                fontWeight: FontWeight.w600,
                                                 color:
                                                     FarmasisPalette.textSteel,
                                               ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ),
@@ -1427,29 +1858,45 @@ class _PosVentasScreenState extends State<PosVentasScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 7, vertical: 3),
-                                        margin: const EdgeInsets.only(right: 10),
+                                        margin:
+                                            const EdgeInsets.only(right: 10),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF06B6D4),
+                                          color: const Color(0xFF0284C7),
                                           borderRadius:
                                               BorderRadius.circular(5),
                                         ),
                                         child: Text(
                                           metodo,
                                           style: const TextStyle(
-                                            fontSize: 10,
+                                            fontSize: 9.5,
                                             fontWeight: FontWeight.w700,
                                             color: Colors.white,
                                           ),
                                         ),
                                       ),
-                                      Text(
-                                        '\$${_formatCurrency(total)}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 14,
-                                          color:
-                                              FarmasisPalette.textSilverBright,
-                                        ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            '\$${_formatCurrency(total)}',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 13.5,
+                                              color: FarmasisPalette
+                                                  .textSilverBright,
+                                            ),
+                                          ),
+                                          if (_isOwner && ganancia > 0)
+                                            Text(
+                                              '+\$${_formatCurrency(ganancia)} gan.',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 10.5,
+                                                color: Color(0xFF15803D),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ],
                                   ),

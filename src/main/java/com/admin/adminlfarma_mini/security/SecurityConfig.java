@@ -28,6 +28,10 @@ public class SecurityConfig {
                                                                 "/api/chat/**")
                                                 .permitAll()
                                                 // Rutas protegidas estrictamente
+                                                .requestMatchers("/owner/gestionar-usuarios", "/owner/crear-usuario",
+                                                                "/owner/actualizar-usuario/**", "/owner/cambiar-rol/**",
+                                                                "/owner/desactivar/**", "/owner/activar/**", "/owner/usuario/**")
+                                                .hasAnyRole("OWNER", "ADMIN")
                                                 .requestMatchers("/owner/**").hasRole("OWNER")
                                                 .requestMatchers("/admin/**").hasAnyRole("ADMIN", "OWNER")
                                                 .requestMatchers("/empleado/**").hasRole("EMPLEADO")

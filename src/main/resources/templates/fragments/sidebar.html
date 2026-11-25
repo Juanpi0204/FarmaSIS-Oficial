@@ -41,8 +41,8 @@
             <!-- LABEL: Gestión (OWNER & ADMIN) -->
             <li class="nav-label nav-text" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">Gestión</li>
 
-            <!-- Gestión de Usuarios — SOLO OWNER -->
-            <li class="nav-item" th:if="${loggedUser != null && loggedUser.rol == 'ROLE_OWNER'}">
+            <!-- Gestión de Usuarios — OWNER y ADMIN (Admin solo crea Empleados) -->
+            <li class="nav-item" th:if="${loggedUser != null && (loggedUser.rol == 'ROLE_OWNER' || loggedUser.rol == 'ROLE_ADMIN')}">
                 <a href="/owner/gestionar-usuarios" class="nav-link" th:classappend="${activePage == 'usuarios' ? 'active' : ''}">
                     <i class="bi bi-people"></i>
                     <span class="nav-text">Gestión de Usuarios</span>
@@ -78,12 +78,12 @@
             <!-- LABEL: Ventas -->
             <li class="nav-label nav-text">Ventas</li>
 
-            <!-- Historial Ventas — TODOS los roles (Empleado ve solo las suyas) -->
+            <!-- Historial Ventas / Contabilidad — TODOS los roles (Owner ve Contabilidad y Ganancias) -->
             <li class="nav-item" th:if="${loggedUser != null}">
                 <a th:href="${loggedUser.rol == 'ROLE_ADMIN' ? '/admin/ventas' : '/ventas'}" 
                    class="nav-link" th:classappend="${activePage == 'ventas' ? 'active' : ''}">
                     <i class="bi bi-receipt"></i>
-                    <span class="nav-text" th:text="${loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas' : 'Historial Ventas'}">Historial Ventas</span>
+                    <span class="nav-text" th:text="${loggedUser.rol == 'ROLE_OWNER' ? 'Ventas y Contabilidad' : (loggedUser.rol == 'ROLE_EMPLEADO' ? 'Mis Ventas' : 'Historial Ventas')}">Historial Ventas</span>
                 </a>
             </li>
 
