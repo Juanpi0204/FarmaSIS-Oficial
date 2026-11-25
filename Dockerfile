@@ -23,5 +23,9 @@ COPY --from=builder /app/target/app.jar app.jar
 ENV PORT=8092
 EXPOSE 8092
 
-# Comando de arranque vinculado al puerto dinámico de Render
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT} -jar app.jar"]
+# Comando de arranque optimizado para bajo consumo de RAM en la nube (Render 512MB)
+# -Xms192m -Xmx320m: tope estricto de memoria para evitar OutOfMemory (error 502)
+# -XX:+UseSerialGC: recolector ligero sin sobrecarga de memoria
+# -XX:+TieredCompilation -XX:TieredStopAtLevel=1: reduce uso de CPU y acelera el arranque
+ENTRYPOINT ["sh", "-c", "java -Xms192m -Xmx320m -Xss512k -XX:+UseSerialGC -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -Dserver.port=${PORT} -jar app.jar"]
+
