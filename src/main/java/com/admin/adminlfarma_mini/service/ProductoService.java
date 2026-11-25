@@ -23,6 +23,10 @@ public class ProductoService {
     private final ProductoRepository productoRepository;
     private final MongoTemplate mongoTemplate;
 
+    public List<Producto> listarTodos() {
+        return productoRepository.findAll();
+    }
+
     public Page<Producto> listarProductos(Pageable pageable) {
         return productoRepository.findActivos(pageable);
     }
